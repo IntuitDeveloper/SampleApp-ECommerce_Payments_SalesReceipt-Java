@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: ipp-v3-java-data-2.3.1">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/libs/qbo-sdk-2.3.1/ipp-v3-java-data-2.3.1.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>

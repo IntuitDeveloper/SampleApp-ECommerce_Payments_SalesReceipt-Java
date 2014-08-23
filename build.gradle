@@ -1,0 +1,80 @@
+buildscript {
+    repositories {
+        maven { url "http://repo.spring.io/libs-release" }
+        maven { url "http://repo.spring.io/libs-milestone" }
+        mavenLocal()
+        mavenCentral()
+    }
+    dependencies {
+        classpath("org.springframework.boot:spring-boot-gradle-plugin:1.1.1.RELEASE")
+    }
+}
+
+apply plugin: 'java'
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+apply plugin: 'jacoco'
+
+
+sourceCompatibility = 1.7
+version = '1.0'
+
+//custom variables for this project
+project.ext {
+
+}
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    maven { url "http://repo.spring.io/libs-release" }
+    maven { url "http://repo.spring.io/libs-milestone" }
+    maven { url "https://repository.jboss.org/nexus/content/repositories/releases" }
+}
+
+dependencies {
+    compile("org.springframework.boot:spring-boot-starter-web")
+    compile("org.springframework.boot:spring-boot-starter-data-jpa")
+    compile("org.hsqldb:hsqldb")
+    compile("org.springframework.data:spring-data-rest-webmvc")
+    compile("commons-io:commons-io:2.4")
+    compile("org.joda:joda-money:0.9.1")
+    compile("ma.glasnost.orika:orika-core:1.4.5")
+    compile fileTree(dir: "libs/qbo-sdk-2.3.1", include: "*.jar")
+
+    testCompile("org.jmockit:jmockit:1.10")
+    testCompile("org.springframework.boot:spring-boot-starter-test")
+
+    //oauth dependencies
+    compile("oauth.signpost:signpost-core:1.2.1.2")
+}
+
+sourceSets {
+    main {
+        resources {
+            output.resourcesDir = output.classesDir
+        }
+    }
+}
+
+jar {
+    baseName = 'ecommerce'
+    version = '0.1.0'
+}
+
+task wrapper(type: Wrapper) {
+    gradleVersion = '1.12' //tie this buildscript to a specific version of gradle so that we get consistent behavior
+}
+
+jacoco {
+    toolVersion = "0.7.1.201405082137" //specify a version of jacoco that works with java 8
+}
+
+test {
+    ignoreFailures = true
+    reports.html.enabled = false
+}
+
+clean {
+    delete 'database'
+}

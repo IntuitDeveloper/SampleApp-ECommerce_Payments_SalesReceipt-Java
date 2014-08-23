@@ -1,0 +1,9 @@
+<component name="libraryTable">
+  <library name="Gradle: tomcat-juli-7.0.54">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/tomcat-juli/7.0.54/tomcat-juli-7.0.54.jar!/" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
