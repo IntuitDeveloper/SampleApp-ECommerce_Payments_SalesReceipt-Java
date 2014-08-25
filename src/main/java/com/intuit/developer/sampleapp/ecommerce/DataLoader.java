@@ -53,7 +53,7 @@ public class DataLoader {
         if (repository.count() == 0) {
 	        System.out.println("No company data in the app, creating data");
 
-            Company company = new Company("Your Company eCommerce Storefront");
+            Company company = new Company("Sample Company eCommerce Storefront");
             repository.save(company);
 
             createCustomers(company, springContext);

@@ -22,6 +22,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 
+import javax.sql.DataSource;
 import java.io.File;
 import java.io.IOException;
 
@@ -50,7 +51,7 @@ public class Application extends RepositoryRestMvcConfiguration {
         }
 
         final ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
-
+	    final DataSource dataSource = (DataSource)context.getBean("dataSource");
         DataLoader.initializeData(context);
     }
 

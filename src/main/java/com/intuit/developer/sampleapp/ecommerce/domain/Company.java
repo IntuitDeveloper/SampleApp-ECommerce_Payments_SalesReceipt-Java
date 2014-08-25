@@ -139,7 +139,11 @@ public class Company {
         this.serviceItemsSynced = serviceItemsSynced;
     }
 
-    public void addCustomer(Customer customer) {
+	public List<Customer> getCustomers() {
+		return customers;
+	}
+
+	public void addCustomer(Customer customer) {
         this.customers.add(customer);
         customer.setCompany(this);
     }

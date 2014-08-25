@@ -94,6 +94,7 @@
     <orderEntry type="library" exported="" name="Gradle: paranamer-2.3" level="project" />
     <orderEntry type="library" exported="" name="Gradle: concurrentlinkedhashmap-lru-1.2_jdk5" level="project" />
     <orderEntry type="library" exported="" name="Gradle: java-sizeof-0.0.4" level="project" />
+    <orderEntry type="library" scope="TEST" name="Gradle: jmockit-1.10" level="project" />
   </component>
 </module>
 
