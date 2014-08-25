@@ -1,0 +1,46 @@
+<div ng-class="row">
+    <div ng-class="row">
+        <h3>Step 1a: Connect To QuickBooks Online</h3>
+
+        <div ng-show="showConnectButton()" id="connect-to-qbo-div">
+            <p>{{model.company.name}} is not connected to QuickBooks Online.</p>
+            <ipp:connectToIntuit></ipp:connectToIntuit>
+        </div>
+        <div ng-show="!showConnectButton()" id="disconnect-from-qbo-div">
+            <p>{{model.company.name}} is connected to QuickBooks Online.</p>
+        </div>
+    </div>
+    <div ng-class="row">
+        <h3>Step 1b: Sync your app data with QuickBooks Online</h3>
+
+        <div class="col-md-3">
+            <table class="table table-striped table-bordered">
+                <tr>
+                    <th>Entity Type</th>
+                    <th>Action</th>
+                </tr>
+                <tr>
+                    <td>Customers</td>
+                    <td>
+                        <button type="button" class="btn btn-default btn-sm"
+                                ng-disabled="disableCustomersSyncButton()"
+                                ng-click="syncCustomers()">
+                            <span class="glyphicon glyphicon-transfer"></span> Sync
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>Sales Items</td>
+                    <td>
+                        <button type="button" class="btn btn-default btn-sm"
+                                ng-disabled="disableSalesItemsSyncButton()"
+                                ng-click="syncSalesItems()">
+                            <span class="glyphicon glyphicon-transfer"></span> Sync
+                        </button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+
+    </div>
+</div>
