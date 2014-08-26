@@ -26,7 +26,7 @@ public class SalesItem {
     private String description;
 
     @Convert(converter = MoneyConverter.class)
-    private Money rate;
+    private Money unitPrice;
 
     @ManyToOne(optional = false)
     @JoinColumn(name = "company_fk", referencedColumnName = "id")
@@ -36,10 +36,10 @@ public class SalesItem {
 
     }
 
-    public SalesItem(String name, String description, Money rate) {
+    public SalesItem(String name, String description, Money unitPrice) {
         this.name = name;
         this.description = description;
-        this.rate = rate;
+        this.unitPrice = unitPrice;
     }
 
 	public long getId() {
@@ -70,12 +70,12 @@ public class SalesItem {
         this.description = description;
     }
 
-    public Money getRate() {
-        return rate;
+    public Money getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setRate(Money rate) {
-        this.rate = rate;
+    public void setUnitPrice(Money unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     public void setCompany(Company company) {
