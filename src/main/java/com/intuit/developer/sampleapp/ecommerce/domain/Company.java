@@ -22,7 +22,7 @@ public class Company {
     private boolean connectedToQbo;
     private boolean employeesSynced;
     private boolean customersSynced;
-    private boolean serviceItemsSynced;
+    private boolean salesItemSynced;
 
     @Column(unique = true)
     private String qboId;
@@ -131,12 +131,12 @@ public class Company {
         this.customersSynced = customersSynced;
     }
 
-    public boolean isServiceItemsSynced() {
-        return serviceItemsSynced;
+    public boolean isSalesItemSynced() {
+        return salesItemSynced;
     }
 
-    public void setServiceItemsSynced(boolean serviceItemsSynced) {
-        this.serviceItemsSynced = serviceItemsSynced;
+    public void setSalesItemSynced(boolean serviceItemsSynced) {
+        this.salesItemSynced = serviceItemsSynced;
     }
 
 	public List<Customer> getCustomers() {

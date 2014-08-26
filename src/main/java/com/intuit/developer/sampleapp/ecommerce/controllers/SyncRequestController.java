@@ -5,8 +5,6 @@ import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
 import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOGateway;
 import com.intuit.developer.sampleapp.ecommerce.repository.CompanyRepository;
-import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
-import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,7 +24,7 @@ public class SyncRequestController {
 	@Autowired
 	private QBOGateway qboGateway;
 
-	@RequestMapping(method = RequestMethod.POST)
+	@RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
 	@ResponseBody
 	public SyncRequest createSyncRequest(@RequestBody final SyncRequest syncRequest) {
 
@@ -40,14 +38,18 @@ public class SyncRequestController {
 					qboGateway.createCustomerInQBO(customer);
 					successfulSyncs++;
 				}
+				company.setCustomersSynced(true);
 				break;
 			case SalesItem:
 				for (SalesItem salesItem : company.getSalesItems()) {
 					qboGateway.createItemInQBO(salesItem);
 					successfulSyncs++;
 				}
+				company.setSalesItemSynced(true);
 				break;
 		}
+
+		companyRepository.save(company);
 
 		syncRequest.setMessage("Synced " + successfulSyncs + " " + syncRequest.getType().name() + " objects to QBO");
 		syncRequest.setSuccessful(true);

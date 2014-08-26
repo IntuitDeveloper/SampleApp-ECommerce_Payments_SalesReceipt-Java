@@ -53,7 +53,7 @@ public class DataLoader {
         if (repository.count() == 0) {
 	        System.out.println("No company data in the app, creating data");
 
-            Company company = new Company("Sample Company eCommerce Storefront");
+            Company company = new Company("SBO eCommerce Account");
             repository.save(company);
 
             createCustomers(company, springContext);
@@ -76,13 +76,12 @@ public class DataLoader {
     private static void createCustomers(Company company, ConfigurableApplicationContext springContext) {
         final CustomerRepository repository = springContext.getBean(CustomerRepository.class);
 
-        final Customer customer1 = new Customer("John", "Defendant", "john.defendant@innocent.com", "916-555-7777");
+        final Customer customer1 = new Customer("John", "Snow", "john.snow@winterfell.com", "916-555-7777");
         company.addCustomer(customer1);
+	    repository.save(customer1);
 
-        final Customer customer2 = new Customer("Jane", "Litigious", "jane.litigious@lawsuit.com", "916-777-9999");
+        final Customer customer2 = new Customer("Jane", "Flowers", "jane.flowers@reach.com", "916-777-9999");
         company.addCustomer(customer2);
-
-        repository.save(customer1);
         repository.save(customer2);
     }
 

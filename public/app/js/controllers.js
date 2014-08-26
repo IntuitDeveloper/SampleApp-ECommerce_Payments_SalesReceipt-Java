@@ -15,10 +15,12 @@ controllersModule.controller('NavCtrl', ['$scope', '$routeParams', '$location', 
     }]);
 
 
-controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'ModelSvc',
-        function ($scope, SyncRequestSvc, ModelSvc) {
+controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'ModelSvc', 'CompanySvc',
+        function ($scope, SyncRequestSvc, ModelSvc, CompanySvc) {
 
             $scope.model = ModelSvc.model;
+            $scope.syncCustomersMessage = '';
+            $scope.syncSalesItemMessage = '';
 
             $scope.showConnectButton = function () {
                 return $scope.model.company.connectedToQbo === false;
@@ -44,10 +46,6 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
                 }
             }
 
-            $scope.disableEmployeeSyncButton = function () {
-                return disableSyncButton($scope.model.company.employeesSynced);
-            }
-
             $scope.disableCustomersSyncButton = function () {
                 return disableSyncButton($scope.model.company.customersSynced);
             }
@@ -57,10 +55,20 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
             }
 
             $scope.syncCustomers = function() {
-                SyncRequestSvc.syncCustomers();
+                SyncRequestSvc.sendCustomerSyncRequest(syncCompleted);
             }
 
             $scope.syncSalesItems = function() {
-                SyncRequestSvc.syncSalesItems();
+                SyncRequestSvc.sendSalesItemSyncRequest(syncCompleted);
+            }
+
+            var syncCompleted = function(data, status, headers, config) {
+                var message = data.successful ? data.message : 'Error: ' + data.message;
+                if (data.type === 'Customer') {
+                    $scope.syncCustomersMessage = message;
+                } else if (data.type === 'SalesItem') {
+                    $scope.syncSalesItemMessage = message;
+                }
+                CompanySvc.getCompanies();
             }
         }]);

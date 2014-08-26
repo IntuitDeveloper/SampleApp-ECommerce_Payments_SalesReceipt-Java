@@ -21,6 +21,7 @@ public class SalesItemMapper {
 
         mapperFactory.classMap(SalesItem.class, com.intuit.ipp.data.Item.class)
                 .field("rate.amount", "unitPrice")
+		        .exclude("id")
                 .byDefault()
                 .register();
 

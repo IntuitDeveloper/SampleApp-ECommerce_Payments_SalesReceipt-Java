@@ -115,10 +115,7 @@ ecommerceServices.factory('CompanySvc', ['$resource', '$rootScope', 'RootUrlSvc'
                 ModelSvc.broadcastCompanyChange();
 
                 var grantUrl = RootUrlSvc.oauthGrantUrl() + '?appCompanyId=' + ModelSvc.model.company.id;
-                intuit.ipp.anywhere.setup({
-                    grantUrl: grantUrl});
-
-
+                intuit.ipp.anywhere.setup({grantUrl: grantUrl});
             });
         };
 
@@ -137,9 +134,9 @@ ecommerceServices.factory('CompanySvc', ['$resource', '$rootScope', 'RootUrlSvc'
 ecommerceServices.factory('SyncRequestSvc', ['$http', '$rootScope', 'RootUrlSvc', 'ModelSvc',
     function ($http, $rootScope, RootUrlSvc, ModelSvc) {
 
-        var sendSyncRequest = function (entityType) {
-            $http.post(RootUrlSvc.syncRequest, {type: entityType, companyId: ModelSvc.model.company.id});
-
+        var sendSyncRequest = function (entityType, successCallback, errorCallback) {
+            $http.post(RootUrlSvc.rootUrls.syncRequest, {type: entityType, companyId: ModelSvc.model.company.id})
+                    .success(successCallback);
         };
 
         var initialize = function () {
@@ -148,8 +145,7 @@ ecommerceServices.factory('SyncRequestSvc', ['$http', '$rootScope', 'RootUrlSvc'
 
         return {
             initialize: initialize,
-            sendCustomerSyncRequest: sendSyncRequest('Customer'),
-            sendSalesItemSyncRequest: sendSyncRequest('SalesItem')
+            sendCustomerSyncRequest: function (callback) { sendSyncRequest('Customer', callback); },
+            sendSalesItemSyncRequest: function (callback) { sendSyncRequest('SalesItem', callback) }
         }
-
     }]);

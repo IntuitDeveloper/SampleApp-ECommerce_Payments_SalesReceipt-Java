@@ -18,6 +18,7 @@
                 <tr>
                     <th>Entity Type</th>
                     <th>Action</th>
+                    <th>Status</th>
                 </tr>
                 <tr>
                     <td>Customers</td>
@@ -28,6 +29,9 @@
                             <span class="glyphicon glyphicon-transfer"></span> Sync
                         </button>
                     </td>
+                    <td>
+                        <span>{{syncCustomersMessage}}</span>
+                    </td>
                 </tr>
                 <tr>
                     <td>Sales Items</td>
@@ -37,6 +41,9 @@
                                 ng-click="syncSalesItems()">
                             <span class="glyphicon glyphicon-transfer"></span> Sync
                         </button>
+                    </td>
+                    <td>
+                        <span>{{syncSalesItemMessage}}</span>
                     </td>
                 </tr>
             </table>

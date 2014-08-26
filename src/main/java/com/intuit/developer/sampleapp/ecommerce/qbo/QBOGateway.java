@@ -63,7 +63,7 @@ public class QBOGateway {
 	    Item qboItem = SalesItemMapper.buildQBOObject(salesItem);
 
 	    // find an Income Account to associate with QBO item
-	    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, " SalesOfProductIncome");
+	    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, "SalesOfProductIncome");
 	    qboItem.setIncomeAccountRef(accountRef);
 
 	    // save the item in OBO
@@ -86,16 +86,16 @@ public class QBOGateway {
 		return referenceType;
 	}
 
-	public static final String INCOME_ACCOUNT_QUERY = "select * from account where accounttype = '%s' and accountsubtype = ' %s'";
+	public static final String INCOME_ACCOUNT_QUERY = "select * from account where accounttype = '%s' and accountsubtype = '%s'";
 	/**
 	 * Search for an account in QBO based on AccountType and AccountSubType
 	 */
 	private Account findAccount(DataService dataService, AccountTypeEnum accountType, String accountSubType) {
-		String accountQuery = String.format(INCOME_ACCOUNT_QUERY, accountType.toString(), accountSubType);
+		String accountQuery = String.format(INCOME_ACCOUNT_QUERY, accountType.value(), accountSubType);
 		try {
 			final QueryResult queryResult = dataService.executeQuery(accountQuery);
-			if (queryResult.getTotalCount() == 0) {
-				throw new RuntimeException("Could not find an account of type " + accountType.name() + " and subtype " + accountSubType);
+			if (queryResult.getEntities().size() == 0) {
+				throw new RuntimeException("Could not find an account of type " + accountType.value() + " and subtype " + accountSubType);
 			}
 
 			final List<Account> entities = (List<Account>) queryResult.getEntities();
@@ -163,6 +163,8 @@ public class QBOGateway {
             final T createdObject = dataService.add(qboObject);
             return createdObject;
         } catch (FMSException e) {
+	        //NOTE: a StaleObjectException can be received while creating a new object; this error indicates that an
+	        //      object with that QBO ID already exists.
             throw new RuntimeException("Failed create an " + qboObject.getClass().getName() + " in QBO", e);
         }
 
