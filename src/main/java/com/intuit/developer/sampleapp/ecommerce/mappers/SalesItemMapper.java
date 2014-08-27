@@ -2,6 +2,7 @@ package com.intuit.developer.sampleapp.ecommerce.mappers;
 
 import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;
 import com.intuit.ipp.data.Item;
+import com.intuit.ipp.data.ItemTypeEnum;
 import ma.glasnost.orika.BoundMapperFacade;
 import ma.glasnost.orika.MapperFactory;
 import ma.glasnost.orika.impl.DefaultMapperFactory;
@@ -20,7 +21,7 @@ public class SalesItemMapper {
         MapperFactory mapperFactory = new DefaultMapperFactory.Builder().build();
 
         mapperFactory.classMap(SalesItem.class, com.intuit.ipp.data.Item.class)
-                .field("rate.amount", "unitPrice")
+                .field("unitPrice.amount", "unitPrice")
 		        .exclude("id")
                 .byDefault()
                 .register();
@@ -35,6 +36,12 @@ public class SalesItemMapper {
         }
 
         Item qboServiceItem = domainToQBOMapper.map(salesItem);
+        // These values must be set regardless of the sales item, they have meaning for QBO but not so much for this app
+        qboServiceItem.setActive(true);
+        qboServiceItem.setTaxable(true);
+        qboServiceItem.setSalesTaxIncluded(false);
+        qboServiceItem.setTrackQtyOnHand(true);
+        qboServiceItem.setType(ItemTypeEnum.INVENTORY);
         return qboServiceItem;
     }
 }

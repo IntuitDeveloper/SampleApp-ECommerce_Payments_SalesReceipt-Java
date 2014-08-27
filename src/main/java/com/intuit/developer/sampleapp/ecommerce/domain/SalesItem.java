@@ -5,6 +5,7 @@ import org.joda.money.Money;
 
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +32,8 @@ public class SalesItem {
     @ManyToOne(optional = false)
     @JoinColumn(name = "company_fk", referencedColumnName = "id")
     private Company company;
+
+    private BigDecimal qtyOnHand;
 
     public SalesItem() {
 
@@ -84,5 +87,13 @@ public class SalesItem {
 
     public Company getCompany() {
         return company;
+    }
+
+    public void setQtyOnHand(BigDecimal qtyOnHand) {
+        this.qtyOnHand = qtyOnHand;
+    }
+
+    public BigDecimal getQtyOnHand() {
+        return this.qtyOnHand;
     }
 }
