@@ -12,5 +12,5 @@ import org.springframework.data.rest.core.annotation.RepositoryRestResource;
  */
 @RepositoryRestResource
 public interface CustomerRepository extends PagingAndSortingRepository<Customer, Long> {
-
+    Customer findByFirstNameAndLastName(String firstName, String lastName);
 }

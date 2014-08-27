@@ -2,14 +2,8 @@ package com.intuit.developer.sampleapp.ecommerce;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intuit.developer.sampleapp.ecommerce.domain.AppInfo;
-import com.intuit.developer.sampleapp.ecommerce.domain.Company;
-import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
-import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;
-import com.intuit.developer.sampleapp.ecommerce.repository.AppInfoRepository;
-import com.intuit.developer.sampleapp.ecommerce.repository.CompanyRepository;
-import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
-import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
+import com.intuit.developer.sampleapp.ecommerce.domain.*;
+import com.intuit.developer.sampleapp.ecommerce.repository.*;
 import org.apache.commons.io.FileUtils;
 import org.joda.money.Money;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -56,21 +50,30 @@ public class DataLoader {
             Company company = new Company("SBO eCommerce Account");
             repository.save(company);
 
-            createCustomers(company, springContext);
             createSalesItems(company, springContext);
+            createCustomers(company, springContext);
         }
     }
 
     private static void createSalesItems(Company company, ConfigurableApplicationContext springContext) {
         final SalesItemRepository repository = springContext.getBean(SalesItemRepository.class);
 
-        final SalesItem salesItem1 = new SalesItem("Cotton T-shirt", "Comfy cotton t-shirt", Money.parse("USD 15.00"));
+        final SalesItem salesItem1 = new SalesItem("Baggies Jersey", "Premier League style", Money.parse("USD 75.00"), "IntuitWestBromAlbionJersey.jpg");
         company.addServiceItem(salesItem1);
 	    repository.save(salesItem1);
 
-	    final SalesItem salesItem2 = new SalesItem("Silk Shirt", "Relax in silk", Money.parse("USD 100.00"));
+	    final SalesItem salesItem2 = new SalesItem("Men's Bike Jersey", "Tour de roads in style", Money.parse("USD 85.00"), "IntuitBikeJersey.jpg");
 	    company.addServiceItem(salesItem2);
         repository.save(salesItem2);
+
+
+        final SalesItem salesItem3 = new SalesItem("Hoodie", "Silicon Valley poseur style", Money.parse("USD 24.50"), "IntuitHoodie.jpg");
+        company.addServiceItem(salesItem3);
+        repository.save(salesItem3);
+
+        final SalesItem salesItem4 = new SalesItem("Classic Polo", "Golf course style", Money.parse("USD 24.50"), "IntuitBlackPolo.jpg");
+        company.addServiceItem(salesItem4);
+        repository.save(salesItem4);
     }
 
     private static void createCustomers(Company company, ConfigurableApplicationContext springContext) {
@@ -79,12 +82,31 @@ public class DataLoader {
         final Customer customer1 = new Customer("John", "Snow", "john.snow@winterfell.com", "916-555-7777");
         company.addCustomer(customer1);
 	    repository.save(customer1);
+        createShoppingCart(customer1, springContext);
 
         final Customer customer2 = new Customer("Jane", "Flowers", "jane.flowers@reach.com", "916-777-9999");
         company.addCustomer(customer2);
         repository.save(customer2);
     }
 
+    private static void createShoppingCart(Customer customer, ConfigurableApplicationContext springContext) {
+        ShoppingCart shoppingCart = new ShoppingCart(customer);
+        customer.setShoppingCart(shoppingCart);
+
+        ShoppingCartRepository shoppingCartRepository = springContext.getBean(ShoppingCartRepository.class);
+        shoppingCartRepository.save(shoppingCart);
+
+        CustomerRepository customerRepository = springContext.getBean(CustomerRepository.class);
+        customerRepository.save(customer);
+
+
+        CartItemRepository cartItemRepository = springContext.getBean(CartItemRepository.class);
+        SalesItemRepository salesItemRepository = springContext.getBean(SalesItemRepository.class);
+        for (SalesItem salesItem : salesItemRepository.findAll()) {
+            CartItem cartItem = new CartItem(salesItem, 1, shoppingCart);
+            cartItemRepository.save(cartItem);
+        }
+    }
 
     private static boolean oauthInfoNeeded(ConfigurableApplicationContext context) {
         AppInfoRepository appInfoRepository = context.getBean(AppInfoRepository.class);

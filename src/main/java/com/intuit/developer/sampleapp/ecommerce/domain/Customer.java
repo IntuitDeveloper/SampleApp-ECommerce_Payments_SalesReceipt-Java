@@ -15,6 +15,7 @@ public class Customer {
     @GeneratedValue(strategy = GenerationType.AUTO)
     private long id;
 
+    @Column(unique = true)
     private String qboId;
 
     private String firstName;
@@ -26,6 +27,9 @@ public class Customer {
     @JoinColumn(name = "company_fk", referencedColumnName = "id")
     private Company company;
 
+    @OneToOne(optional = true)
+    private ShoppingCart shoppingCart;
+
     public Customer() {
 
     }
@@ -35,6 +39,10 @@ public class Customer {
         this.lastName = lastName;
         this.emailAddress = emailAddress;
         this.phoneNumber = phoneNumber;
+    }
+
+    public Long getId() {
+        return id;
     }
 
     public String getFirstName() {
@@ -81,8 +89,15 @@ public class Customer {
         this.company = company;
     }
 
-
     public Company getCompany() {
         return company;
+    }
+
+    public ShoppingCart getShoppingCart() {
+        return shoppingCart;
+    }
+
+    public void setShoppingCart(ShoppingCart shoppingCart) {
+        this.shoppingCart = shoppingCart;
     }
 }
