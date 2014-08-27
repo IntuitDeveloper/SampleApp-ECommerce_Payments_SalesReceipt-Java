@@ -1,0 +1,38 @@
+<div class="container">
+    <h1 class="text-center">SUMMER SALE</h1>
+    <h3 class="text-center">20% off All Orders Now Through July 1st</h3>
+    <div ng-model="items">
+        <div class="col-md-3 item" ng-repeat="salesItem in model.company.customers">
+            <div class="thumbnail">
+                <!-- todo: replace with Intuit branded clothing images -->
+                <img src="http://placehold.it/175x100" alt="">
+
+                <div class="caption">
+
+                    <!-- item detail -->
+                    <h5 class="pull-right">${{salesItem.unitPrice}}</h5>
+                    <h5>{{salesItem.name}}</h5>
+                    <h6 class="text-muted">{{salesItem.description}}</h6>
+
+                    <!-- add to cart -->
+                    <a class="btn btn-default pull-right"
+                       ng-click="addToCart(salesItem)"
+                       data-toggle="modal" data-target="#addedToCart">Add To Cart</a>
+
+                    <!-- cart add confirmation -->
+                    <div class="modal fade" id="addedToCart">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <div class="modal-body">
+                                    <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                                    <h4>Your selection has been added to the cart.</h4>
+                                </div>
+                            </div><
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div><!--/.row-->
+</div><!--/.container-->

@@ -15,7 +15,7 @@ public class ShoppingCart {
 	@JoinColumn(name="customer_fk", referencedColumnName="id")
 	Customer customer;
 	
-	@OneToMany(cascade=CascadeType.ALL, mappedBy="shoppingcart")
+	@OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="shoppingcart")
 	List<CartItem> cartItems = new ArrayList<CartItem>();
 	
 	float subTotal;

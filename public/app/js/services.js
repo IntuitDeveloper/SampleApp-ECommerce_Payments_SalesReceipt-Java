@@ -7,13 +7,28 @@ var ecommerceServices = angular.module('myApp.services', ['ngResource']);
 
 ecommerceServices.value('version', '0.1');
 
-ecommerceServices.factory('InitializerSvc', ['$rootScope', 'RootUrlSvc', 'CompanySvc',
-    function ($rootScope, RootUrlSvc, CompanySvc) {
+ecommerceServices.factory('InitializerSvc', ['$rootScope', 'RootUrlSvc', 'CompanySvc', 'SalesItemSvc', 'CustomerSvc', 'ShoppingCartSvc',
+    function ($rootScope, RootUrlSvc, CompanySvc, SalesItemSvc, CustomerSvc, ShoppingCartSvc) {
 
         var initialized = false;
 
         var initialize = function () {
-            CompanySvc.initialize();
+
+            $rootScope.$on('api.loaded', function() {
+                CompanySvc.initialize();
+                SalesItemSvc.initialize();
+                CustomerSvc.initialize();
+                ShoppingCartSvc.initialize();
+                //CartItemSvc.initialize();
+
+                CompanySvc.initializeModel();
+            });
+
+            $rootScope.$on('model.company.change', function() {
+                SalesItemSvc.initializeModel();
+                CustomerSvc.initializeModel();
+            });
+
             RootUrlSvc.initialize();
 
             $rootScope.$on('$viewContentLoaded', function (scope, next, current) {
@@ -101,14 +116,14 @@ ecommerceServices.factory('RootUrlSvc', ['$resource', '$rootScope', '$location',
 ecommerceServices.factory('CompanySvc', ['$resource', '$rootScope', 'RootUrlSvc', 'ModelSvc',
     function ($resource, $rootScope, RootUrlSvc, ModelSvc) {
 
-        var getCompanyResource = function () {
-            return $resource(RootUrlSvc.rootUrls.companies + ':companyId', {}, {
-                query: {method: 'GET', isArray: false}
-            });
+        var Company;
+
+        var initialize = function () {
+            Company = $resource(RootUrlSvc.rootUrls.companies + ':companyId', {}, { query: {method: 'GET', isArray: false} });
         };
 
-        var getCompanies = function () {
-            getCompanyResource().query(function (data) {
+        var initializeModel = function() {
+            Company.query(function (data) {
                 var companies = data._embedded.companies;
                 ModelSvc.model.companies = companies;
                 ModelSvc.model.company = companies[0]; //select the first company for now
@@ -119,17 +134,116 @@ ecommerceServices.factory('CompanySvc', ['$resource', '$rootScope', 'RootUrlSvc'
             });
         };
 
-        var initialize = function () {
-            RootUrlSvc.onApiLoaded($rootScope, getCompanies);
-        };
-
         return {
             initialize: initialize,
-            getCompanies: getCompanies
+            initializeModel: initializeModel
         }
 
     }]);
 
+
+ecommerceServices.factory('SalesItemSvc', ['$resource', '$rootScope', 'RootUrlSvc', 'ModelSvc',
+    function ($resource, $rootScope, RootUrlSvc, ModelSvc) {
+
+        var SalesItem;
+
+        var initialize = function() {
+            SalesItem = $resource(RootUrlSvc.rootUrls.salesItems, {}, { query: {method: 'GET', isArray: false} });
+        };
+
+        var initializeModel = function() {
+            SalesItem.query(function (data) {
+                var salesItems = data._embedded.salesItems;
+                ModelSvc.model.company.salesItems = salesItems;
+            });
+        }
+
+        return {
+            initialize: initialize,
+            initializeModel: initializeModel
+        }
+    }]);
+
+
+ecommerceServices.factory('CustomerSvc', ['$resource', '$rootScope', 'RootUrlSvc', 'ModelSvc', 'ShoppingCartSvc',
+    function ($resource, $rootScope, RootUrlSvc, ModelSvc, ShoppingCartSvc) {
+
+        var Customer;
+
+        var initialize = function() {
+            Customer  = $resource(RootUrlSvc.rootUrls.customers, {}, { query: {method: 'GET', isArray: false} });
+        };
+
+        var initializeModel = function() {
+            Customer.query(function(data) {
+                var customers = data._embedded.customers;
+                ModelSvc.model.company.customers = customers;
+                ModelSvc.model.customer = customers[0];  // auto-set the 'logged in' customer
+
+                //TODO: move to an event handler for customer changed
+                ShoppingCartSvc.initializeModel();
+            });
+        }
+
+        return {
+            initialize: initialize,
+            initializeModel: initializeModel
+        }
+    }]);
+
+
+ecommerceServices.factory('ShoppingCartSvc', ['$resource', '$rootScope', 'RootUrlSvc', 'ModelSvc',
+    function ($resource, $rootScope, RootUrlSvc, ModelSvc) {
+
+        var ShoppingCart;
+
+        var initialize = function() {
+            ShoppingCart = $resource(RootUrlSvc.rootUrls.shoppingCarts, {},
+                {
+                    forCustomer: {  method: 'GET',
+                        url: RootUrlSvc.rootUrls.shoppingCarts + '/search/findByCustomerEmailAddress',
+                        isArray: false},
+
+                    query: { method: 'GET', isArray: false}
+                });
+        };
+
+        var initializeModel = function() {
+            //TODO: switch query parameter to customerId when issue w/Spring Data Rest exposing id is resolved
+            var customerShoppingCart = ShoppingCart.forCustomer({emailAddress: ModelSvc.model.customer.emailAddress}, function() {
+                ModelSvc.model.shoppingCart = customerShoppingCart._embedded.shoppingCarts[0];
+            });
+        };
+
+        return {
+            initialize: initialize,
+            initializeModel: initializeModel
+        }
+    }]);
+
+/*
+ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc', 'ModelSvc',
+    function ($resource, $rootScope, RootUrlSvc, ModelSvc) {
+
+        var CartItem;
+
+        var initialize = function() {
+            CartItem = $resource(RootUrlSvc.rootUrls.cartItems, {}, {query: { method: 'GET', isArray: false}});
+        }
+
+        var addCartItem = function(salesItem, shoppingCart) {
+            var cartItem = new CartItem();
+            cartItem.salesItem = salesItem;
+            cartItem.shoppingCart = shoppingCart;
+            cartItem.$save();
+        };
+
+        return {
+            initialize: initialize,
+            addCartItem: addCartItem
+        }
+    }]);
+*/
 
 ecommerceServices.factory('SyncRequestSvc', ['$http', '$rootScope', 'RootUrlSvc', 'ModelSvc',
     function ($http, $rootScope, RootUrlSvc, ModelSvc) {

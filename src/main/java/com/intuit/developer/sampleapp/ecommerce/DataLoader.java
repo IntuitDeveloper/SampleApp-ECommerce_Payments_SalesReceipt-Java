@@ -2,14 +2,8 @@ package com.intuit.developer.sampleapp.ecommerce;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.intuit.developer.sampleapp.ecommerce.domain.AppInfo;
-import com.intuit.developer.sampleapp.ecommerce.domain.Company;
-import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
-import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;
-import com.intuit.developer.sampleapp.ecommerce.repository.AppInfoRepository;
-import com.intuit.developer.sampleapp.ecommerce.repository.CompanyRepository;
-import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
-import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
+import com.intuit.developer.sampleapp.ecommerce.domain.*;
+import com.intuit.developer.sampleapp.ecommerce.repository.*;
 import org.apache.commons.io.FileUtils;
 import org.joda.money.Money;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -56,8 +50,8 @@ public class DataLoader {
             Company company = new Company("SBO eCommerce Account");
             repository.save(company);
 
-            createCustomers(company, springContext);
             createSalesItems(company, springContext);
+            createCustomers(company, springContext);
         }
     }
 
@@ -79,12 +73,35 @@ public class DataLoader {
         final Customer customer1 = new Customer("John", "Snow", "john.snow@winterfell.com", "916-555-7777");
         company.addCustomer(customer1);
 	    repository.save(customer1);
+        createShoppingCart(customer1, springContext);
 
         final Customer customer2 = new Customer("Jane", "Flowers", "jane.flowers@reach.com", "916-777-9999");
         company.addCustomer(customer2);
         repository.save(customer2);
     }
 
+    private static void createShoppingCart(Customer customer, ConfigurableApplicationContext springContext) {
+        ShoppingCart shoppingCart = new ShoppingCart(customer);
+        customer.setShoppingCart(shoppingCart);
+
+        ShoppingCartRepository shoppingCartRepository = springContext.getBean(ShoppingCartRepository.class);
+        shoppingCartRepository.save(shoppingCart);
+
+        CustomerRepository customerRepository = springContext.getBean(CustomerRepository.class);
+        customerRepository.save(customer);
+
+
+        CartItemRepository cartItemRepository = springContext.getBean(CartItemRepository.class);
+        SalesItemRepository salesItemRepository = springContext.getBean(SalesItemRepository.class);
+        for (SalesItem salesItem : salesItemRepository.findAll()) {
+            CartItem cartItem = new CartItem(salesItem, 1, shoppingCart);
+            cartItemRepository.save(cartItem);
+        }
+
+        Customer c = customerRepository.findByFirstNameAndLastName("John", "Snow");
+        System.out.println("John Snow customer id: " + c.getId());
+        System.out.println("cart item count: " + c.getShoppingCart().getCartItems());
+    }
 
     private static boolean oauthInfoNeeded(ConfigurableApplicationContext context) {
         AppInfoRepository appInfoRepository = context.getBean(AppInfoRepository.class);
