@@ -72,3 +72,15 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
                 CompanySvc.getCompanies();
             }
         }]);
+
+
+controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc',
+    function ($scope, ModelSvc) {
+        $scope.model = ModelSvc.model;
+
+        // assume that login of customer has occurred - CustomerSvc automatically loads
+
+        $scope.addToCart = function(salesItem) {
+            CartItemSvc.addToCart(salesItem, ModelSvc.model.shoppingCart);
+        };
+    }]);
