@@ -1,0 +1,9 @@
+# ignore all ide project files
+.idea/
+*.iml
+# ignore changes to oauth.json since that will be dynamic
+#oauth.json
+
+# ignore build + gradle artifacts
+.gradle/
+build/

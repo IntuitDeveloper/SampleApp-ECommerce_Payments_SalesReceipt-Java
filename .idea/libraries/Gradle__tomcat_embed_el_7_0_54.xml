@@ -1,9 +1,0 @@
-<component name="libraryTable">
-  <library name="Gradle: tomcat-embed-el-7.0.54">
-    <CLASSES>
-      <root url="jar://$MAVEN_REPOSITORY$/org/apache/tomcat/embed/tomcat-embed-el/7.0.54/tomcat-embed-el-7.0.54.jar!/" />
-    </CLASSES>
-    <JAVADOC />
-    <SOURCES />
-  </library>
-</component>
