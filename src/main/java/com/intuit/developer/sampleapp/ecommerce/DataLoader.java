@@ -58,7 +58,7 @@ public class DataLoader {
     private static void createSalesItems(Company company, ConfigurableApplicationContext springContext) {
         final SalesItemRepository repository = springContext.getBean(SalesItemRepository.class);
 
-        final SalesItem salesItem1 = new SalesItem("West Brom Albion Home Kit", "Premier League style", Money.parse("USD 75.00"), "IntuitWestBromAlbionJersey.jpg");
+        final SalesItem salesItem1 = new SalesItem("West Brom Albion Jersey", "Premier League style", Money.parse("USD 75.00"), "IntuitWestBromAlbionJersey.jpg");
         company.addServiceItem(salesItem1);
 	    repository.save(salesItem1);
 
