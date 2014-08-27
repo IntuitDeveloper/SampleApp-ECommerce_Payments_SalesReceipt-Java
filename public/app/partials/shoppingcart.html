@@ -1,0 +1,55 @@
+<div class="container">
+    <table class="table ">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Item</th>
+                <th>Quantity</th>
+                <th>Price</th>
+            </tr>
+        </thead>
+        <tbody ng-model = "items">
+            <tr ng-repeat = "item in items">
+                <td> <img src="http://placehold.it/175x100" alt=""></td>
+                <td>{{item.name}}</td>
+                <td>{{item.id}}</td>
+                <td>$12.00</td>
+            </tr>
+        </tbody>      
+    </table>
+    <hr></hr> 
+    <div class="container-fluid">
+        <h5 class="col-sm-2">Subtotal</h5>
+        <h5 class="pull-right">$100.00</h5>
+    </div>
+    <div class="container-fluid">
+        <h5 class="col-sm-2">Promotion - 20%</h5>
+        <h5 class="pull-right">$20.00</h5>
+    </div>
+    <div class="container-fluid">
+        <h5 class="col-sm-2">Tax - 10%</h5>
+        <h5 class="pull-right">$10.00</h5>
+    </div>
+    <div class="container-fluid">
+        <h5 class="col-sm-2">Total</h5>
+        <h5 class="pull-right">$90.00</h5>
+    </div>
+    <hr/>
+    <div class="container-fluid">  
+        <button type="button" class="btn btn-default col-sm-2 pull-right" ui-sref="customer.checkout">Proceed to Checkout >></button>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
