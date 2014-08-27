@@ -97,10 +97,6 @@ public class DataLoader {
             CartItem cartItem = new CartItem(salesItem, 1, shoppingCart);
             cartItemRepository.save(cartItem);
         }
-
-        Customer c = customerRepository.findByFirstNameAndLastName("John", "Snow");
-        System.out.println("John Snow customer id: " + c.getId());
-        System.out.println("cart item count: " + c.getShoppingCart().getCartItems());
     }
 
     private static boolean oauthInfoNeeded(ConfigurableApplicationContext context) {
