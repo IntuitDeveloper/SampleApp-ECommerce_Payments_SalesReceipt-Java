@@ -100,12 +100,12 @@ public class DataLoader {
         customerRepository.save(customer);
 
 
-        CartItemRepository cartItemRepository = springContext.getBean(CartItemRepository.class);
-        SalesItemRepository salesItemRepository = springContext.getBean(SalesItemRepository.class);
-        for (SalesItem salesItem : salesItemRepository.findAll()) {
-            CartItem cartItem = new CartItem(salesItem, 1, shoppingCart);
-            cartItemRepository.save(cartItem);
-        }
+//        CartItemRepository cartItemRepository = springContext.getBean(CartItemRepository.class);
+//        SalesItemRepository salesItemRepository = springContext.getBean(SalesItemRepository.class);
+//        for (SalesItem salesItem : salesItemRepository.findAll()) {
+//            CartItem cartItem = new CartItem(salesItem, 1, shoppingCart);
+//            cartItemRepository.save(cartItem);
+//        }
     }
 
     private static boolean oauthInfoNeeded(ConfigurableApplicationContext context) {

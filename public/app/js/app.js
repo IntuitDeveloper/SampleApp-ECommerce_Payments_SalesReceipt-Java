@@ -14,6 +14,7 @@ angular.module('myApp', [
     config(['$routeProvider', function ($routeProvider) {
         $routeProvider.when('/settings', {templateUrl: 'partials/settings.html', controller: 'SettingsCtrl'});
         $routeProvider.when('/storefront', {templateUrl: 'partials/storefront.html', controller: 'StoreFrontCtrl'});
+        $routeProvider.when('/shoppingcart', {templateUrl: 'partials/shoppingcart.html', controller: 'ShoppingCartCtrl'});
         $routeProvider.otherwise({redirectTo: '/settings'});
     }])
     .run(['InitializerSvc', function(InitializerSvc) {

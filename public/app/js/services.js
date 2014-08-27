@@ -233,8 +233,9 @@ ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc
 
         var addCartItem = function(salesItem, shoppingCart) {
             var cartItem = new CartItem();
-            cartItem.salesItem = salesItem;
-            cartItem.shoppingCart = shoppingCart;
+            cartItem.salesItem = salesItem._links.self.href;
+            cartItem.shoppingCart = shoppingCart._links.self.href;
+            cartItem.quantity = 1;
             cartItem.$save();
         };
 
