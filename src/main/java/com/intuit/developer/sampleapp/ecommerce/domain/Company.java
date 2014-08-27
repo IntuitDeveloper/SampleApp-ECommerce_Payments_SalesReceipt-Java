@@ -152,7 +152,7 @@ public class Company {
 		return salesItems;
 	}
 
-	public void addServiceItem(SalesItem salesItem) {
+	public void addSalesItem(SalesItem salesItem) {
         this.salesItems.add(salesItem);
         salesItem.setCompany(this);
     }

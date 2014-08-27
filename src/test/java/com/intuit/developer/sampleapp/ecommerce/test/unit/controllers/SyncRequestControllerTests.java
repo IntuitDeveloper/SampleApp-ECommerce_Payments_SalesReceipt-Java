@@ -10,7 +10,6 @@ import com.intuit.developer.sampleapp.ecommerce.repository.CompanyRepository;
 import mockit.*;
 import org.joda.money.Money;
 import org.junit.Test;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import static junit.framework.Assert.*;
 /**
@@ -57,7 +56,7 @@ public class SyncRequestControllerTests {
     public void testSalesItemSync() {
         final SalesItem salesItem = new SalesItem("name", "description", Money.parse("USD 1"), "imageFile");
         final Company company = new Company("accessToken", "accessTokenSecret", "1234567");
-        company.addServiceItem(salesItem);
+        company.addSalesItem(salesItem);
 
         SyncRequest syncRequest = new SyncRequest();
         syncRequest.setCompanyId("1234");
