@@ -74,13 +74,20 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
         }]);
 
 
-controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc',
-    function ($scope, ModelSvc) {
+controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemSvc',
+    function ($scope, ModelSvc, CartItemSvc) {
         $scope.model = ModelSvc.model;
 
         // assume that login of customer has occurred - CustomerSvc automatically loads
 
         $scope.addToCart = function(salesItem) {
-            CartItemSvc.addToCart(salesItem, ModelSvc.model.shoppingCart);
+            CartItemSvc.addCartItem(salesItem, ModelSvc.model.shoppingCart);
         };
+    }]);
+
+controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc',
+    function ($scope, ModelSvc) {
+        $scope.model = ModelSvc.model;
+
+
     }]);
