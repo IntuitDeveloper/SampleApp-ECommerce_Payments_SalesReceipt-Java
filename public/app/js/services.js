@@ -7,8 +7,8 @@ var ecommerceServices = angular.module('myApp.services', ['ngResource']);
 
 ecommerceServices.value('version', '0.1');
 
-ecommerceServices.factory('InitializerSvc', ['$rootScope', 'RootUrlSvc', 'CompanySvc', 'SalesItemSvc', 'CustomerSvc', 'ShoppingCartSvc',
-    function ($rootScope, RootUrlSvc, CompanySvc, SalesItemSvc, CustomerSvc, ShoppingCartSvc) {
+ecommerceServices.factory('InitializerSvc', ['$rootScope', 'RootUrlSvc', 'CompanySvc', 'SalesItemSvc', 'CustomerSvc', 'ShoppingCartSvc', 'CartItemSvc',
+    function ($rootScope, RootUrlSvc, CompanySvc, SalesItemSvc, CustomerSvc, ShoppingCartSvc, CartItemSvc) {
 
         var initialized = false;
 
@@ -19,7 +19,7 @@ ecommerceServices.factory('InitializerSvc', ['$rootScope', 'RootUrlSvc', 'Compan
                 SalesItemSvc.initialize();
                 CustomerSvc.initialize();
                 ShoppingCartSvc.initialize();
-                //CartItemSvc.initialize();
+                CartItemSvc.initialize();
 
                 CompanySvc.initializeModel();
             });
@@ -221,7 +221,7 @@ ecommerceServices.factory('ShoppingCartSvc', ['$resource', '$rootScope', 'RootUr
         }
     }]);
 
-/*
+
 ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc', 'ModelSvc',
     function ($resource, $rootScope, RootUrlSvc, ModelSvc) {
 
@@ -243,7 +243,6 @@ ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc
             addCartItem: addCartItem
         }
     }]);
-*/
 
 ecommerceServices.factory('SyncRequestSvc', ['$http', '$rootScope', 'RootUrlSvc', 'ModelSvc',
     function ($http, $rootScope, RootUrlSvc, ModelSvc) {
