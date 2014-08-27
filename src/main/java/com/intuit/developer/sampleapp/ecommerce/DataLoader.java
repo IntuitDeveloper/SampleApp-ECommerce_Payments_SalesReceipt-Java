@@ -58,13 +58,22 @@ public class DataLoader {
     private static void createSalesItems(Company company, ConfigurableApplicationContext springContext) {
         final SalesItemRepository repository = springContext.getBean(SalesItemRepository.class);
 
-        final SalesItem salesItem1 = new SalesItem("Cotton T-shirt", "Comfy cotton t-shirt", Money.parse("USD 15.00"));
+        final SalesItem salesItem1 = new SalesItem("West Brom Albion Home Kit", "Premier League style", Money.parse("USD 75.00"), "IntuitWestBromAlbionJersey.jpg");
         company.addServiceItem(salesItem1);
 	    repository.save(salesItem1);
 
-	    final SalesItem salesItem2 = new SalesItem("Silk Shirt", "Relax in silk", Money.parse("USD 100.00"));
+	    final SalesItem salesItem2 = new SalesItem("Men's Bike Jersey", "Tour de roads in style", Money.parse("USD 85.00"), "IntuitBikeJersey.jpg");
 	    company.addServiceItem(salesItem2);
         repository.save(salesItem2);
+
+
+        final SalesItem salesItem3 = new SalesItem("Hoodie", "Silicon Valley poseur style", Money.parse("USD 24.50"), "IntuitHoodie.jpg");
+        company.addServiceItem(salesItem3);
+        repository.save(salesItem3);
+
+        final SalesItem salesItem4 = new SalesItem("Classic Polo", "Golf course style", Money.parse("USD 24.50"), "IntuitBlackPolo.jpg");
+        company.addServiceItem(salesItem4);
+        repository.save(salesItem4);
     }
 
     private static void createCustomers(Company company, ConfigurableApplicationContext springContext) {

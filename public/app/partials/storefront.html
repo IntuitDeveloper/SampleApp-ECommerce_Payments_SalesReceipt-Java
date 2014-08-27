@@ -1,11 +1,11 @@
 <div class="container">
-    <h1 class="text-center">SUMMER SALE</h1>
-    <h3 class="text-center">20% off All Orders Now Through July 1st</h3>
+    <h1 class="text-center">Timeless Style</h1>
+    <h3 class="text-center">What all the cool kids are wearing</h3>
     <div ng-model="items">
         <div class="col-md-3 item" ng-repeat="salesItem in model.company.salesItems">
             <div class="thumbnail">
                 <!-- todo: replace with Intuit branded clothing images -->
-                <img src="http://placehold.it/175x100" alt="">
+                <img ng-src="/app/assets/{{salesItem.imageFile}}" alt="{{salesItem.imageFile}}">
 
                 <div class="caption">
 

@@ -26,6 +26,8 @@ public class SalesItem {
 
     private String description;
 
+    private String imageFile;
+
     @Convert(converter = MoneyConverter.class)
     private Money unitPrice;
 
@@ -39,10 +41,11 @@ public class SalesItem {
 
     }
 
-    public SalesItem(String name, String description, Money unitPrice) {
+    public SalesItem(String name, String description, Money unitPrice, String imageFile) {
         this.name = name;
         this.description = description;
         this.unitPrice = unitPrice;
+        this.imageFile = imageFile;
     }
 
 	public long getId() {
@@ -67,6 +70,14 @@ public class SalesItem {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getImageFile() {
+        return imageFile;
+    }
+
+    public void setImageFile(String imageFile) {
+        this.imageFile = imageFile;
     }
 
     public void setDescription(String description) {
