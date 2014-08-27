@@ -1,4 +1,4 @@
-package com.intuit.developer.sampleapp.ecommerce.test.integration;
+package com.intuit.developer.sampleapp.ecommerce.test.unit.qbo;
 
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
@@ -14,11 +14,13 @@ import com.intuit.ipp.data.ItemTypeEnum;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
-import mockit.*;
+import mockit.Expectations;
+import mockit.Injectable;
+import mockit.Mocked;
+import mockit.Tested;
 import mockit.integration.junit4.JMockit;
 import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
-import org.joda.money.BigMoney;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Test;
@@ -27,9 +29,7 @@ import org.junit.runner.RunWith;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.Assert.assertEquals;
-import static junit.framework.Assert.assertFalse;
-import static junit.framework.Assert.assertTrue;
+import static junit.framework.Assert.*;
 
 /**
  * Created by akuchta on 8/27/14.
@@ -133,13 +133,6 @@ public class QBOGatewayIntegrationTests {
             dataServiceFactory.getDataService(customer.getCompany());
             result = dataService;
 
-//            // The dataService will try to execute a query
-//            try {
-//                dataService.executeQuery(anyString);
-//            } catch (FMSException e) {
-//            }
-//            result = queryResult;
-
             // The data service will try to add an Item
             try {
                 dataService.add(withArgThat(new CustomerQBOCustomerMatcher(customer)));
@@ -195,6 +188,7 @@ public class QBOGatewayIntegrationTests {
         }
     }
 
+    // Defining a matcher class to check the the correct fields get mapped over to qbo Customer from app customer
     public class CustomerQBOCustomerMatcher extends  TypeSafeMatcher<com.intuit.ipp.data.Customer> {
         Customer customerToMatch;
 
