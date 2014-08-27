@@ -42,6 +42,7 @@ public class SyncRequestControllerTests {
 
         SyncRequest syncRequestReturn = controller.createSyncRequest(syncRequest);
         assertEquals(true, syncRequestReturn.isSuccessful());
+        assertEquals(true, company.isCustomersSynced());
 
         new Verifications() {{
             mockedQBOGateway.createCustomerInQBO(withSameInstance(customer)); times = 1;
