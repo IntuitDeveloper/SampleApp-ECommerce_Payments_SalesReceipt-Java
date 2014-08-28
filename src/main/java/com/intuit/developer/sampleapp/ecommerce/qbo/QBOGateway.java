@@ -16,9 +16,8 @@ import com.intuit.ipp.services.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Interface to QBO via QBO v3 SDK.
@@ -64,7 +63,18 @@ public class QBOGateway {
 
 	    // find an Income Account to associate with QBO item
 	    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, "SalesOfProductIncome");
-	    qboItem.setIncomeAccountRef(accountRef);
+        qboItem.setIncomeAccountRef(accountRef);
+
+        // find an Asset Account to associate with QBO item
+        ReferenceType assetAccountRef = findAccountReference(dataService, AccountTypeEnum.OTHER_CURRENT_ASSET, AccountSubTypeEnum.INVENTORY.value());
+        qboItem.setAssetAccountRef(assetAccountRef);
+
+        // find a Cost of Goods Sold account to use as the expense account reference on the QBO Item
+        ReferenceType cogAccountRef = findAccountReference(dataService, AccountTypeEnum.COST_OF_GOODS_SOLD, AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS.value());
+        qboItem.setExpenseAccountRef(cogAccountRef);
+
+        // Set the inventory start date to be today
+        qboItem.setInvStartDate(new Date());
 
 	    // save the item in OBO
 	    qboItem = createObjectInQBO(dataService, qboItem);
@@ -86,12 +96,12 @@ public class QBOGateway {
 		return referenceType;
 	}
 
-	public static final String INCOME_ACCOUNT_QUERY = "select * from account where accounttype = '%s' and accountsubtype = '%s'";
+	public static final String ACCOUNT_TYPE_QUERY = "select * from account where accounttype = '%s' and accountsubtype = '%s'";
 	/**
 	 * Search for an account in QBO based on AccountType and AccountSubType
 	 */
 	private Account findAccount(DataService dataService, AccountTypeEnum accountType, String accountSubType) {
-		String accountQuery = String.format(INCOME_ACCOUNT_QUERY, accountType.value(), accountSubType);
+		String accountQuery = String.format(ACCOUNT_TYPE_QUERY, accountType.value(), accountSubType);
 		try {
 			final QueryResult queryResult = dataService.executeQuery(accountQuery);
 			if (queryResult.getEntities().size() == 0) {
