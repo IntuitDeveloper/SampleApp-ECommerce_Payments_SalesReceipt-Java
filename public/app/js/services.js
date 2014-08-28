@@ -201,7 +201,7 @@ ecommerceServices.factory('ShoppingCartSvc', ['$resource', '$rootScope', 'RootUr
             ShoppingCart = $resource(RootUrlSvc.rootUrls.shoppingCarts, {},
                 {
                     forCustomer: {  method: 'GET',
-                        url: RootUrlSvc.rootUrls.shoppingCarts + '/search/findByCustomerEmailAddress',
+                        url: RootUrlSvc.rootUrls.shoppingCarts + '/search/findByCustomerId',
                         isArray: false},
 
                     query: { method: 'GET', isArray: false}
@@ -210,7 +210,7 @@ ecommerceServices.factory('ShoppingCartSvc', ['$resource', '$rootScope', 'RootUr
 
         var initializeModel = function() {
             //TODO: switch query parameter to customerId when issue w/Spring Data Rest exposing id is resolved
-            var customerShoppingCart = ShoppingCart.forCustomer({emailAddress: ModelSvc.model.customer.emailAddress}, function() {
+            var customerShoppingCart = ShoppingCart.forCustomer({customerId: ModelSvc.model.customer.id}, function() {
                 ModelSvc.model.shoppingCart = customerShoppingCart._embedded.shoppingCarts[0];
             });
         };
