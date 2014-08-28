@@ -62,15 +62,15 @@ public class QBOGateway {
 	    Item qboItem = SalesItemMapper.buildQBOObject(salesItem);
 
 	    // find an Income Account to associate with QBO item
-	    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, "SalesOfProductIncome");
+	    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME);
         qboItem.setIncomeAccountRef(accountRef);
 
         // find an Asset Account to associate with QBO item
-        ReferenceType assetAccountRef = findAccountReference(dataService, AccountTypeEnum.OTHER_CURRENT_ASSET, AccountSubTypeEnum.INVENTORY.value());
+        ReferenceType assetAccountRef = findAccountReference(dataService, AccountTypeEnum.OTHER_CURRENT_ASSET, AccountSubTypeEnum.INVENTORY);
         qboItem.setAssetAccountRef(assetAccountRef);
 
         // find a Cost of Goods Sold account to use as the expense account reference on the QBO Item
-        ReferenceType cogAccountRef = findAccountReference(dataService, AccountTypeEnum.COST_OF_GOODS_SOLD, AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS.value());
+        ReferenceType cogAccountRef = findAccountReference(dataService, AccountTypeEnum.COST_OF_GOODS_SOLD, AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS);
         qboItem.setExpenseAccountRef(cogAccountRef);
 
         // Set the inventory start date to be today
@@ -89,8 +89,8 @@ public class QBOGateway {
 	 *
 	 * ReferenceType values are used to associate different QBO entities to each other.
 	 */
-	private ReferenceType findAccountReference(DataService dataService, AccountTypeEnum accountType, String accountSubType) {
-		Account account = findAccount(dataService, accountType, accountSubType);
+	private ReferenceType findAccountReference(DataService dataService, AccountTypeEnum accountType, AccountSubTypeEnum accountSubType) {
+		Account account = findAccount(dataService, accountType, accountSubType.value());
 		ReferenceType referenceType = new ReferenceType();
 		referenceType.setValue(account.getId());
 		return referenceType;
