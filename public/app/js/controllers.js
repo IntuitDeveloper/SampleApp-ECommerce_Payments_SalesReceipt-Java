@@ -85,9 +85,8 @@ controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemS
         };
     }]);
 
-controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc',
-    function ($scope, ModelSvc) {
+controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'CartItemSvc',
+    function ($scope, ModelSvc, CartItemSvc) {
+        CartItemSvc.getCartItems();
         $scope.model = ModelSvc.model;
-
-
     }]);

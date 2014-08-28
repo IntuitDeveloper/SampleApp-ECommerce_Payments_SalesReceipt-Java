@@ -209,7 +209,10 @@ ecommerceServices.factory('ShoppingCartSvc', ['$resource', '$rootScope', 'RootUr
         };
 
         var initializeModel = function() {
-            //TODO: switch query parameter to customerId when issue w/Spring Data Rest exposing id is resolved
+            refreshShoppingCart();
+        };
+
+        var refreshShoppingCart = function() {
             var customerShoppingCart = ShoppingCart.forCustomer({customerId: ModelSvc.model.customer.id}, function() {
                 ModelSvc.model.shoppingCart = customerShoppingCart._embedded.shoppingCarts[0];
             });
@@ -217,7 +220,8 @@ ecommerceServices.factory('ShoppingCartSvc', ['$resource', '$rootScope', 'RootUr
 
         return {
             initialize: initialize,
-            initializeModel: initializeModel
+            initializeModel: initializeModel,
+            refreshShoppingCart: refreshShoppingCart
         }
     }]);
 
@@ -228,8 +232,24 @@ ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc
         var CartItem;
 
         var initialize = function() {
-            CartItem = $resource(RootUrlSvc.rootUrls.cartItems, {}, {query: { method: 'GET', isArray: false}});
-        }
+            CartItem = $resource(RootUrlSvc.rootUrls.cartItems, {projection: 'summary'},
+                        {   query: { method: 'GET', isArray: false },
+                            forShoppingCart: {
+                                method: 'GET',
+                                url: RootUrlSvc.rootUrls.cartItems + '/search/findByShoppingCartId',
+                                isArray: false}
+                        });
+
+            ModelSvc.model.shoppingCartItems = [];
+        };
+
+        var getCartItems = function() {
+            if (ModelSvc.model.shoppingCart != 'undefined') {
+                var shoppingCartItems = CartItem.forShoppingCart({shoppingCartId: ModelSvc.model.shoppingCart.id}, function (data) {
+                    ModelSvc.model.shoppingCartItems = shoppingCartItems._embedded.cartItems;
+                })
+            }
+        };
 
         var addCartItem = function(salesItem, shoppingCart) {
             var cartItem = new CartItem();
@@ -241,6 +261,7 @@ ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc
 
         return {
             initialize: initialize,
+            getCartItems: getCartItems,
             addCartItem: addCartItem
         }
     }]);
