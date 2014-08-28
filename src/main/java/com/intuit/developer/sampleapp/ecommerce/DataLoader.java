@@ -10,6 +10,7 @@ import org.springframework.context.ConfigurableApplicationContext;
 
 import java.io.File;
 import java.io.IOException;
+import java.math.BigDecimal;
 
 /**
  * Created with IntelliJ IDEA.
@@ -59,19 +60,23 @@ public class DataLoader {
         final SalesItemRepository repository = springContext.getBean(SalesItemRepository.class);
 
         final SalesItem salesItem1 = new SalesItem("Baggies Jersey", "Premier League style", Money.parse("USD 75.00"), "IntuitWestBromAlbionJersey.jpg");
+        salesItem1.setQtyOnHand(new BigDecimal(5));
         company.addSalesItem(salesItem1);
 	    repository.save(salesItem1);
 
-	    final SalesItem salesItem2 = new SalesItem("Men's Bike Jersey", "Tour de roads in style", Money.parse("USD 85.00"), "IntuitBikeJersey.jpg");
+	    final SalesItem salesItem2 = new SalesItem("Men's Bike Jersey", "Tour de roads in style", Money.parse("USD 82.88"), "IntuitBikeJersey.jpg");
+        salesItem2.setQtyOnHand(new BigDecimal(5));
+
 	    company.addSalesItem(salesItem2);
         repository.save(salesItem2);
 
-
         final SalesItem salesItem3 = new SalesItem("Hoodie", "Silicon Valley poseur style", Money.parse("USD 24.50"), "IntuitHoodie.jpg");
+        salesItem3.setQtyOnHand(new BigDecimal(5));
         company.addSalesItem(salesItem3);
         repository.save(salesItem3);
 
         final SalesItem salesItem4 = new SalesItem("Classic Polo", "Golf course style", Money.parse("USD 24.50"), "IntuitBlackPolo.jpg");
+        salesItem4.setQtyOnHand(new BigDecimal(5));
         company.addSalesItem(salesItem4);
         repository.save(salesItem4);
     }
@@ -98,14 +103,6 @@ public class DataLoader {
 
         CustomerRepository customerRepository = springContext.getBean(CustomerRepository.class);
         customerRepository.save(customer);
-
-
-//        CartItemRepository cartItemRepository = springContext.getBean(CartItemRepository.class);
-//        SalesItemRepository salesItemRepository = springContext.getBean(SalesItemRepository.class);
-//        for (SalesItem salesItem : salesItemRepository.findAll()) {
-//            CartItem cartItem = new CartItem(salesItem, 1, shoppingCart);
-//            cartItemRepository.save(cartItem);
-//        }
     }
 
     private static boolean oauthInfoNeeded(ConfigurableApplicationContext context) {

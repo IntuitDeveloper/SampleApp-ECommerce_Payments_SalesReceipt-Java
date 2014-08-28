@@ -1,6 +1,10 @@
 package com.intuit.developer.sampleapp.ecommerce.domain;
 
+import org.joda.money.CurrencyUnit;
+import org.joda.money.Money;
+
 import javax.persistence.*;
+import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,33 +19,17 @@ public class ShoppingCart {
 	@JoinColumn(name="customer_fk", referencedColumnName="id")
 	Customer customer;
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="shoppingcart")
+	@OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="shoppingCart")
 	List<CartItem> cartItems = new ArrayList<CartItem>();
-	
-	float subTotal;
-	
+
 	protected ShoppingCart()
 	{
-		
 	}
-	
 	
 	public ShoppingCart(Customer cust)
 	{
 		this.customer = cust;
 	}
-	
-	
-
-	public float getSubTotal() {
-		return subTotal;
-	}
-
-
-	public void setSubTotal(float subTotal) {
-		this.subTotal = subTotal;
-	}
-
 
 	public long getId() {
 		return id;
@@ -71,5 +59,26 @@ public class ShoppingCart {
 	{
 		cartItems.add(cartItem);
 	}
-	
+
+    public Money getSubTotal() {
+        Money subTotal = Money.zero(CurrencyUnit.USD);
+        for (CartItem cartItem : cartItems) {
+            subTotal = subTotal.plus(cartItem.getSalesItem().getUnitPrice());
+        }
+        return subTotal;
+    }
+
+    public Money getPromotionalSavings() {
+        return getSubTotal().multipliedBy(.2d, RoundingMode.CEILING);
+    }
+
+    public Money getTax() {
+        return getSubTotal().minus(getPromotionalSavings()).multipliedBy(.0793d, RoundingMode.CEILING);
+    }
+
+    public Money getTotal() {
+        return getSubTotal().minus(getPromotionalSavings()).plus(getTax());
+    }
+
 }
+

@@ -23,6 +23,7 @@ public class CustomerMapper {
                 .field("lastName", "familyName")
                 .field("emailAddress", "primaryEmailAddr.address")
                 .field("phoneNumber", "primaryPhone.freeFormNumber")
+                .exclude("id")
                 .byDefault()
                 .register();
 
