@@ -202,6 +202,7 @@ ecommerceServices.factory('ShoppingCartSvc', ['$resource', '$rootScope', 'RootUr
                 {
                     forCustomer: {  method: 'GET',
                         url: RootUrlSvc.rootUrls.shoppingCarts + '/search/findByCustomerId',
+                        params: {projection: 'order'},
                         isArray: false},
 
                     query: { method: 'GET', isArray: false}
@@ -232,11 +233,12 @@ ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc
         var CartItem;
 
         var initialize = function() {
-            CartItem = $resource(RootUrlSvc.rootUrls.cartItems, {projection: 'summary'},
+            CartItem = $resource(RootUrlSvc.rootUrls.cartItems, {},
                         {   query: { method: 'GET', isArray: false },
                             forShoppingCart: {
                                 method: 'GET',
                                 url: RootUrlSvc.rootUrls.cartItems + '/search/findByShoppingCartId',
+                                params: {projection: 'summary'},
                                 isArray: false}
                         });
 
@@ -253,8 +255,8 @@ ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc
 
         var addCartItem = function(salesItem, shoppingCart) {
             var cartItem = new CartItem();
-            cartItem.shoppingCart = shoppingCart._links.self.href;
-            cartItem.salesItem = salesItem._links.self.href;
+            cartItem.shoppingCart = shoppingCart._links.self.href.split(/\{/)[0];
+            cartItem.salesItem = salesItem._links.self.href.split(/\{/)[0];
             cartItem.quantity = 1;
             cartItem.$save();
         };

@@ -20,19 +20,19 @@
     <hr></hr> 
     <div class="container-fluid">
         <h5 class="col-sm-2">Subtotal</h5>
-        <h5 class="pull-right">$100.00</h5>
+        <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.subTotal | currency}}</h5>
     </div>
     <div class="container-fluid">
         <h5 class="col-sm-2">Promotion - 20%</h5>
-        <h5 class="pull-right">$20.00</h5>
+        <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.promotionalSavings | currency}}</h5>
     </div>
     <div class="container-fluid">
         <h5 class="col-sm-2">Tax - 10%</h5>
-        <h5 class="pull-right">$10.00</h5>
+        <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.tax | currency}}</h5>
     </div>
     <div class="container-fluid">
         <h5 class="col-sm-2">Total</h5>
-        <h5 class="pull-right">$90.00</h5>
+        <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.total | currency}}</h5>
     </div>
     <hr/>
     <div class="container-fluid">  

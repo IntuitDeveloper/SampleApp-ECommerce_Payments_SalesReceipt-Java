@@ -85,8 +85,9 @@ controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemS
         };
     }]);
 
-controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'CartItemSvc',
-    function ($scope, ModelSvc, CartItemSvc) {
+controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc',
+    function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc) {
+        ShoppingCartSvc.refreshShoppingCart();
         CartItemSvc.getCartItems();
         $scope.model = ModelSvc.model;
     }]);
