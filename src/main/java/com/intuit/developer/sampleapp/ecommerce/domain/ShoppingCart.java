@@ -73,7 +73,7 @@ public class ShoppingCart {
     }
 
     public Money getTax() {
-        return getSubTotal().minus(getPromotionalSavings()).multipliedBy(.06d, RoundingMode.CEILING);
+        return getSubTotal().minus(getPromotionalSavings()).multipliedBy(.0793d, RoundingMode.CEILING);
     }
 
     public Money getTotal() {
