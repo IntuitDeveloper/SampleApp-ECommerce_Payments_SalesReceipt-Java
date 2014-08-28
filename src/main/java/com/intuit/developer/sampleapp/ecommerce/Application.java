@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 import com.intuit.developer.sampleapp.ecommerce.controllers.OAuthInfoProviderImpl;
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
+import com.intuit.developer.sampleapp.ecommerce.domain.ShoppingCart;
 import com.intuit.developer.sampleapp.ecommerce.oauth.OAuthInfoProvider;
 import com.intuit.developer.sampleapp.ecommerce.qbo.DataServiceFactory;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOGateway;
@@ -58,7 +59,7 @@ public class Application extends RepositoryRestMvcConfiguration {
     @Override
     protected void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
         config.setReturnBodyOnCreate(true);
-        config.exposeIdsFor(Company.class);
+        config.exposeIdsFor(Company.class, ShoppingCart.class);
     }
 
 //    @Override

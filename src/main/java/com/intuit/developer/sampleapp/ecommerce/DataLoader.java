@@ -62,7 +62,7 @@ public class DataLoader {
         company.addSalesItem(salesItem1);
 	    repository.save(salesItem1);
 
-	    final SalesItem salesItem2 = new SalesItem("Men's Bike Jersey", "Tour de roads in style", Money.parse("USD 85.00"), "IntuitBikeJersey.jpg");
+	    final SalesItem salesItem2 = new SalesItem("Men's Bike Jersey", "Tour de roads in style", Money.parse("USD 82.88"), "IntuitBikeJersey.jpg");
 	    company.addSalesItem(salesItem2);
         repository.save(salesItem2);
 
@@ -98,14 +98,6 @@ public class DataLoader {
 
         CustomerRepository customerRepository = springContext.getBean(CustomerRepository.class);
         customerRepository.save(customer);
-
-
-//        CartItemRepository cartItemRepository = springContext.getBean(CartItemRepository.class);
-//        SalesItemRepository salesItemRepository = springContext.getBean(SalesItemRepository.class);
-//        for (SalesItem salesItem : salesItemRepository.findAll()) {
-//            CartItem cartItem = new CartItem(salesItem, 1, shoppingCart);
-//            cartItemRepository.save(cartItem);
-//        }
     }
 
     private static boolean oauthInfoNeeded(ConfigurableApplicationContext context) {

@@ -7,36 +7,34 @@ public class CartItem {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
-	long id;
+	private long id;
 
 	@ManyToOne(optional=false)
 	@JoinColumn(name="item_fk", referencedColumnName="id")
-	SalesItem salesItem;
+	private SalesItem salesItem;
 
 	@ManyToOne(optional=false)
-	@JoinColumn(name="shoppingcart_fk",referencedColumnName="id")
-	ShoppingCart shoppingcart;
+	@JoinColumn(name="shopping_cart_fk", referencedColumnName="id")
+	private ShoppingCart shoppingCart;
 
-	int quantity;
+	private int quantity;
 
-	protected CartItem()
-	{
-
+	public CartItem() {
 	}
 
 	public CartItem(SalesItem salesItem, int quantity, ShoppingCart shoppingCart)
 	{
 		this.salesItem = salesItem;
 		this.quantity = quantity;
-		this.shoppingcart = shoppingCart;
+		this.shoppingCart = shoppingCart;
 	}
 
-	public ShoppingCart getShoppingcart() {
-		return shoppingcart;
+	public ShoppingCart getShoppingCart() {
+		return shoppingCart;
 	}
 
-	public void setShoppingcart(ShoppingCart shoppingcart) {
-		this.shoppingcart = shoppingcart;
+	public void setShoppingCart(ShoppingCart shoppingcart) {
+		this.shoppingCart = shoppingcart;
 	}
 
 	public long getId() {

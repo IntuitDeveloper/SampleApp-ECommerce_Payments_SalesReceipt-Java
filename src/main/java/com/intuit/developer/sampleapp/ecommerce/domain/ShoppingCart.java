@@ -15,33 +15,27 @@ public class ShoppingCart {
 	@JoinColumn(name="customer_fk", referencedColumnName="id")
 	Customer customer;
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="shoppingcart")
+	@OneToMany(fetch = FetchType.LAZY, cascade=CascadeType.ALL, mappedBy="shoppingCart")
 	List<CartItem> cartItems = new ArrayList<CartItem>();
 	
 	float subTotal;
 	
 	protected ShoppingCart()
 	{
-		
 	}
-	
 	
 	public ShoppingCart(Customer cust)
 	{
 		this.customer = cust;
 	}
 	
-	
-
 	public float getSubTotal() {
 		return subTotal;
 	}
 
-
 	public void setSubTotal(float subTotal) {
 		this.subTotal = subTotal;
 	}
-
 
 	public long getId() {
 		return id;
