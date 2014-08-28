@@ -29,9 +29,16 @@ describe('settings page', function() {
 
         browser.getAllWindowHandles().then(function(handles) {
             browser.switchTo().window(handles[1]);
-            ptor.findElement(By.id('ius-sign-in-header')).then(function(){
-                expect(browser.getCurrentUrl()).toContain('https://appcenter.intuit.com/Connect/Begin?oauth_token=');
-            });
+            ptor.findElement(by.id('ius-sign-in-header')); // HACK to wait for loading?
+
+            expect(browser.getCurrentUrl()).toContain('https://appcenter.intuit.com/Connect/Begin?oauth_token=');
+
+            var emailInput = element(by.name('Email'));
+            var passwordInput = element(by.name('Password'));
+            var submitButton = element(by.id('ius-sign-in-submit-btn'));
+            emailInput.sendKeys(browser.params.qbo_username);
+            passwordInput.sendKeys(browser.params.qbo_password);
+            submitButton.click();
         });
 
     });

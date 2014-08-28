@@ -22,5 +22,15 @@ exports.config = {
 
     jasmineNodeOpts: {
         defaultTimeoutInterval: 30000
+    },
+
+    params: {
+        qbo_username: 'jyangqbotest',
+        qbo_password: 'intuit1234',
+        endpoint_host: 'http://localhost:8080',
+        endpoint_companyuri: "/companies",
+        endpoint_customeruri: "/customers",
+        endpoint_employeeuri: "/employees",
+        endpoint_serviceitemuri: "/serviceItems"
     }
 };
