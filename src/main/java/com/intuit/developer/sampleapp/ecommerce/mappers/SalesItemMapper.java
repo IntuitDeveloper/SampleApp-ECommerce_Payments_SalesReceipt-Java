@@ -36,7 +36,8 @@ public class SalesItemMapper {
         }
 
         Item qboServiceItem = domainToQBOMapper.map(salesItem);
-        // These values must be set regardless of the sales item, they have meaning for QBO but not so much for this app
+
+        // These values must be set for all sales items and are constants
         qboServiceItem.setActive(true);
         qboServiceItem.setTaxable(true);
         qboServiceItem.setSalesTaxIncluded(false);

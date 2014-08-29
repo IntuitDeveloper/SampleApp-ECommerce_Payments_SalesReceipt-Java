@@ -1,8 +1,8 @@
 package com.intuit.developer.sampleapp.ecommerce.qbo;
 
+import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
-import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;
 import com.intuit.developer.sampleapp.ecommerce.mappers.CustomerMapper;
 import com.intuit.developer.sampleapp.ecommerce.mappers.SalesItemMapper;
 import com.intuit.developer.sampleapp.ecommerce.repository.CompanyRepository;
@@ -15,6 +15,7 @@ import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -25,7 +26,7 @@ import java.util.List;
 public class QBOGateway {
 
     @Autowired
-    private DataServiceFactory dataServiceFactory;
+    private QBOServiceFactory qboServiceFactory;
 
 	@Autowired
 	private CompanyRepository companyRepository;
@@ -36,8 +37,47 @@ public class QBOGateway {
     @Autowired
     private SalesItemRepository salesItemRepository;
 
+    public void createSalesReceiptInQBO(ShoppingCart cart) {
+        Customer customer = cart.getCustomer();
+        DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
+        // Make a sales receipt
+        SalesReceipt receipt = new SalesReceipt();
+
+        // Make a list of lines
+        List<Line> lineItems = new ArrayList<>();
+
+        // For each cart item there will be a line item
+        for (CartItem cartItem : cart.getCartItems()) {
+            Line line = new Line();
+            // Create a line detail
+            SalesItemLineDetail lineDetail = new SalesItemLineDetail();
+
+            // Make the line item reference the sales item from the cart item
+            ReferenceType itemRef = new ReferenceType();
+            itemRef.setValue(cartItem.getSalesItem().getQboId());
+            lineDetail.setItemRef(itemRef);
+
+            // Set the quantity
+            lineDetail.setQty(BigDecimal.valueOf(cartItem.getQuantity()));
+
+            line.setSalesItemLineDetail(lineDetail);
+            // Add the line item to the list
+            lineItems.add(line);
+        }
+        receipt.setLine(lineItems);
+        receipt.setTxnDate(new Date());
+
+        // Set the reference to the customer
+        ReferenceType customerRef = new ReferenceType();
+        customerRef.setValue(customer.getQboId());
+        receipt.setCustomerRef(customerRef);
+
+        receipt = createObjectInQBO(dataService, receipt);
+    }
+
+
     public void createCustomerInQBO(Customer customer) {
-        DataService dataService = dataServiceFactory.getDataService(customer.getCompany());
+        DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
         final com.intuit.ipp.data.Customer qboObject = CustomerMapper.buildQBOObject(customer);
         final com.intuit.ipp.data.Customer returnedQBOObject = createObjectInQBO(dataService, qboObject);
 
@@ -56,10 +96,15 @@ public class QBOGateway {
 	 *       please use the BatchOperation API
 	 */
     public void createItemInQBO(SalesItem salesItem) {
-	    DataService dataService = dataServiceFactory.getDataService(salesItem.getCompany());
+	    DataService dataService = qboServiceFactory.getDataService(salesItem.getCompany());
 
 	    // copy SalesItem to QBO Item
+        // This also populates some necessary default constant values
 	    Item qboItem = SalesItemMapper.buildQBOObject(salesItem);
+
+        //
+        // We need to do lookups for accounts to associate the item to
+        //
 
 	    // find an Income Account to associate with QBO item
 	    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME);
@@ -74,6 +119,7 @@ public class QBOGateway {
         qboItem.setExpenseAccountRef(cogAccountRef);
 
         // Set the inventory start date to be today
+        // This is not set in the mapper because this should only be set when the item is first created in QBO
         qboItem.setInvStartDate(new Date());
 
 	    // save the item in OBO
@@ -118,7 +164,7 @@ public class QBOGateway {
 
 	public List<Account> getAccounts(long appCompanyId) {
 		Company company = companyRepository.findOne(appCompanyId);
-		DataService service = dataServiceFactory.getDataService(company);
+		DataService service = qboServiceFactory.getDataService(company);
 
 		try {
 			return service.findAll(new Account());
@@ -131,7 +177,7 @@ public class QBOGateway {
 	public static final String INVENTORY_ITEM_QUERY = "select * from item where active=%b and type = '%s";
 	public List<Item> getItems(long appCompanyId) {
 		Company company = companyRepository.findOne(appCompanyId);
-		DataService service = dataServiceFactory.getDataService(company);
+		DataService service = qboServiceFactory.getDataService(company);
 
 		List<Item> items = new ArrayList<Item>();
 		try {
@@ -151,7 +197,7 @@ public class QBOGateway {
 	public static final String CUSTOMERS_QUERY = "select * from customer where active = true";
 	public List<com.intuit.ipp.data.Customer> getCustomers(long appCompanyId) {
 		Company company = companyRepository.findOne(appCompanyId);
-		DataService service = dataServiceFactory.getDataService(company);
+		DataService service = qboServiceFactory.getDataService(company);
 
 		final List<com.intuit.ipp.data.Customer> qboCustomers = new ArrayList<com.intuit.ipp.data.Customer>();
 		try {

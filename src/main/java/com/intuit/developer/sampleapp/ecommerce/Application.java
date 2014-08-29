@@ -7,7 +7,8 @@ import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
 import com.intuit.developer.sampleapp.ecommerce.domain.ShoppingCart;
 import com.intuit.developer.sampleapp.ecommerce.oauth.OAuthInfoProvider;
-import com.intuit.developer.sampleapp.ecommerce.qbo.DataServiceFactory;
+import com.intuit.developer.sampleapp.ecommerce.qbo.PaymentGateway;
+import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOGateway;
 import com.intuit.developer.sampleapp.ecommerce.serializers.MoneyDeserializer;
 import com.intuit.developer.sampleapp.ecommerce.serializers.MoneySerializer;
@@ -98,7 +99,10 @@ public class Application extends RepositoryRestMvcConfiguration {
     }
 
     @Bean
-    DataServiceFactory dataServiceFactory() {
-        return new DataServiceFactory();
+    QBOServiceFactory qboServiceFactory() {
+        return new QBOServiceFactory();
     }
+
+    @Bean
+    PaymentGateway paymentGateway() {return new PaymentGateway();}
 }

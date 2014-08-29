@@ -12,8 +12,9 @@
     ...
 
     -->
-
     <include resource="org/springframework/boot/logging/logback/base.xml"/>
     <logger name="com.intuit.iahelper" level="DEBUG"/>
-
+    <logger name="com.intuit.logger">
+        <level value="DEBUG"/>
+    </logger>
 </configuration>

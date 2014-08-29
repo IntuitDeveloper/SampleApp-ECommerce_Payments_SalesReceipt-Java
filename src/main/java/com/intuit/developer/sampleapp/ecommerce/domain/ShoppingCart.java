@@ -63,7 +63,8 @@ public class ShoppingCart {
     public Money getSubTotal() {
         Money subTotal = Money.zero(CurrencyUnit.USD);
         for (CartItem cartItem : cartItems) {
-            subTotal = subTotal.plus(cartItem.getSalesItem().getUnitPrice());
+            // subtotal = subtotal + unitPrice * qty
+            subTotal = subTotal.plus(cartItem.getSalesItem().getUnitPrice().multipliedBy(cartItem.getQuantity()));
         }
         return subTotal;
     }
