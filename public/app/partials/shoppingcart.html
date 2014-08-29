@@ -1,55 +1,183 @@
-<div class="container">
-    <table class="table ">
-        <thead>
+<div ng-switch="shoppingCartView">
+    <div class="container" ng-switch-when="Review">
+        <table class="table ">
+            <thead>
             <tr>
                 <th></th>
                 <th>Item</th>
                 <th style="text-align: right">Quantity</th>
                 <th style="text-align: right">Price</th>
             </tr>
-        </thead>
-        <tbody ng-model = "model.shoppingCartItems">
-            <tr ng-repeat = "item in model.shoppingCartItems">
-                <td> <img ng-src="/app/assets/Thumb-{{item.salesItem.imageFile}}" alt=""></td>
+            </thead>
+            <tbody ng-model="model.shoppingCartItems">
+            <tr ng-repeat="item in model.shoppingCartItems">
+                <td><img ng-src="../app/assets/Thumb-{{item.salesItem.imageFile}}" alt=""></td>
                 <td>{{item.salesItem.name}}<br>{{item.salesItem.description}}</td>
                 <td align="right">{{item.quantity}}</td>
                 <td align="right">{{item.salesItem.unitPrice | currency}}</td>
             </tr>
-        </tbody>      
-    </table>
-    <hr></hr> 
-    <div class="container-fluid">
-        <h5 class="col-sm-2">Subtotal</h5>
-        <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.subTotal | currency}}</h5>
+            </tbody>
+        </table>
+        <hr>
+        <div class="container-fluid">
+            <h5 class="col-sm-2">Subtotal</h5>
+            <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.subTotal | currency}}</h5>
+        </div>
+        <div class="container-fluid">
+            <h5 class="col-sm-2">Promotion - 20%</h5>
+            <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.promotionSavings | currency}}</h5>
+        </div>
+        <div class="container-fluid">
+            <h5 class="col-sm-2">Tax - 10%</h5>
+            <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.tax | currency}}</h5>
+        </div>
+        <div class="container-fluid">
+            <h5 class="col-sm-2">Total</h5>
+            <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.total | currency}}</h5>
+        </div>
+        <hr/>
+        <div class="container-fluid">
+            <button type="button" class="btn btn-default col-sm-2 pull-right" ng-click="showView('Checkout')">
+                Proceed to Checkout >>
+            </button>
+        </div>
     </div>
-    <div class="container-fluid">
-        <h5 class="col-sm-2">Promotion - 20%</h5>
-        <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.promotionalSavings | currency}}</h5>
-    </div>
-    <div class="container-fluid">
-        <h5 class="col-sm-2">Tax - 10%</h5>
-        <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.tax | currency}}</h5>
-    </div>
-    <div class="container-fluid">
-        <h5 class="col-sm-2">Total</h5>
-        <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.total | currency}}</h5>
-    </div>
-    <hr/>
-    <div class="container-fluid">  
-        <button type="button" class="btn btn-default col-sm-2 pull-right" ui-sref="customer.checkout">Proceed to Checkout >></button>
+
+    <div class="container" ng-switch-when="Checkout">
+        <div class="container">
+            <form class="form-horizontal" role="form" ng-submit="submitCharge()">
+
+                <h4>Credit Card Information</h4>
+                <div id="creditCardInformation" class="form-group">
+                    <label class="control-label col-sm-2 pull-left">Credit Card No.</label>
+                    <div class="col-sm-4">
+                        <select class="form-control" ng-model="creditCard.number">
+                            <option>Visa 4112344112344113</option>
+                            <option>Visa Commercial Card 4110144110144115</option>
+                            <option>Visa Corporate Card II 4114360123456785</option>
+                            <option>Visa Purchasing Card III 4061724061724061</option>
+                            <option>MasterCard 5111005111051128</option>
+                            <option>MasterCard 5112345112345114</option>
+                            <option>MasterCard II 5115915115915118</option>
+                            <option>MasterCard III 5116601234567894</option>
+                            <option>Discover 6011016011016011</option>
+                            <option>Discover 6559906559906557</option>
+                            <option>Discover Diners 36110361103612</option>
+                            <option>Diners 36438936438936</option>
+                        </select>
+                    </div>
+                    <label class="control-label pull-left">CVC</label>
+                    <div class="col-sm-1">
+                        <input class="form-control" placeholder="***"  ng-model="creditCard.CVC">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label pull-left">Expiration Date</label>
+
+                    <div class="col-sm-2">
+                        <select class="form-control" ng-model="creditCard.expMonth">
+                            <option>Month</option>
+                            <option>01</option>
+                            <option>02</option>
+                            <option>03</option>
+                            <option>04</option>
+                            <option>05</option>
+                            <option>06</option>
+                            <option>07</option>
+                            <option>08</option>
+                            <option>09</option>
+                            <option>10</option>
+                            <option>11</option>
+                            <option>12</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2">
+                        <select class="form-control" ng-model="creditCard.expYear">
+                            <option>Year</option>
+                        </select>
+                    </div>
+                </div>
+                <hr>
+                <h4>Billing and Shipping Information</h4>
+
+                <div class="form-group">
+                    <label class="col-sm-2 control-label pull-left">Name</label>
+
+                    <div class="col-sm-4">
+                        <input class="form-control" placeholder="John Smith" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label pull-left">Address</label>
+
+                    <div class="col-sm-4">
+                        <input class="form-control" placeholder="2632 Marine Way" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label pull-left">City, State, Zip</label>
+
+                    <div class="col-sm-4">
+                        <input class="form-control" placeholder="Mountain View, CA 91534" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label pull-left">Email</label>
+
+                    <div class="col-sm-4">
+                        <input class="form-control" placeholder="john_smith@intuit.com" ng-disabled="true">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 control-label pull-left">Phone</label>
+
+                    <div class="col-sm-4">
+                        <input class="form-control" placeholder="555-555-5555" ng-disabled="true">
+                    </div>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <label class="col-sm-2 pull-left">Subtotal</label>
+
+                    <div class="col-sm-1 pull-right">
+                        <h5 style="text-align: right">{{model.shoppingCart.subTotal | currency}}</h5>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 pull-left">Tax</label>
+
+                    <div class="col-sm-1 pull-right">
+                        <h5 style="text-align: right">{{model.shoppingCart.tax | currency}}</h5>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-6 pull-left">Promotional Discount</label>
+
+                    <div class="col-sm-1 pull-right">
+                        <h5 style="text-align: right">-{{model.shoppingCart.promotionSavings | currency}}</h5>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-sm-2 pull-left">Shipping</label>
+
+                    <div class="col-sm-1 pull-right">
+                        <h5 style="text-align: right">{{model.shoppingCart.shipping | currency}}</h5>
+                    </div>
+                </div>
+                <hr>
+                <div class="form-group">
+                    <label class="col-sm-2 pull-left">Total</label>
+
+                    <div class="col-sm-1 pull-right">
+                        <h5 style="text-align: right">{{model.shoppingCart.total | currency}}</h5>
+                    </div>
+                </div>
+                <hr>
+                <button type="button" class="btn btn-default pull-left" ng-click="showView('Review')"><< Cancel</button>
+                <button type="button" class="btn btn-default pull-right" ng-click="placeOrder()">Submit Purchase</button>
+            </form>
+        </div>
+
     </div>
 </div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-

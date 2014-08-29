@@ -69,7 +69,7 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
                 } else if (data.type === 'SalesItem') {
                     $scope.syncSalesItemMessage = message;
                 }
-                CompanySvc.getCompanies();
+                CompanySvc.initializeModel();
             }
         }]);
 
@@ -78,7 +78,7 @@ controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemS
     function ($scope, ModelSvc, CartItemSvc) {
         $scope.model = ModelSvc.model;
 
-        // assume that login of customer has occurred - CustomerSvc automatically loads
+        $scope.shoppingCartView = "CartReview";
 
         $scope.addToCart = function(salesItem) {
             CartItemSvc.addCartItem(salesItem, ModelSvc.model.shoppingCart);
@@ -87,7 +87,33 @@ controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemS
 
 controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc',
     function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc) {
+
         ShoppingCartSvc.refreshShoppingCart();
         CartItemSvc.getCartItems();
         $scope.model = ModelSvc.model;
+
+        $scope.shoppingCartView = "Review";
+
+        $scope.creditCard = {};
+        $scope.creditCard.number = '';
+        $scope.creditCard.CVC = '';
+        $scope.creditCard.expMonth = '';
+        $scope.creditCard.expYear = '';
+
+        $scope.billingInfo = {};
+        $scope.billingInfo.name = '';
+        $scope.billingInfo.address = '';
+        $scope.billingInfo.cityStateZip = '';
+        $scope.billingInfo.email = '';
+        $scope.billingInfo.phone = '';
+
+        $scope.showView = function(viewName) {
+            $scope.shoppingCartView = viewName
+        }
+
+        $scope.placeOrder = function() {
+            // package data and call service
+        }
+
+
     }]);

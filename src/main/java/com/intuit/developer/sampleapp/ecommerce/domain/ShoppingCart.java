@@ -68,16 +68,20 @@ public class ShoppingCart {
         return subTotal;
     }
 
-    public Money getPromotionalSavings() {
+    public Money getPromotionSavings() {
         return getSubTotal().multipliedBy(.2d, RoundingMode.CEILING);
     }
 
     public Money getTax() {
-        return getSubTotal().minus(getPromotionalSavings()).multipliedBy(.0793d, RoundingMode.CEILING);
+        return getSubTotal().minus(getPromotionSavings()).multipliedBy(.0793d, RoundingMode.CEILING);
     }
 
+	public Money getShipping() {
+		return getSubTotal().minus(getPromotionSavings()).multipliedBy(.05d, RoundingMode.FLOOR);
+	}
+
     public Money getTotal() {
-        return getSubTotal().minus(getPromotionalSavings()).plus(getTax());
+        return getSubTotal().minus(getPromotionSavings()).plus(getTax()).plus(getShipping());
     }
 
 }

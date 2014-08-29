@@ -9,7 +9,8 @@ import java.util.List;
 public interface ShoppingCartOrderProjection {
     long getId();
     Money getSubTotal();
-    Money getPromotionalSavings();
+    Money getPromotionSavings();
     Money getTax();
+	Money getShipping();
     Money getTotal();
 }

@@ -39,14 +39,7 @@
                     <li ng-class="navClass('storefront')"><a href="#/storefront">Store Front</a></li>
                     <li ng-class="navClass('shoppingcart')"><a href="#/shoppingcart">Shopping Cart</a></li>
                 </ul>
-                <ul class="nav navbar-nav navbar-right" id="navbar-dropdown-button">
-                    <li class="dropdown">
-                        <a href="#" class="dropdown-toggle" data-toggle="dropdown" >{{model.company.name}} <span class="caret"></span></a>
-                        <ul class="dropdown-menu" role="menu">
-                            <li><a href="#">Change Company</a></li>
-                        </ul>
-                    </li>
-                </ul>
+                <p class="navbar-right navbar-text">{{model.company.name}}</p>
             </div><!-- /.navbar-collapse -->
         </div><!-- /.container-fluid -->
     </nav>
