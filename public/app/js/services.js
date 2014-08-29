@@ -248,7 +248,9 @@ ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc
         var getCartItems = function() {
             if (ModelSvc.model.shoppingCart != 'undefined') {
                 var shoppingCartItems = CartItem.forShoppingCart({shoppingCartId: ModelSvc.model.shoppingCart.id}, function (data) {
-                    ModelSvc.model.shoppingCartItems = shoppingCartItems._embedded.cartItems;
+                    ModelSvc.model.shoppingCartItems =
+                        shoppingCartItems._embedded ?
+                            ModelSvc.model.shoppingCartItems = shoppingCartItems._embedded.cartItems : {};
                 })
             }
         };
