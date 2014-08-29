@@ -35,7 +35,6 @@ public class SalesItem {
     @JoinColumn(name = "company_fk", referencedColumnName = "id")
     private Company company;
 
-    // Zero Items is a sane default.
     private BigDecimal qtyOnHand;
 
     public SalesItem() {
