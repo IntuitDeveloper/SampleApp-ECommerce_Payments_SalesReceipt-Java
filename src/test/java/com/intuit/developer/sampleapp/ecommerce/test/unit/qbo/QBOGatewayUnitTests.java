@@ -3,10 +3,11 @@ package com.intuit.developer.sampleapp.ecommerce.test.unit.qbo;
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
 import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;
-import com.intuit.developer.sampleapp.ecommerce.qbo.DataServiceFactory;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOGateway;
+import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
 import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
 import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
+import com.intuit.ipp.core.IEntity;
 import com.intuit.ipp.data.*;
 import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
@@ -18,6 +19,7 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -29,8 +31,7 @@ import static junit.framework.Assert.*;
  * Created by akuchta on 8/27/14.
  */
 @RunWith(JMockit.class)
-public class
-        QBOGatewayIntegrationTests {
+public class QBOGatewayUnitTests {
     @Tested
     QBOGateway gateway;
 
@@ -38,7 +39,7 @@ public class
     DataService dataService;
 
     @Injectable
-    DataServiceFactory dataServiceFactory;
+    QBOServiceFactory qboServiceFactory;
 
     @Injectable
     CustomerRepository customerRepository;
@@ -66,17 +67,19 @@ public class
 
         //Create an income account
         final Account incomeAccount = new Account();
-        incomeAccount.setId("1234");
-        incomeAccount.setName("Foo");
-        incomeAccount.setDescription("Bar");
+        incomeAccount.setId("1");
+        incomeAccount.setName("Income Account");
+        incomeAccount.setDescription("The Income account");
         incomeAccount.setAccountType(AccountTypeEnum.INCOME);
+        incomeAccount.setAccountSubType(AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME.value());
         final ReferenceType incomeAccountRef = new ReferenceType();
         incomeAccountRef.setValue(incomeAccount.getId());
 
         //Create an asset account
         final Account assetAccount = new Account();
-        assetAccount.setName("Foo");
-        assetAccount.setDescription("Bar");
+        assetAccount.setId("2");
+        assetAccount.setName("Asset Account");
+        assetAccount.setDescription("The Asset Account");
         assetAccount.setAccountType(AccountTypeEnum.OTHER_CURRENT_ASSET);
         assetAccount.setAccountSubType(AccountSubTypeEnum.INVENTORY.value());
         final ReferenceType assetAccountRef = new ReferenceType();
@@ -84,10 +87,11 @@ public class
 
         //Create a cost of goods sold account
         final Account cogAccount = new Account();
-        cogAccount.setName("Foo");
-        cogAccount.setDescription("Bar");
-        cogAccount.setAccountType(AccountTypeEnum.OTHER_CURRENT_ASSET);
-        cogAccount.setAccountSubType(AccountSubTypeEnum.INVENTORY.value());
+        cogAccount.setId("3");
+        cogAccount.setName("Cost of Goods Sold Account");
+        cogAccount.setDescription("THE Cogs account.");
+        cogAccount.setAccountType(AccountTypeEnum.COST_OF_GOODS_SOLD);
+        cogAccount.setAccountSubType(AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS.value());
         final ReferenceType cogAccountRef = new ReferenceType();
         cogAccountRef.setValue(cogAccount.getId());
 
@@ -112,10 +116,10 @@ public class
         final Item qboItem = new Item();
         qboItem.setId(qboItemID);
 
-
+        // Non Strict expectations, generally just mocking collaborators
         new NonStrictExpectations() {{
             // The QBO gateway will try to acquire a data service instance
-            dataServiceFactory.getDataService(salesItem.getCompany());
+            qboServiceFactory.getDataService(salesItem.getCompany());
             result = dataService;
 
             // The dataService will try to execute a query for income accounts
@@ -143,22 +147,28 @@ public class
             result = cogAccountQueryResult;
 
             // The data service will try to add the item to QBO
-            dataService.add(withArgThat(new SalesItemQBOItemMatcher(salesItem, incomeAccountRef, assetAccountRef, cogAccountRef)));
+            dataService.add(withAny(new Item()));
             result = qboItem;
 
-            // The salesItemRepository should save the sales item
-            salesItemRepository.save(salesItem);
         }};
 
         // Perform the actual operation under test
         gateway.createItemInQBO(salesItem);
 
         //Check that the qbo item ID was correctly assigned to the sales Item
-        assertEquals(salesItem.getQboId(), qboItemID);
+        assertEquals(qboItemID, salesItem.getQboId());
+
+        // Explicitly verify things that SHOULD HAVE happened.
+        new Verifications() {{
+            dataService.add(withArgThat(new SalesItemQBOItemMatcher(salesItem, incomeAccountRef, assetAccountRef, cogAccountRef)));
+
+            // The salesItemRepository should save the sales item
+            salesItemRepository.save(salesItem);
+        }};
     }
 
     @Test
-    public void testCreateCustomerInQBO() {
+    public void testCreateCustomerInQBO() throws Exception {
         //
         // Establish a set of test data
         //
@@ -175,23 +185,19 @@ public class
         customer.setCompany(company);
 
 
-        // Establish a sequence of expectations.
-        new Expectations() {{
+        // Establish non-sequential expections
+        // Mostly used for mocking collaborators
+        new NonStrictExpectations() {{
             // The QBO gateway will try to acquire a data service instance
-            dataServiceFactory.getDataService(customer.getCompany());
+            qboServiceFactory.getDataService(customer.getCompany());
             result = dataService;
 
             // The data service will try to add an Item
-            try {
-                dataService.add(withArgThat(new CustomerQBOCustomerMatcher(customer)));
-            } catch (Exception e) {
-            }
+            dataService.add(withAny(new com.intuit.ipp.data.Customer()));
             com.intuit.ipp.data.Customer qboCustomer = new com.intuit.ipp.data.Customer();
             qboCustomer.setId(qboCustomerID);
             result = qboCustomer;
 
-            // The salesItemRepository should save the sales item
-            customerRepository.save(customer);
         }};
 
         // Perform the actual operation under test
@@ -199,6 +205,14 @@ public class
 
         //Check that the qbo item ID was correctly assigned to the sales Item
         assertEquals(customer.getQboId(), qboCustomerID);
+
+        new Verifications() {{
+            // Explicitly verify that dataService.add must be called with a paramter that matches certain requirements
+            dataService.add(withArgThat(new CustomerQBOCustomerMatcher(customer)));
+
+            // The salesItemRepository should save the sales item
+            customerRepository.save(customer);
+        }};
     }
 
 
