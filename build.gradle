@@ -41,6 +41,7 @@ dependencies {
     compile("org.joda:joda-money:0.9.1")
     compile("ma.glasnost.orika:orika-core:1.4.5")
     compile fileTree(dir: "libs/qbo-sdk-2.3.1", include: "*.jar")
+    compile fileTree(dir: "libs/qbo-sdk-3.0.0", include: "*.jar")
 
     testCompile("org.jmockit:jmockit:1.10")
     testCompile("org.springframework.boot:spring-boot-starter-test")
