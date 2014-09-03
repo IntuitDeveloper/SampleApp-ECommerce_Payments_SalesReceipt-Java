@@ -95,10 +95,10 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
         $scope.shoppingCartView = "Review";
 
         $scope.creditCard = {};
-        $scope.creditCard.number = '';
-        $scope.creditCard.CVC = '';
-        $scope.creditCard.expMonth = '';
-        $scope.creditCard.expYear = '';
+        $scope.creditCard.number = '4111111111111111';
+        $scope.creditCard.CVC = '123';
+        $scope.creditCard.expMonth = '02';
+        $scope.creditCard.expYear = '2020';
 
         $scope.billingInfo = {};
         $scope.billingInfo.name = '';
