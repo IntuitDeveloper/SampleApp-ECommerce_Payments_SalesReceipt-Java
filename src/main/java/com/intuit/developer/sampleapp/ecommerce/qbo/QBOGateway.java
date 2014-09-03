@@ -43,29 +43,8 @@ public class QBOGateway {
         // Make a sales receipt
         SalesReceipt receipt = new SalesReceipt();
 
-        // Make a list of lines
-        List<Line> lineItems = new ArrayList<>();
-
-        // For each cart item there will be a line item
-        for (CartItem cartItem : cart.getCartItems()) {
-            Line line = new Line();
-            // Create a line detail
-            SalesItemLineDetail lineDetail = new SalesItemLineDetail();
-
-            // Make the line item reference the sales item from the cart item
-            ReferenceType itemRef = new ReferenceType();
-            itemRef.setValue(cartItem.getSalesItem().getQboId());
-            lineDetail.setItemRef(itemRef);
-
-            // Set the quantity
-            lineDetail.setQty(BigDecimal.valueOf(cartItem.getQuantity()));
-
-            line.setSalesItemLineDetail(lineDetail);
-            // Add the line item to the list
-            lineItems.add(line);
-        }
-        receipt.setLine(lineItems);
-        receipt.setTxnDate(new Date());
+        // Do Construct the necessary lines items from the shopping cart
+        appendLineItems(receipt, cart);
 
         // Set the reference to the customer
         ReferenceType customerRef = new ReferenceType();
@@ -226,5 +205,56 @@ public class QBOGateway {
 
     }
 
+    private void appendLineItems(SalesReceipt salesReceipt, ShoppingCart cart) {
+        // Make a list of lines
+        List<Line> lineItems = new ArrayList<>();
+
+        // For each cart item there will be a line item
+        for (CartItem cartItem : cart.getCartItems()) {
+            Line line = new Line();
+            // Create a line detail
+            SalesItemLineDetail lineDetail = new SalesItemLineDetail();
+
+            // Make the line item reference the sales item from the cart item
+            ReferenceType itemRef = new ReferenceType();
+            itemRef.setValue(cartItem.getSalesItem().getQboId());
+            lineDetail.setItemRef(itemRef);
+
+            // Set the quantity
+            lineDetail.setQty(BigDecimal.valueOf(cartItem.getQuantity()));
+
+            // Set the unit price
+            lineDetail.setUnitPrice(cartItem.getSalesItem().getUnitPrice().getAmount());
+            line.setSalesItemLineDetail(lineDetail);
+
+            // Set the line total
+            line.setAmount(lineDetail.getUnitPrice().multiply(lineDetail.getQty()));
+            line.setDetailType(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL);
+
+            // Add the line item to the list
+            lineItems.add(line);
+        }
+        // Create Discount Line Item
+        Line discountLine = new Line();
+        discountLine.setDetailType(LineDetailTypeEnum.DISCOUNT_LINE_DETAIL);
+        discountLine.setAmount(cart.getPromotionSavings().getAmount());
+        DiscountLineDetail discountLineDetail = new DiscountLineDetail();
+        discountLineDetail.setDiscountPercent(new BigDecimal(ShoppingCart.PROMOTION_PERCENTAGE));
+        discountLineDetail.setPercentBased(true);
+        discountLine.setDiscountLineDetail(discountLineDetail);
+        lineItems.add(discountLine);
+
+        // Create Tax Line Item
+        Line taxLine = new Line();
+        taxLine.setDetailType(LineDetailTypeEnum.TAX_LINE_DETAIL);
+        taxLine.setAmount(cart.getTax().getAmount());
+        TaxLineDetail taxLineDetail = new TaxLineDetail();
+        taxLineDetail.setTaxPercent(new BigDecimal(ShoppingCart.TAX_PERCENTAGE));
+        taxLineDetail.setPercentBased(true);
+        taxLine.setTaxLineDetail(taxLineDetail);
+        lineItems.add(taxLine);
+
+        salesReceipt.setLine(lineItems);
+    }
 
 }

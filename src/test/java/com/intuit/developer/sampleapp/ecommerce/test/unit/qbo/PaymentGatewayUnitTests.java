@@ -19,7 +19,7 @@ import java.util.List;
 import static junit.framework.Assert.*;
 import static junit.framework.Assert.assertEquals;
 
-public class PaymentGatewayTest {
+public class PaymentGatewayUnitTests {
 
     @Tested
     PaymentGateway gateway;
@@ -63,12 +63,6 @@ public class PaymentGatewayTest {
         cartItems.add(cartItem);
         shoppingCart.setCartItems(cartItems);
 
-        // Some extra assertions to make sure the cart amounts are right
-        assertEquals(Money.of(CurrencyUnit.USD, 13.50), shoppingCart.getSubTotal());
-        // Taxes and discounts
-        assertEquals(Money.of(CurrencyUnit.USD, 11.66), shoppingCart.getTotal());
-
-
         //
         // Setup non-strict expectations (mocking)
         //
@@ -87,54 +81,16 @@ public class PaymentGatewayTest {
         // Explicitly verify strict conditions. In ORDER because authorization must come before capture
         //
         new VerificationsInOrder() {{
-            // There should one call to "authorize" - See matcher for checks
-            chargeService.charge(withArgThat(new AuthorizeChargeMatcher(shoppingCart)));
+            // Verify that the authorization was requested with the right parameters
+            Charge chargePassed;
+            chargeService.charge(chargePassed = withCapture());
+            assertFalse(chargePassed.getCapture());
+            assertEquals(shoppingCart.getTotal().getAmount(), chargePassed.getAmount());
+            assertEquals(PaymentGateway.CHARGE_DESCRIPTION, chargePassed.getDescription());
+
+            // Verify that the capture was request with the right parameters.
             // There be another call to "capture" - See matcher for checks
             //  chargeService.capture(anyString, withArgThat(new CaptureMatcher(shoppingCart)));
         }};
-    }
-
-    public class AuthorizeChargeMatcher extends TypeSafeMatcher<Charge> {
-
-        ShoppingCart shoppingCartToMatch;
-
-        public AuthorizeChargeMatcher(ShoppingCart shoppingCart) {
-            this.shoppingCartToMatch = shoppingCart;
-        }
-
-        @Override
-        protected boolean matchesSafely(Charge charge) {
-            // The charge should not be captured, just authorized
-            assertFalse(charge.getCapture());
-            assertEquals(shoppingCartToMatch.getTotal().getAmount(), charge.getAmount());
-            assertEquals(PaymentGateway.CHARGE_DESCRIPTION,charge.getDescription());
-
-            return true;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("The charge did not meet expectations");
-        }
-    }
-
-    public class CaptureMatcher extends TypeSafeMatcher<Capture> {
-
-        ShoppingCart shoppingCartToMatch;
-
-        public CaptureMatcher(ShoppingCart shoppingCart) {
-            this.shoppingCartToMatch = shoppingCart;
-        }
-        @Override
-        protected boolean matchesSafely(Capture capture) {
-            assertEquals(shoppingCartToMatch.getTotal().getAmount(), capture.getAmount());
-            assertEquals(PaymentGateway.CHARGE_DESCRIPTION, capture.getDescription());
-            return true;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("The capture did not meet expectations");
-        }
     }
 }

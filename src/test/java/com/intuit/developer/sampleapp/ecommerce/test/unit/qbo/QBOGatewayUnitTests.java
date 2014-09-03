@@ -1,13 +1,12 @@
 package com.intuit.developer.sampleapp.ecommerce.test.unit.qbo;
 
+import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
-import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOGateway;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
 import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
 import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
-import com.intuit.ipp.core.IEntity;
 import com.intuit.ipp.data.*;
 import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
@@ -17,15 +16,17 @@ import org.hamcrest.Description;
 import org.hamcrest.TypeSafeMatcher;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-import org.slf4j.Logger;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
-import static junit.framework.Assert.*;
+import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
 
 /**
  * Created by akuchta on 8/27/14.
@@ -47,6 +48,19 @@ public class QBOGatewayUnitTests {
     @Injectable
     SalesItemRepository salesItemRepository;
 
+    Company company;
+    Customer customer;
+
+    @Before
+    public void before() {
+        company = new Company();
+        company.setName("Foo");
+        company.setAccessToken("asdasdA");
+        company.setAccessTokenSecret("sfsfsdfsdfsdfs");
+
+        customer = new Customer("Bob", "Shmob", "a@a.com", "");
+        customer.setCompany(company);
+    }
 
     @Test
     public void testCreateItemInQBO() throws Exception {
@@ -54,16 +68,10 @@ public class QBOGatewayUnitTests {
         // Establish a set of test data
         //
 
-        // Create a company
-        Company company = new Company();
-        company.setName("Foo");
-        company.setAccessToken("asdasdA");
-        company.setAccessTokenSecret("sfsfsdfsdfsdfs");
-
         // Create a sales item
         final SalesItem salesItem = new SalesItem("Shirt", "It's a shirt", Money.of(CurrencyUnit.USD, 5.00), "");
         salesItem.setQtyOnHand(new BigDecimal(5.0));
-        String qboItemID = "1";
+        final String qboItemID = "1";
 
         //Create an income account
         final Account incomeAccount = new Account();
@@ -160,7 +168,28 @@ public class QBOGatewayUnitTests {
 
         // Explicitly verify things that SHOULD HAVE happened.
         new Verifications() {{
-            dataService.add(withArgThat(new SalesItemQBOItemMatcher(salesItem, incomeAccountRef, assetAccountRef, cogAccountRef)));
+            Item qboItemPassed;
+            dataService.add(qboItemPassed = withCapture());
+
+            // Compare Values of Domain Object and QBO entity
+            assertEquals(salesItem.getName(), qboItemPassed.getName());
+            assertEquals(salesItem.getDescription(), qboItemPassed.getDescription());
+            assertEquals(salesItem.getQtyOnHand(), qboItemPassed.getQtyOnHand());
+            assertEquals(salesItem.getUnitPrice().getAmount(), qboItemPassed.getUnitPrice());
+            // Check for explicit / special fields on the _QBO ENTITY_ that are not part of domain object but should be set
+            // as part of mapping
+            assertTrue(qboItemPassed.isTaxable());
+            assertTrue(qboItemPassed.isActive());
+            assertTrue(qboItemPassed.isTrackQtyOnHand());
+            assertFalse(qboItemPassed.isSalesTaxIncluded());
+            assertEquals(ItemTypeEnum.INVENTORY, qboItemPassed.getType());
+            assertNotNull(qboItemPassed.getInvStartDate());
+            assertNotNull(qboItemPassed.getQtyOnHand());
+
+            //Check that the correct account references were made
+            assertEquals(assetAccountRef, qboItemPassed.getAssetAccountRef());
+            assertEquals(incomeAccountRef, qboItemPassed.getIncomeAccountRef());
+            assertEquals(cogAccountRef, qboItemPassed.getExpenseAccountRef());
 
             // The salesItemRepository should save the sales item
             salesItemRepository.save(salesItem);
@@ -169,22 +198,7 @@ public class QBOGatewayUnitTests {
 
     @Test
     public void testCreateCustomerInQBO() throws Exception {
-        //
-        // Establish a set of test data
-        //
-
-        // Create a company
-        Company company = new Company();
-        company.setName("Foo");
-        company.setAccessToken("asdasdA");
-        company.setAccessTokenSecret("sfsfsdfsdfsdfs");
-
-        // Create a customer
-        final Customer customer = new Customer("Bob", "Shmob", "a@a.com", "");
         final String qboCustomerID = "1";
-        customer.setCompany(company);
-
-
         // Establish non-sequential expections
         // Mostly used for mocking collaborators
         new NonStrictExpectations() {{
@@ -207,83 +221,93 @@ public class QBOGatewayUnitTests {
         assertEquals(customer.getQboId(), qboCustomerID);
 
         new Verifications() {{
-            // Explicitly verify that dataService.add must be called with a paramter that matches certain requirements
-            dataService.add(withArgThat(new CustomerQBOCustomerMatcher(customer)));
+            com.intuit.ipp.data.Customer passedInCustomer;
+
+            // Explicitly verify that dataService.add must be called with a parameter that matches certain requirements
+            dataService.add(passedInCustomer = withCapture());
+
+            assertEquals(customer.getFirstName(), passedInCustomer.getGivenName());
+            assertEquals(customer.getLastName(), passedInCustomer.getFamilyName());
+            assertEquals(customer.getEmailAddress(), passedInCustomer.getPrimaryEmailAddr().getAddress());
+            assertEquals(customer.getPhoneNumber(), passedInCustomer.getPrimaryPhone().getFreeFormNumber());
 
             // The salesItemRepository should save the sales item
             customerRepository.save(customer);
         }};
     }
 
+    @Test
+    public void testCreateSalesReceiptInQBO() throws Exception {
+        // Create a a shopping cart
+        final ShoppingCart shoppingCart = new ShoppingCart(customer);
 
-    // Defining a matcher class to check that the correct fields get mapped over to qbo Item from the Sales Item
-    public class SalesItemQBOItemMatcher extends TypeSafeMatcher<Item> {
+        // Create a list of items for the cart
+        List<CartItem> cartItems = new ArrayList<>();
+        CartItem cartItem = new CartItem();
+        cartItem.setSalesItem(new SalesItem("ItemType1","It's an item", Money.of(CurrencyUnit.USD, 5.00), ""));
+        cartItem.setQuantity(2);
+        cartItem.setShoppingCart(shoppingCart);
+        cartItems.add(cartItem);
+        cartItem = new CartItem();
+        cartItem.setSalesItem(new SalesItem("ItemType2","It's another item", Money.of(CurrencyUnit.USD, 3.50), ""));
+        cartItem.setQuantity(1);
+        cartItem.setShoppingCart(shoppingCart);
+        cartItems.add(cartItem);
+        shoppingCart.setCartItems(cartItems);
 
-        SalesItem salesItemToMatch;
-        ReferenceType incomeAccountRefToMatch;
-        ReferenceType assetAccountRefToMatch;
-        ReferenceType expenseAccountRefToMatch;
+        new NonStrictExpectations() {{
+            qboServiceFactory.getDataService(withAny(new Company()));
+            result = dataService;
+        }};
 
-        public SalesItemQBOItemMatcher(SalesItem salesItem, ReferenceType incomeAccountRefToMatch, ReferenceType assetAccountRefToMatch, ReferenceType expenseAccountRefToMatch) {
-            this.salesItemToMatch = salesItem;
-            this.incomeAccountRefToMatch = incomeAccountRefToMatch;
-            this.assetAccountRefToMatch = assetAccountRefToMatch;
-            this.expenseAccountRefToMatch = expenseAccountRefToMatch;
-        }
+        gateway.createSalesReceiptInQBO(shoppingCart);
 
-        @Override
-        public boolean matchesSafely(Item item) {
-            // Compare Values of Domain Object and QBO entity
-            assertEquals(salesItemToMatch.getName(), item.getName());
-            assertEquals(salesItemToMatch.getDescription(), item.getDescription());
-            assertEquals(salesItemToMatch.getQtyOnHand(), item.getQtyOnHand());
-            assertEquals(salesItemToMatch.getUnitPrice().getAmount(), item.getUnitPrice());
-            // Check for explicit / special fields on the _QBO ENTITY_ that are not part of domain object but should be set
-            // as part of mapping
-            assertTrue(item.isTaxable());
-            assertTrue(item.isActive());
-            assertTrue(item.isTrackQtyOnHand());
-            assertFalse(item.isSalesTaxIncluded());
-            assertEquals(ItemTypeEnum.INVENTORY, item.getType());
-            assertNotNull(item.getInvStartDate());
-            assertNotNull(item.getQtyOnHand());
+        new Verifications() {{
+            SalesReceipt receiptPassed;
+            dataService.add(receiptPassed = withCapture());
+            List<Line> lines = receiptPassed.getLine();
+            assertEquals(4, lines.size());
+            List<CartItem> cartItems = shoppingCart.getCartItems();
 
-            //Check that the correct account references were made
-            assertEquals(assetAccountRefToMatch, item.getAssetAccountRef());
-            assertEquals(incomeAccountRefToMatch, item.getIncomeAccountRef());
-            assertEquals(expenseAccountRefToMatch, item.getExpenseAccountRef());
+            // The first two lines items of the sales receipt should be the items added
+            verifyLineForCartItem(lines.get(0), cartItems.get(0));
+            verifyLineForCartItem(lines.get(1), cartItems.get(1));
 
-            // If we reach this return statement all assertions have passed.
-            return true;
-        }
+            // The next line should be a discount
+            verifyLineForDiscount(lines.get(2), shoppingCart);
 
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("The QBO Item did not match the SalesItem");
-        }
+            // The next line should be taxes
+            verifyLineForTaxes(lines.get(3), shoppingCart);
+        }};
     }
 
-    // Defining a matcher class to check the the correct fields get mapped over to qbo Customer from app customer
-    public class CustomerQBOCustomerMatcher extends TypeSafeMatcher<com.intuit.ipp.data.Customer> {
-        Customer customerToMatch;
+    private void verifyLineForCartItem(Line line, CartItem cartItem) {
+        assertEquals(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL, line.getDetailType());
+        SalesItemLineDetail lineDetail = line.getSalesItemLineDetail();
+        assertEquals(
+                "The unit prices should match",
+                cartItem.getSalesItem().getUnitPrice().getAmount(),
+                lineDetail.getUnitPrice());
+        assertEquals("The item quantities should match",
+                new BigDecimal(cartItem.getQuantity()),
+                lineDetail.getQty());
+        assertEquals(
+                "The line total should be cart item qty * unit price",
+                cartItem.getSalesItem().getUnitPrice().multipliedBy(cartItem.getQuantity()).getAmount(),
+                line.getAmount());
+    }
 
-        public CustomerQBOCustomerMatcher(Customer customerToMatch) {
-            this.customerToMatch = customerToMatch;
-        }
+    private void verifyLineForDiscount(Line line, ShoppingCart shoppingCart) {
+        assertEquals(LineDetailTypeEnum.DISCOUNT_LINE_DETAIL, line.getDetailType());
+        DiscountLineDetail lineDetail = line.getDiscountLineDetail();
+        assertTrue(lineDetail.isPercentBased());
+        assertEquals(new BigDecimal(ShoppingCart.PROMOTION_PERCENTAGE), lineDetail.getDiscountPercent());
+    }
 
-        @Override
-        public boolean matchesSafely(com.intuit.ipp.data.Customer qboCustomer) {
-            assertEquals(customerToMatch.getFirstName(), qboCustomer.getGivenName());
-            assertEquals(customerToMatch.getLastName(), qboCustomer.getFamilyName());
-            assertEquals(customerToMatch.getEmailAddress(), qboCustomer.getPrimaryEmailAddr().getAddress());
-            assertEquals(customerToMatch.getPhoneNumber(), qboCustomer.getPrimaryPhone().getFreeFormNumber());
-            // If we reach this return statement all assertions have passed.
-            return true;
-        }
-
-        @Override
-        public void describeTo(Description description) {
-            description.appendText("The QBO Customer Did not match the Customer");
-        }
+    private void verifyLineForTaxes(Line line, ShoppingCart shoppingCart) {
+        assertEquals(LineDetailTypeEnum.TAX_LINE_DETAIL, line.getDetailType());
+        TaxLineDetail lineDetail = line.getTaxLineDetail();
+        assertEquals(shoppingCart.getTax().getAmount(), line.getAmount());
+        assertEquals(new BigDecimal(ShoppingCart.TAX_PERCENTAGE), lineDetail.getTaxPercent());
     }
 }
