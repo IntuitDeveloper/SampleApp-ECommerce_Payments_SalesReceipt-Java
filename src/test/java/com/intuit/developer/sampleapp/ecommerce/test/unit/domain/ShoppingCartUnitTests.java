@@ -62,6 +62,6 @@ public class ShoppingCartUnitTests {
 
     @Test
     public void testGetTotal() throws Exception {
-        assertEquals(Money.of(CurrencyUnit.USD, 12.20), shoppingCart.getTotal());
+        assertEquals(Money.of(CurrencyUnit.USD, 11.66), shoppingCart.getTotal());
     }
 }

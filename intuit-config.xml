@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<intuit-config>
+    <baseURL>
+        <qbd>https://quickbooks.api.intuit.com/v3/company</qbd>
+        <qbo>https://quickbooks.api.intuit.com/v3/company</qbo>
+        <platformService>https://appcenter.intuit.com/db</platformService>
+        <quickbooks-api>https://transaction-api-e2e.payments.intuit.net/v2</quickbooks-api>
+    </baseURL>
+</intuit-config>

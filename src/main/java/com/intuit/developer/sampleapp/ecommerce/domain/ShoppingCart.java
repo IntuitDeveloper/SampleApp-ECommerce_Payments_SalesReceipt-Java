@@ -12,8 +12,8 @@ import java.util.List;
 public class ShoppingCart {
 
     public static final double SHIPPING_PERCENTAGE = .05d;
-    public static final double TAX_PERCENTAGE = .0793d;
-    public static final double PROMOTION_PERCENTAGE = .2d;
+    public static final double TAX_MULTIPLIER = .0793d;
+    public static final double PROMOTION_MULTIPLIER = .2d;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,7 +23,7 @@ public class ShoppingCart {
 	@JoinColumn(name="customer_fk", referencedColumnName="id")
 	Customer customer;
 	
-	@OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="shoppingCart")
+	@OneToMany(fetch = FetchType.EAGER, cascade=CascadeType.ALL, mappedBy="shoppingCart", orphanRemoval = true)
 	List<CartItem> cartItems = new ArrayList<CartItem>();
 
 	protected ShoppingCart()
@@ -74,11 +74,11 @@ public class ShoppingCart {
     }
 
     public Money getPromotionSavings() {
-        return getSubTotal().multipliedBy(PROMOTION_PERCENTAGE, RoundingMode.CEILING);
+        return getSubTotal().multipliedBy(PROMOTION_MULTIPLIER, RoundingMode.CEILING);
     }
 
     public Money getTax() {
-        return getSubTotal().minus(getPromotionSavings()).multipliedBy(TAX_PERCENTAGE, RoundingMode.CEILING);
+        return getSubTotal().minus(getPromotionSavings()).multipliedBy(TAX_MULTIPLIER, RoundingMode.CEILING);
     }
 
 	public Money getShipping() {
@@ -86,7 +86,7 @@ public class ShoppingCart {
 	}
 
     public Money getTotal() {
-        return getSubTotal().minus(getPromotionSavings()).plus(getTax()).plus(getShipping());
+        return getSubTotal().minus(getPromotionSavings());
     }
 
 }

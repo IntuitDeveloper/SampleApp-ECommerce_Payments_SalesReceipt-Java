@@ -1,5 +1,6 @@
 package com.intuit.developer.sampleapp.ecommerce.test.unit.qbo;
 
+import com.intuit.developer.sampleapp.ecommerce.controllers.OrderConfirmation;
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.qbo.PaymentGateway;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
@@ -71,11 +72,11 @@ public class PaymentGatewayUnitTests {
             result = chargeService;
         }};
 
-
+        OrderConfirmation confirmation = new OrderConfirmation();
         //
         // Execute method under test
         //
-        gateway.chargeCustomerForOrder(shoppingCart, "1235FF22345CD987741");
+       gateway.chargeCustomerForOrder(shoppingCart, "1235FF22345CD987741", confirmation);
 
         //
         // Explicitly verify strict conditions. In ORDER because authorization must come before capture
@@ -84,7 +85,7 @@ public class PaymentGatewayUnitTests {
             // Verify that the authorization was requested with the right parameters
             Charge chargePassed;
             chargeService.charge(chargePassed = withCapture());
-            assertFalse(chargePassed.getCapture());
+            assertTrue(chargePassed.getCapture());
             assertEquals(shoppingCart.getTotal().getAmount(), chargePassed.getAmount());
             assertEquals(PaymentGateway.CHARGE_DESCRIPTION, chargePassed.getDescription());
 

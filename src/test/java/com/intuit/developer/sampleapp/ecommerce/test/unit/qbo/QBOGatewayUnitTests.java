@@ -1,5 +1,6 @@
 package com.intuit.developer.sampleapp.ecommerce.test.unit.qbo;
 
+import com.intuit.developer.sampleapp.ecommerce.controllers.OrderConfirmation;
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
@@ -344,12 +345,35 @@ public class QBOGatewayUnitTests {
 		cartItems.add(cartItem);
 		shoppingCart.setCartItems(cartItems);
 
+        TaxCode taxCode = new TaxCode();
+        taxCode.setId("23");
+        taxCode.setName("California Sales Tax");
+        taxCode.setTaxable(true);
+        taxCode.setActive(true);
+        final QueryResult taxCodeQueryResult = new QueryResult();
+        taxCodeQueryResult.setEntities(Arrays.asList(taxCode));
+
+        final SalesReceipt receiptReturned = new SalesReceipt();
+        receiptReturned.setDocNumber("1001");
+
 		new NonStrictExpectations() {{
 			qboServiceFactory.getDataService(withAny(new Company()));
 			result = dataService;
+
+            dataService.executeQuery(anyString);
+            result = taxCodeQueryResult;
+
+            dataService.add(withAny(new SalesReceipt()));
+            result =  receiptReturned;
 		}};
 
-		gateway.createSalesReceiptInQBO(shoppingCart);
+        OrderConfirmation orderConfirmation = new OrderConfirmation();
+		gateway.createSalesReceiptInQBO(shoppingCart, orderConfirmation);
+
+        assertEquals(
+                "The order confirmation shoud contain the receipt document number",
+                receiptReturned.getDocNumber(),
+                orderConfirmation.getOrderNumber());
 
 		new Verifications() {{
             // Capture the sales receipt passed to the dataService
@@ -367,9 +391,6 @@ public class QBOGatewayUnitTests {
 
 			// The next line should be a discount
 			verifyLineForDiscount(lines.get(2), shoppingCart);
-
-			// A Tax detail line should be included
-			verifyTxnTaxDetail(receiptPassed.getTxnTaxDetail(), shoppingCart);
 
             // The the customer reference should be set on the sales receipt
 			assertEquals(shoppingCart.getCustomer().getQboId(), receiptPassed.getCustomerRef().getValue());
@@ -411,17 +432,7 @@ public class QBOGatewayUnitTests {
         assertEquals(LineDetailTypeEnum.DISCOUNT_LINE_DETAIL, line.getDetailType());
         DiscountLineDetail lineDetail = line.getDiscountLineDetail();
         assertTrue(lineDetail.isPercentBased());
-        assertEquals(new BigDecimal(ShoppingCart.PROMOTION_PERCENTAGE), lineDetail.getDiscountPercent());
-    }
-
-    private void verifyTxnTaxDetail(TxnTaxDetail txnTaxDetail, ShoppingCart shoppingCart) {
-        List<Line> taxLines = txnTaxDetail.getTaxLine();
-        assertEquals(1, taxLines.size());
-        Line taxLine = taxLines.get(0);
-        assertEquals(LineDetailTypeEnum.TAX_LINE_DETAIL, taxLine.getDetailType());
-        TaxLineDetail lineDetail = taxLine.getTaxLineDetail();
-        assertEquals(shoppingCart.getTax().getAmount(), taxLine.getAmount());
-        assertEquals(new BigDecimal(ShoppingCart.TAX_PERCENTAGE), lineDetail.getTaxPercent());
+        assertEquals(new BigDecimal(ShoppingCart.PROMOTION_MULTIPLIER * 100), lineDetail.getDiscountPercent());
     }
 
 	private Account createAccount(String id, String accountName, String description, AccountTypeEnum accountType, AccountSubTypeEnum accountSubType) {

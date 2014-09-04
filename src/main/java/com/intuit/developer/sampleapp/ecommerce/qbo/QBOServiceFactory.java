@@ -5,6 +5,7 @@ import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.repository.AppInfoRepository;
 import com.intuit.ipp.core.Context;
 import com.intuit.ipp.core.ServiceType;
+import com.intuit.ipp.data.TaxService;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.security.IAuthorizer;
 import com.intuit.ipp.security.OAuthAuthorizer;

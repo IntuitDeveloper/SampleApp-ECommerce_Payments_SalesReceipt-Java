@@ -1,5 +1,6 @@
 package com.intuit.developer.sampleapp.ecommerce.qbo;
 
+import com.intuit.developer.sampleapp.ecommerce.controllers.OrderConfirmation;
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
 import com.intuit.developer.sampleapp.ecommerce.mappers.CustomerMapper;
@@ -15,9 +16,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.lang.Class;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.math.BigInteger;
+import java.sql.Ref;
+import java.util.*;
 
 /**
  * Interface to QBO via QBO v3 SDK.
@@ -33,21 +34,24 @@ public class QBOGateway {
     @Autowired
     private SalesItemRepository salesItemRepository;
 
-    public void createSalesReceiptInQBO(ShoppingCart cart) {
+    public void createSalesReceiptInQBO(ShoppingCart cart, OrderConfirmation confirmation) {
         Customer customer = cart.getCustomer();
         DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
         // Make a sales receipt
         SalesReceipt receipt = new SalesReceipt();
 
-        // Do Construct the necessary lines items from the shopping cart
+        //Append the necessary lines items from the shopping cart
         appendLineItems(receipt, cart);
 
         // Set the reference to the customer
         ReferenceType customerRef = new ReferenceType();
         customerRef.setValue(customer.getQboId());
         receipt.setCustomerRef(customerRef);
-
+        receipt.setPaymentType(PaymentTypeEnum.CREDIT_CARD);
         receipt = createObjectInQBO(dataService, receipt);
+
+        // Keep the receipt document number to send in the confirmation.
+        confirmation.setOrderNumber(receipt.getDocNumber());
     }
 
 	public void createCustomerInQBO(Customer customer) {
@@ -98,7 +102,6 @@ public class QBOGateway {
 		    // copy SalesItem to QBO Item
 		    // This also populates some necessary default constant values
 		    Item qboItem = SalesItemMapper.buildQBOObject(salesItem);
-
 		    //
 		    // We need to do lookups for accounts to associate the item to
 		    //
@@ -140,10 +143,10 @@ public class QBOGateway {
 		return referenceType;
 	}
 
-	public static final String ACCOUNT_TYPE_QUERY = "select * from account where accounttype = '%s' and accountsubtype = '%s'";
 	/**
 	 * Search for an account in QBO based on AccountType and AccountSubType
 	 */
+	public static final String ACCOUNT_TYPE_QUERY = "select * from account where accounttype = '%s' and accountsubtype = '%s'";
 	private Account findAccount(DataService dataService, AccountTypeEnum accountType, String accountSubType) {
 		String accountQuery = String.format(ACCOUNT_TYPE_QUERY, accountType.value(), accountSubType);
 		try {
@@ -159,24 +162,10 @@ public class QBOGateway {
 		}
 	}
 
-    private <T extends IEntity> T createObjectInQBO(DataService dataService, T qboObject) {
-        try {
-            final T createdObject = dataService.add(qboObject);
-            return createdObject;
-        } catch (FMSException e) {
-	        //NOTE: a StaleObjectException can be received while creating a new object; this error indicates that an
-	        //      object with that QBO ID already exists.
-            throw new RuntimeException("Failed create an " + qboObject.getClass().getName() + " in QBO", e);
-        }
-
-    }
-
-	public static final String CUSTOMER_QUERY = "select * from customer where active = true and givenName = '%s' and familyName = '%s'";
-	public static final String ITEM_QUERY = "select * from item where active = true and name = '%s'";
-
 	/**
 	 * Finds a QBO customer where the customer's first & last name equals the passed in application's customer's first & last name.
 	 */
+	public static final String CUSTOMER_QUERY = "select * from customer where active = true and givenName = '%s' and familyName = '%s'";
 	public com.intuit.ipp.data.Customer findCustomer(DataService dataService, Customer customer) {
 		String query = String.format(CUSTOMER_QUERY, customer.getFirstName(), customer.getLastName());
 		return executeQuery(dataService, query, com.intuit.ipp.data.Customer.class);
@@ -185,6 +174,7 @@ public class QBOGateway {
 	/**
 	 * Finds a QBO item where the item's name equals the passed in salesItem's name.
 	 */
+	public static final String ITEM_QUERY = "select * from item where active = true and name = '%s'";
 	public com.intuit.ipp.data.Item findItem(DataService dataService, SalesItem salesItem) {
 		String query = String.format(ITEM_QUERY, salesItem.getName());
 		return executeQuery(dataService, query, com.intuit.ipp.data.Item.class);
@@ -206,6 +196,18 @@ public class QBOGateway {
 		}
 	}
 
+    private <T extends IEntity> T createObjectInQBO(DataService dataService, T qboObject) {
+        try {
+            final T createdObject = dataService.add(qboObject);
+            return createdObject;
+        } catch (FMSException e) {
+            //NOTE: a StaleObjectException can be received while creating a new object; this error indicates that an
+            //      object with that QBO ID already exists.
+            throw new RuntimeException("Failed create an " + qboObject.getClass().getName() + " in QBO", e);
+        }
+
+    }
+
     /**
      * Append Line Items to a sales receipt based on a shopping cart.
      * This is the bulk of the effort in creating a sales receipt.
@@ -219,6 +221,10 @@ public class QBOGateway {
 		// For each cart item there will be a line item
 		for (CartItem cartItem : cart.getCartItems()) {
 			Line line = new Line();
+
+            // This line corresponds to a the _sale_ of an _item_
+            line.setDetailType(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL);
+
 			// Create a line detail
 			SalesItemLineDetail lineDetail = new SalesItemLineDetail();
 
@@ -234,37 +240,45 @@ public class QBOGateway {
 			lineDetail.setUnitPrice(cartItem.getSalesItem().getUnitPrice().getAmount());
 			line.setSalesItemLineDetail(lineDetail);
 			line.setDescription(cartItem.getSalesItem().getName());
+
 			// Set the line total
 			line.setAmount(lineDetail.getUnitPrice().multiply(lineDetail.getQty()));
-			line.setDetailType(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL);
 
 			// Add the line item to the list
 			lineItems.add(line);
 		}
-		// Create Discount Line Item
+
+		// Create a line to contain the discount
 		Line discountLine = new Line();
+
+        // This line corresponds to a _discout_
 		discountLine.setDetailType(LineDetailTypeEnum.DISCOUNT_LINE_DETAIL);
-		//discountLine.setAmount(cart.getPromotionSavings().getAmount());
-		DiscountLineDetail discountLineDetail = new DiscountLineDetail();
-		discountLineDetail.setDiscountPercent(new BigDecimal(ShoppingCart.PROMOTION_PERCENTAGE));
-		discountLineDetail.setPercentBased(true);
-		discountLine.setDiscountLineDetail(discountLineDetail);
+
+        // Creating an attaching a 'detail' object
+        DiscountLineDetail discountLineDetail = new DiscountLineDetail();
+
+        /**
+         * There are two ways to set the value of the discount which are mutually exclusive
+         * 1) Set an explicit amount
+         * 2) Set a percentage of total.
+         *
+         * We will use the _percentage_ approach.
+         */
+
+        // Explicit amount approach
+        // discountLine.setAmount(cart.getPromotionSavings().getAmount());
+
+        // Percentage approach
+        discountLineDetail.setDiscountPercent(new BigDecimal(ShoppingCart.PROMOTION_MULTIPLIER * 100));
+        discountLineDetail.setPercentBased(true);
+
+        // Add the discount details to the line
+        discountLine.setDiscountLineDetail(discountLineDetail);
+
+        // Add the discount line to the sales recept
 		lineItems.add(discountLine);
 
-		// Create Tax Line Item
-		Line taxLine = new Line();
-		taxLine.setDetailType(LineDetailTypeEnum.TAX_LINE_DETAIL);
-		taxLine.setAmount(cart.getTax().getAmount());
-		TaxLineDetail taxLineDetail = new TaxLineDetail();
-		taxLineDetail.setTaxPercent(new BigDecimal(ShoppingCart.TAX_PERCENTAGE));
-		taxLineDetail.setPercentBased(true);
-		taxLine.setTaxLineDetail(taxLineDetail);
-		TxnTaxDetail txnTaxDetail = new TxnTaxDetail();
-		List<Line> txnTaxLines = new ArrayList<>();
-		txnTaxLines.add(taxLine);
-		txnTaxDetail.setTaxLine(txnTaxLines);
-		txnTaxDetail.setTotalTax(cart.getTax().getAmount());
-		salesReceipt.setTxnTaxDetail(txnTaxDetail);
-		salesReceipt.setLine(lineItems);
-	}	
+        // Add the line items to the receipt
+        salesReceipt.setLine(lineItems);
+	}
 }
