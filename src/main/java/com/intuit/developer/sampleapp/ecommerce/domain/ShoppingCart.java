@@ -10,6 +10,10 @@ import java.util.List;
 
 @Entity
 public class ShoppingCart {
+
+    public static final double SHIPPING_PERCENTAGE = .05d;
+    public static final double TAX_PERCENTAGE = .0793d;
+    public static final double PROMOTION_PERCENTAGE = .2d;
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
@@ -70,15 +74,15 @@ public class ShoppingCart {
     }
 
     public Money getPromotionSavings() {
-        return getSubTotal().multipliedBy(.2d, RoundingMode.CEILING);
+        return getSubTotal().multipliedBy(PROMOTION_PERCENTAGE, RoundingMode.CEILING);
     }
 
     public Money getTax() {
-        return getSubTotal().minus(getPromotionSavings()).multipliedBy(.0793d, RoundingMode.CEILING);
+        return getSubTotal().minus(getPromotionSavings()).multipliedBy(TAX_PERCENTAGE, RoundingMode.CEILING);
     }
 
 	public Money getShipping() {
-		return getSubTotal().minus(getPromotionSavings()).multipliedBy(.05d, RoundingMode.FLOOR);
+		return getSubTotal().minus(getPromotionSavings()).multipliedBy(SHIPPING_PERCENTAGE, RoundingMode.FLOOR);
 	}
 
     public Money getTotal() {
