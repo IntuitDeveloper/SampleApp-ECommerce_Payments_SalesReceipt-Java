@@ -13,16 +13,12 @@ import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
 import mockit.*;
 import mockit.integration.junit4.JMockit;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
-import javax.management.Query;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -111,7 +107,7 @@ public class QBOGatewayUnitTests {
             qboServiceFactory.getDataService(salesItem.getCompany());
             result = dataService;
 
-	        dataService.executeQuery(String.format(QBOGateway.SALES_ITEM_QUERY, salesItem.getName()));
+	        dataService.executeQuery(String.format(QBOGateway.ITEM_QUERY, salesItem.getName()));
 	        result = itemQueryResult;
 
             // The dataService will try to execute a query for income accounts
@@ -400,46 +396,6 @@ public class QBOGatewayUnitTests {
 			assertEquals(shoppingCart.getCustomer().getQboId(), receiptPassed.getCustomerRef().getValue());
 		}};
 	}	
-
-    // Defining a matcher class to check that the correct fields get mapped over to qbo Item from the Sales Item
-    public class SalesItemQBOItemMatcher extends TypeSafeMatcher<Item> {
-
-        cartItem = new CartItem();
-        salesItem = new SalesItem("ItemType2","It's another item", Money.of(CurrencyUnit.USD, 3.50), "");
-        salesItem.setQboId("2");
-        cartItem.setSalesItem(salesItem);
-        cartItem.setQuantity(1);
-        cartItem.setShoppingCart(shoppingCart);
-        cartItems.add(cartItem);
-        shoppingCart.setCartItems(cartItems);
-
-        new NonStrictExpectations() {{
-            qboServiceFactory.getDataService(withAny(new Company()));
-            result = dataService;
-        }};
-
-        gateway.createSalesReceiptInQBO(shoppingCart);
-
-        new Verifications() {{
-            SalesReceipt receiptPassed;
-            dataService.add(receiptPassed = withCapture());
-            List<Line> lines = receiptPassed.getLine();
-            assertEquals(3, lines.size());
-            List<CartItem> cartItems = shoppingCart.getCartItems();
-
-            // The first two lines items of the sales receipt should be the items added
-            verifyLineForCartItem(lines.get(0), cartItems.get(0));
-            verifyLineForCartItem(lines.get(1), cartItems.get(1));
-
-            // The next line should be a discount
-            verifyLineForDiscount(lines.get(2), shoppingCart);
-
-            // The next line should be taxes
-            verifyTxnTaxDetail(receiptPassed.getTxnTaxDetail(), shoppingCart);
-
-            assertEquals(shoppingCart.getCustomer().getQboId(), receiptPassed.getCustomerRef().getValue());
-        }};
-    }
 
     private void verifyLineForCartItem(Line line, CartItem cartItem) {
         assertEquals(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL, line.getDetailType());

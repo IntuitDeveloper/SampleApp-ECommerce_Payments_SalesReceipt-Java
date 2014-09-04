@@ -172,7 +172,7 @@ public class QBOGateway {
     }
 
 	public static final String CUSTOMER_QUERY = "select * from customer where active = true and givenName = '%s' and familyName = '%s'";
-	public static final String SALES_ITEM_QUERY = "select * from item where active = true and name = '%s'";
+	public static final String ITEM_QUERY = "select * from item where active = true and name = '%s'";
 
 	/**
 	 * Finds a QBO customer where the customer's first & last name equals the passed in application's customer's first & last name.
@@ -186,7 +186,7 @@ public class QBOGateway {
 	 * Finds a QBO item where the item's name equals the passed in salesItem's name.
 	 */
 	public com.intuit.ipp.data.Item findItem(DataService dataService, SalesItem salesItem) {
-		String query = String.format(SALES_ITEM_QUERY, salesItem.getName());
+		String query = String.format(ITEM_QUERY, salesItem.getName());
 		return executeQuery(dataService, query, com.intuit.ipp.data.Item.class);
 	}
 
