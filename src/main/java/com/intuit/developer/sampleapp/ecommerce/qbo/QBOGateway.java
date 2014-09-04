@@ -1,11 +1,9 @@
 package com.intuit.developer.sampleapp.ecommerce.qbo;
 
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
-import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
 import com.intuit.developer.sampleapp.ecommerce.mappers.CustomerMapper;
 import com.intuit.developer.sampleapp.ecommerce.mappers.SalesItemMapper;
-import com.intuit.developer.sampleapp.ecommerce.repository.CompanyRepository;
 import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
 import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
 import com.intuit.ipp.core.IEntity;
@@ -15,6 +13,7 @@ import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.lang.Class;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
@@ -27,9 +26,6 @@ public class QBOGateway {
 
     @Autowired
     private QBOServiceFactory qboServiceFactory;
-
-	@Autowired
-	private CompanyRepository companyRepository;
 
     @Autowired
     private CustomerRepository customerRepository;
@@ -75,16 +71,28 @@ public class QBOGateway {
         receipt = createObjectInQBO(dataService, receipt);
     }
 
+	public void createCustomerInQBO(Customer customer) {
+		DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
 
-    public void createCustomerInQBO(Customer customer) {
-        DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
-        final com.intuit.ipp.data.Customer qboObject = CustomerMapper.buildQBOObject(customer);
-        final com.intuit.ipp.data.Customer returnedQBOObject = createObjectInQBO(dataService, qboObject);
+        /* In order to prevent syncing the same data into QBO more than once, query to see if the entity already exists.
+           This solution is only meant to provide a better sample app experience (e.g. if you wipe out your database,
+           we don't want the sample app to keep creating the same data over and over in QBO).
 
-	    // TODO: comment on best practice of not embedding QBO ID on app domain class
-        customer.setQboId(returnedQBOObject.getId());
-        customerRepository.save(customer);
-    }
+           In a production app keeping data in two systems in sync is a difficult problem to solve; this code is not
+           meant to demonstrate production quality sync functionality.
+         */
+
+		com.intuit.ipp.data.Customer returnedQBOObject = findCustomer(dataService, customer);
+		if (returnedQBOObject == null) {
+			final com.intuit.ipp.data.Customer qboObject = CustomerMapper.buildQBOObject(customer);
+			returnedQBOObject = createObjectInQBO(dataService, qboObject);
+		}
+
+		// TODO: comment on best practice of not embedding QBO ID on app domain class
+		customer.setQboId(returnedQBOObject.getId());
+		customerRepository.save(customer);
+	}
+
 
 	/**
 	 * Called when "Sync" on the Admin->Settings page is invoked in the UI
@@ -97,37 +105,48 @@ public class QBOGateway {
 	 */
     public void createItemInQBO(SalesItem salesItem) {
 	    DataService dataService = qboServiceFactory.getDataService(salesItem.getCompany());
+        /* In order to prevent syncing the same data into QBO more than once, query to see if the entity already exists.
+           This solution is only meant to provide a better sample app experience (e.g. if you wipe out your database,
+           we don't want the sample app to keep creating the same data over and over in QBO).
 
-	    // copy SalesItem to QBO Item
-        // This also populates some necessary default constant values
-	    Item qboItem = SalesItemMapper.buildQBOObject(salesItem);
+           In a production app keeping data in two systems in sync is a difficult problem to solve; this code is not
+           meant to demonstrate production quality sync functionality.
 
-        //
-        // We need to do lookups for accounts to associate the item to
-        //
+         */
 
-	    // find an Income Account to associate with QBO item
-	    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME);
-        qboItem.setIncomeAccountRef(accountRef);
+	    com.intuit.ipp.data.Item returnedQBOObject = findItem(dataService, salesItem);
+	    if (returnedQBOObject == null) {
+		    // copy SalesItem to QBO Item
+		    // This also populates some necessary default constant values
+		    Item qboItem = SalesItemMapper.buildQBOObject(salesItem);
 
-        // find an Asset Account to associate with QBO item
-        ReferenceType assetAccountRef = findAccountReference(dataService, AccountTypeEnum.OTHER_CURRENT_ASSET, AccountSubTypeEnum.INVENTORY);
-        qboItem.setAssetAccountRef(assetAccountRef);
+		    //
+		    // We need to do lookups for accounts to associate the item to
+		    //
 
-        // find a Cost of Goods Sold account to use as the expense account reference on the QBO Item
-        ReferenceType cogAccountRef = findAccountReference(dataService, AccountTypeEnum.COST_OF_GOODS_SOLD, AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS);
-        qboItem.setExpenseAccountRef(cogAccountRef);
+		    // find an Income Account to associate with QBO item
+		    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME);
+		    qboItem.setIncomeAccountRef(accountRef);
 
-        // Set the inventory start date to be today
-        // This is not set in the mapper because this should only be set when the item is first created in QBO
-        qboItem.setInvStartDate(new Date());
+		    // find an Asset Account to associate with QBO item
+		    ReferenceType assetAccountRef = findAccountReference(dataService, AccountTypeEnum.OTHER_CURRENT_ASSET, AccountSubTypeEnum.INVENTORY);
+		    qboItem.setAssetAccountRef(assetAccountRef);
 
-	    // save the item in OBO
-	    qboItem = createObjectInQBO(dataService, qboItem);
+		    // find a Cost of Goods Sold account to use as the expense account reference on the QBO Item
+		    ReferenceType cogAccountRef = findAccountReference(dataService, AccountTypeEnum.COST_OF_GOODS_SOLD, AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS);
+		    qboItem.setExpenseAccountRef(cogAccountRef);
+
+		    // Set the inventory start date to be today
+		    // This is not set in the mapper because this should only be set when the item is first created in QBO
+		    qboItem.setInvStartDate(new Date());
+
+		    // save the item in OBO
+		    returnedQBOObject = createObjectInQBO(dataService, qboItem);
+	    }
 
 	    // update the SalesItem in app
-        salesItem.setQboId(qboItem.getId());
-        salesItemRepository.save(salesItem);
+	    salesItem.setQboId(returnedQBOObject.getId());
+	    salesItemRepository.save(salesItem);
     }
 
 	/**
@@ -161,59 +180,6 @@ public class QBOGateway {
 		}
 	}
 
-
-	public List<Account> getAccounts(long appCompanyId) {
-		Company company = companyRepository.findOne(appCompanyId);
-		DataService service = qboServiceFactory.getDataService(company);
-
-		try {
-			return service.findAll(new Account());
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static final String INVENTORY_ITEM_QUERY = "select * from item where active=%b and type = '%s";
-	public List<Item> getItems(long appCompanyId) {
-		Company company = companyRepository.findOne(appCompanyId);
-		DataService service = qboServiceFactory.getDataService(company);
-
-		List<Item> items = new ArrayList<Item>();
-		try {
-			String inventoryItemQuery = String.format(INVENTORY_ITEM_QUERY, true, ItemTypeEnum.INVENTORY);
-			QueryResult result = service.executeQuery(inventoryItemQuery);
-			for(IEntity entity : result.getEntities()) {
-				items.add((Item)entity);
-			}
-		}
-		catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-
-		return items;
-	}
-
-	public static final String CUSTOMERS_QUERY = "select * from customer where active = true";
-	public List<com.intuit.ipp.data.Customer> getCustomers(long appCompanyId) {
-		Company company = companyRepository.findOne(appCompanyId);
-		DataService service = qboServiceFactory.getDataService(company);
-
-		final List<com.intuit.ipp.data.Customer> qboCustomers = new ArrayList<com.intuit.ipp.data.Customer>();
-		try {
-			QueryResult queryResult = service.executeQuery(CUSTOMERS_QUERY);
-			for(IEntity entity: queryResult.getEntities()) {
-				com.intuit.ipp.data.Customer customer = (com.intuit.ipp.data.Customer) entity;
-				qboCustomers.add(customer);
-			}
-		} catch (Exception e) {
-			throw new RuntimeException(e);
-		}
-
-		return qboCustomers;
-	}
-
-
     private <T extends IEntity> T createObjectInQBO(DataService dataService, T qboObject) {
         try {
             final T createdObject = dataService.add(qboObject);
@@ -226,5 +192,38 @@ public class QBOGateway {
 
     }
 
+	public static final String CUSTOMER_QUERY = "select * from customer where active = true and givenName = '%s' and familyName = '%s'";
+	public static final String SALES_ITEM_QUERY = "select * from item where active = true and name = '%s'";
 
+	/**
+	 * Finds a QBO customer where the customer's first & last name equals the passed in application's customer's first & last name.
+	 */
+	public com.intuit.ipp.data.Customer findCustomer(DataService dataService, Customer customer) {
+		String query = String.format(CUSTOMER_QUERY, customer.getFirstName(), customer.getLastName());
+		return executeQuery(dataService, query, com.intuit.ipp.data.Customer.class);
+	}
+
+	/**
+	 * Finds a QBO item where the item's name equals the passed in salesItem's name.
+	 */
+	public com.intuit.ipp.data.Item findItem(DataService dataService, SalesItem salesItem) {
+		String query = String.format(SALES_ITEM_QUERY, salesItem.getName());
+		return executeQuery(dataService, query, com.intuit.ipp.data.Item.class);
+	}
+
+	private <T extends IEntity> T executeQuery(DataService dataService, String query, Class<T> qboType) {
+		try {
+			final QueryResult queryResult = dataService.executeQuery(query);
+			final List<? extends IEntity> entities = queryResult.getEntities();
+			if (entities.size() == 0) {
+				return null;
+			} else {
+				final IEntity entity = entities.get(0);
+				return (T) entity;
+			}
+
+		} catch (FMSException e) {
+			throw new RuntimeException("Failed to execute an entity query: " + query, e);
+		}
+	}
 }
