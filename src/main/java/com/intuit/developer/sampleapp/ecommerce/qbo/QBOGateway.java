@@ -226,7 +226,7 @@ public class QBOGateway {
             // Set the unit price
             lineDetail.setUnitPrice(cartItem.getSalesItem().getUnitPrice().getAmount());
             line.setSalesItemLineDetail(lineDetail);
-
+            line.setDescription(cartItem.getSalesItem().getName());
             // Set the line total
             line.setAmount(lineDetail.getUnitPrice().multiply(lineDetail.getQty()));
             line.setDetailType(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL);
@@ -237,7 +237,7 @@ public class QBOGateway {
         // Create Discount Line Item
         Line discountLine = new Line();
         discountLine.setDetailType(LineDetailTypeEnum.DISCOUNT_LINE_DETAIL);
-        discountLine.setAmount(cart.getPromotionSavings().getAmount());
+        //discountLine.setAmount(cart.getPromotionSavings().getAmount());
         DiscountLineDetail discountLineDetail = new DiscountLineDetail();
         discountLineDetail.setDiscountPercent(new BigDecimal(ShoppingCart.PROMOTION_PERCENTAGE));
         discountLineDetail.setPercentBased(true);
@@ -252,8 +252,12 @@ public class QBOGateway {
         taxLineDetail.setTaxPercent(new BigDecimal(ShoppingCart.TAX_PERCENTAGE));
         taxLineDetail.setPercentBased(true);
         taxLine.setTaxLineDetail(taxLineDetail);
-        lineItems.add(taxLine);
-
+        TxnTaxDetail txnTaxDetail = new TxnTaxDetail();
+        List<Line> txnTaxLines = new ArrayList<>();
+        txnTaxLines.add(taxLine);
+        txnTaxDetail.setTaxLine(txnTaxLines);
+        txnTaxDetail.setTotalTax(cart.getTax().getAmount());
+        salesReceipt.setTxnTaxDetail(txnTaxDetail);
         salesReceipt.setLine(lineItems);
     }
 

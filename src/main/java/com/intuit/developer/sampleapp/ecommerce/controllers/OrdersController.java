@@ -42,7 +42,7 @@ public class OrdersController {
         ShoppingCart cart = shoppingCartRepository.findOne(order.getShoppingCartId());
 
         // Payments
-        paymentGateway.chargeCustomerForOrder(cart, order.getPaymentToken());
+        //paymentGateway.chargeCustomerForOrder(cart, order.getPaymentToken());
 
         // Accounting
         // We need to create sales receipts in order to manage inventory/ accounting

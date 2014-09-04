@@ -244,12 +244,17 @@ public class QBOGatewayUnitTests {
         // Create a list of items for the cart
         List<CartItem> cartItems = new ArrayList<>();
         CartItem cartItem = new CartItem();
-        cartItem.setSalesItem(new SalesItem("ItemType1","It's an item", Money.of(CurrencyUnit.USD, 5.00), ""));
+        SalesItem salesItem = new SalesItem("ItemType1","It's an item", Money.of(CurrencyUnit.USD, 5.00), "");
+        salesItem.setQboId("1");
+        cartItem.setSalesItem(salesItem);
         cartItem.setQuantity(2);
         cartItem.setShoppingCart(shoppingCart);
         cartItems.add(cartItem);
+
         cartItem = new CartItem();
-        cartItem.setSalesItem(new SalesItem("ItemType2","It's another item", Money.of(CurrencyUnit.USD, 3.50), ""));
+        salesItem = new SalesItem("ItemType2","It's another item", Money.of(CurrencyUnit.USD, 3.50), "");
+        salesItem.setQboId("2");
+        cartItem.setSalesItem(salesItem);
         cartItem.setQuantity(1);
         cartItem.setShoppingCart(shoppingCart);
         cartItems.add(cartItem);
@@ -266,7 +271,7 @@ public class QBOGatewayUnitTests {
             SalesReceipt receiptPassed;
             dataService.add(receiptPassed = withCapture());
             List<Line> lines = receiptPassed.getLine();
-            assertEquals(4, lines.size());
+            assertEquals(3, lines.size());
             List<CartItem> cartItems = shoppingCart.getCartItems();
 
             // The first two lines items of the sales receipt should be the items added
@@ -277,24 +282,41 @@ public class QBOGatewayUnitTests {
             verifyLineForDiscount(lines.get(2), shoppingCart);
 
             // The next line should be taxes
-            verifyLineForTaxes(lines.get(3), shoppingCart);
+            verifyTxnTaxDetail(receiptPassed.getTxnTaxDetail(), shoppingCart);
+
+            assertEquals(shoppingCart.getCustomer().getQboId(), receiptPassed.getCustomerRef().getValue());
         }};
     }
 
     private void verifyLineForCartItem(Line line, CartItem cartItem) {
         assertEquals(LineDetailTypeEnum.SALES_ITEM_LINE_DETAIL, line.getDetailType());
         SalesItemLineDetail lineDetail = line.getSalesItemLineDetail();
+        assertNotNull(
+                "There must be an item ref",
+                lineDetail.getItemRef());
+        assertNotNull(
+                "The item ref must have a value",
+                lineDetail.getItemRef().getValue());
+        assertEquals(
+                "The item ref should contain the Item QBO ID",
+                cartItem.getSalesItem().getQboId(),
+                lineDetail.getItemRef().getValue());
         assertEquals(
                 "The unit prices should match",
                 cartItem.getSalesItem().getUnitPrice().getAmount(),
                 lineDetail.getUnitPrice());
-        assertEquals("The item quantities should match",
+        assertEquals(
+                "The item quantities should match",
                 new BigDecimal(cartItem.getQuantity()),
                 lineDetail.getQty());
         assertEquals(
                 "The line total should be cart item qty * unit price",
                 cartItem.getSalesItem().getUnitPrice().multipliedBy(cartItem.getQuantity()).getAmount(),
                 line.getAmount());
+        assertEquals(
+                "The item name should go on the sales receipt",
+                cartItem.getSalesItem().getName(),
+                line.getDescription());
     }
 
     private void verifyLineForDiscount(Line line, ShoppingCart shoppingCart) {
@@ -304,10 +326,13 @@ public class QBOGatewayUnitTests {
         assertEquals(new BigDecimal(ShoppingCart.PROMOTION_PERCENTAGE), lineDetail.getDiscountPercent());
     }
 
-    private void verifyLineForTaxes(Line line, ShoppingCart shoppingCart) {
-        assertEquals(LineDetailTypeEnum.TAX_LINE_DETAIL, line.getDetailType());
-        TaxLineDetail lineDetail = line.getTaxLineDetail();
-        assertEquals(shoppingCart.getTax().getAmount(), line.getAmount());
+    private void verifyTxnTaxDetail(TxnTaxDetail txnTaxDetail, ShoppingCart shoppingCart) {
+        List<Line> taxLines = txnTaxDetail.getTaxLine();
+        assertEquals(1, taxLines.size());
+        Line taxLine = taxLines.get(0);
+        assertEquals(LineDetailTypeEnum.TAX_LINE_DETAIL, taxLine.getDetailType());
+        TaxLineDetail lineDetail = taxLine.getTaxLineDetail();
+        assertEquals(shoppingCart.getTax().getAmount(), taxLine.getAmount());
         assertEquals(new BigDecimal(ShoppingCart.TAX_PERCENTAGE), lineDetail.getTaxPercent());
     }
 }
