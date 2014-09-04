@@ -206,6 +206,12 @@ public class QBOGateway {
 		}
 	}
 
+    /**
+     * Append Line Items to a sales receipt based on a shopping cart.
+     * This is the bulk of the effort in creating a sales receipt.
+     * @param salesReceipt - the receipt to append line items to
+     * @param cart - the cart to use as a basis for the receipt (represents what was purchased)
+     */
 	private void appendLineItems(SalesReceipt salesReceipt, ShoppingCart cart) {
 		// Make a list of lines
 		List<Line> lineItems = new ArrayList<>();

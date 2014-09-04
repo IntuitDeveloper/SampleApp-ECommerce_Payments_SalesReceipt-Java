@@ -182,12 +182,6 @@ public class QBOGatewayUnitTests {
 		// Establish a set of test data
 		//
 
-		// Create a company
-		Company company = new Company();
-		company.setName("Foo");
-		company.setAccessToken("asdasdA");
-		company.setAccessTokenSecret("sfsfsdfsdfsdfs");
-
 		// Create a sales item
 		final SalesItem salesItem = new SalesItem("Shirt", "It's a shirt", Money.of(CurrencyUnit.USD, 5.00), "");
 		assertNull(salesItem.getQboId());
@@ -203,7 +197,6 @@ public class QBOGatewayUnitTests {
 		// Create item query results
 		final QueryResult itemQueryResult = new QueryResult();
 		itemQueryResult.setEntities(Arrays.asList(qboItem));
-
 
 		// Non Strict expectations, generally just mocking collaborators
 		new NonStrictExpectations() {{
@@ -238,16 +231,7 @@ public class QBOGatewayUnitTests {
         // Establish a set of test data
         //
 
-        // Create a company
-        Company company = new Company();
-        company.setName("Foo");
-        company.setAccessToken("asdasdA");
-        company.setAccessTokenSecret("sfsfsdfsdfsdfs");
-
-        // Create a customer
-        final Customer customer = new Customer("Bob", "Shmob", "a@a.com", "");
         final String qboCustomerID = "1";
-        customer.setCompany(company);
 
 	    final QueryResult customerQueryResult = new QueryResult();
 	    customerQueryResult.setEntities(new ArrayList<IEntity>()); // intentionally empty
@@ -297,15 +281,6 @@ public class QBOGatewayUnitTests {
 		//
 		// Establish a set of test data
 		//
-
-		// Create a company
-		Company company = new Company();
-		company.setName("Foo");
-		company.setAccessToken("asdasdA");
-		company.setAccessTokenSecret("sfsfsdfsdfsdfs");
-
-		// Create a customer that has not been synced w/QBO
-		final Customer customer = new Customer("Bob", "Shmob", "a@a.com", "");
 		assertNull(customer.getQboId());
 
 		final String qboCustomerID = "10"; // intentionally choose a number other than 1
@@ -377,8 +352,11 @@ public class QBOGatewayUnitTests {
 		gateway.createSalesReceiptInQBO(shoppingCart);
 
 		new Verifications() {{
+            // Capture the sales receipt passed to the dataService
 			SalesReceipt receiptPassed;
-			dataService.add(receiptPassed = withCapture());
+			dataService.add(receiptPassed = withCapture()); times = 1;
+
+            // Verify the makeup of the receipt
 			List<Line> lines = receiptPassed.getLine();
 			assertEquals(3, lines.size());
 			List<CartItem> cartItems = shoppingCart.getCartItems();
@@ -390,9 +368,10 @@ public class QBOGatewayUnitTests {
 			// The next line should be a discount
 			verifyLineForDiscount(lines.get(2), shoppingCart);
 
-			// The next line should be taxes
+			// A Tax detail line should be included
 			verifyTxnTaxDetail(receiptPassed.getTxnTaxDetail(), shoppingCart);
 
+            // The the customer reference should be set on the sales receipt
 			assertEquals(shoppingCart.getCustomer().getQboId(), receiptPassed.getCustomerRef().getValue());
 		}};
 	}	
