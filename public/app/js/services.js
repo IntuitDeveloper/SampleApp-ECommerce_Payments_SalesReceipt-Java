@@ -90,6 +90,7 @@ ecommerceServices.factory('RootUrlSvc', ['$resource', '$rootScope', '$location',
                     rootUrls[link] = href.split(/\{/)[0]; //chop off the template stuff
                 }
                 rootUrls['syncRequest'] = apiRoot() + "/syncrequest";  // non-discoverable
+                rootUrls['orders'] = apiRoot() + "/orders";  // non-discoverable
                 $rootScope.$broadcast('api.loaded');  //broadcast an event so that the CompanySvc can know to load the companies
             });
         };
@@ -270,6 +271,57 @@ ecommerceServices.factory('CartItemSvc', ['$resource', '$rootScope', 'RootUrlSvc
         }
     }]);
 
+ecommerceServices.factory('OrderSvc', ['$http', '$rootScope', 'RootUrlSvc', 'ModelSvc',
+    function ($http, $rootScope, RootUrlSvc, ModelSvc) {
+
+        var sendOrder = function (creditCard, billingInfo, successCallback, errorCallback) {
+            // step 1 - tokenize credit card info
+            var request = {};
+
+            request.card = {};
+            var card = request.card;
+            card.number = creditCard.number;
+            card.exp_month = creditCard.expMonth;
+            card.exp_year = creditCard.expYear;
+            card.cvc = creditCard.CVC;
+            card.address = {};
+            card.address.street_address = billingInfo.address;
+            card.address.city = billingInfo.cityStateZip.split(",")[0];
+            card.address.region = billingInfo.cityStateZip.split(",")[1].trim().split(" ")[0];
+            card.address.country = "US";
+            card.address.postal_code = billingInfo.cityStateZip.split(",")[1].trim().split(" ")[1];;
+
+            tokenize(request, successCallback, errorCallback);
+        };
+
+        var tokenize = function(card, successCallback, errorCallback) {
+            intuit.ipp.payments.tokenize(card, function(token, response) {
+                if (token) {
+                    // step 2 - place order to backend
+                    console.log('placing order to: ' + RootUrlSvc.rootUrls.orders + ' with args: ' + token + ", " + ModelSvc.model.shoppingCart.id);
+                    $http.post(
+                        RootUrlSvc.rootUrls.orders,
+                        { shoppingCartId: ModelSvc.model.shoppingCart.id, paymentToken: token })
+                        .success(successCallback)
+                        .error(errorCallback);
+                }
+                else {
+                    // "Error during tokenization " + response.code +"<br/>" + response.message + "<br/>" + response.detail + "<br/>" + response.moreinfo
+                    errorCallback(response);
+                }
+            });
+         };
+
+        var initialize = function () {
+
+        };
+
+        return {
+            initialize: initialize,
+            sendOrder: sendOrder
+        }
+    }]);
+
 ecommerceServices.factory('SyncRequestSvc', ['$http', '$rootScope', 'RootUrlSvc', 'ModelSvc',
     function ($http, $rootScope, RootUrlSvc, ModelSvc) {
 
@@ -288,3 +340,4 @@ ecommerceServices.factory('SyncRequestSvc', ['$http', '$rootScope', 'RootUrlSvc'
             sendSalesItemSyncRequest: function (callback) { sendSyncRequest('SalesItem', callback) }
         }
     }]);
+

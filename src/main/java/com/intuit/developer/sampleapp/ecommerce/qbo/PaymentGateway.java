@@ -105,12 +105,12 @@ public class PaymentGateway {
 
     private void captureFundsForCharge(Charge charge, ChargeService chargeService) {
 
-        Capture capture = new Capture();
-
-        try {
-            charge = chargeService.capture(charge.getId(), capture);
-        } catch (FMSException e) {
-            throw new RuntimeException(e);
-        }
+//        Capture capture = new Capture();
+//
+//        try {
+//            charge = chargeService.capture(charge.getId(), capture);
+//        } catch (FMSException e) {
+//            throw new RuntimeException(e);
+//        }
     }
 }

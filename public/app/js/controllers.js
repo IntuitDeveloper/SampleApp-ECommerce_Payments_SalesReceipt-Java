@@ -85,8 +85,8 @@ controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemS
         };
     }]);
 
-controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc',
-    function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc) {
+controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc', 'OrderSvc',
+    function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc, OrderSvc) {
 
         ShoppingCartSvc.refreshShoppingCart();
         CartItemSvc.getCartItems();
@@ -101,18 +101,27 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
         $scope.creditCard.expYear = '2020';
 
         $scope.billingInfo = {};
-        $scope.billingInfo.name = '';
-        $scope.billingInfo.address = '';
-        $scope.billingInfo.cityStateZip = '';
-        $scope.billingInfo.email = '';
-        $scope.billingInfo.phone = '';
+        $scope.billingInfo.name = 'John Smith';
+        $scope.billingInfo.address = '2632 Marine Way';
+        $scope.billingInfo.cityStateZip = 'Mountain View, CA 91354';
+        $scope.billingInfo.email = 'john_smith@ipp.developer.com';
+        $scope.billingInfo.phone = '555-555-5555';
 
         $scope.showView = function(viewName) {
             $scope.shoppingCartView = viewName
         }
 
         $scope.placeOrder = function() {
-            // package data and call service
+            OrderSvc.sendOrder(
+                $scope.creditCard,
+                $scope.billingInfo,
+                function(data) {
+                    $scope.orderMessage = 'Your order has been placed and is in status ' + data.status + '.'
+                },
+                function(data) {
+                    $scope.orderMessage = 'Unexpected error placing your order.'
+                }
+            );
         }
 
 

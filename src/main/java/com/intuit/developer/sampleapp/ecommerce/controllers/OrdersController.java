@@ -46,7 +46,7 @@ public class OrdersController {
 
         // Payments
         OrderConfirmation confirmation = new OrderConfirmation();
-        paymentGateway.chargeCustomerForOrder(cart, orderRequest.getPaymentToken(), confirmation);
+        //paymentGateway.chargeCustomerForOrder(cart, orderRequest.getPaymentToken(), confirmation);
 
         // Accounting
         // We need to create sales receipts in orderRequest to manage inventory/ accounting
