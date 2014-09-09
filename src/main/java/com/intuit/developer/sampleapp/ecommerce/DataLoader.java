@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.repository.*;
+import com.intuit.ipp.data.PhysicalAddress;
 import org.apache.commons.io.FileUtils;
 import org.joda.money.Money;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -37,7 +38,10 @@ public class DataLoader {
                 createCompany(context);
 
             } catch (IOException e) {
-                throw new RuntimeException("Failed to read oauth information from oauth.json. Please make sure oauth.json is in the root of the project directory");
+                throw new RuntimeException("Failed to read oauth information from oauth.json. Please make sure" +
+                        " oauth.json is in the root of the project directory. This file should contain your appToken," +
+                        " consumerKey, and consumerSecret which can be copied from the intuit developer portal. See the" +
+                        " readme for more information.");
             }
         }
     }
@@ -85,6 +89,12 @@ public class DataLoader {
         final CustomerRepository repository = springContext.getBean(CustomerRepository.class);
 
         final Customer customer1 = new Customer("John", "Snow", "john.snow@winterfell.com", "916-555-7777");
+        customer1.setCity("Troy");
+        customer1.setPostalCode("95054");
+        customer1.setCountry("United States");
+        customer1.setLine1("950 Smith St.");
+        customer1.setLine2("Apt #25");
+        customer1.setCountrySubDivisionCode("CA");
         company.addCustomer(customer1);
 	    repository.save(customer1);
         createShoppingCart(customer1, springContext);
@@ -123,7 +133,6 @@ public class DataLoader {
         repository.save(appInfo);
 
         return appInfo;
-
     }
 
 }

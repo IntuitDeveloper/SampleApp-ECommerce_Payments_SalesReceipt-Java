@@ -139,4 +139,87 @@
         </div>
 
     </div>
+    <div class="container" ng-switch-when="Confirmation">
+        <h1>Sales Receipt #{{orderConfirmation.orderNumber}}</h1>
+        <hr />
+        <div class="container col-md-6">
+            <div class="row">
+                <h3>Billing Address:</h3>
+            </div>
+            <div class="row">
+                <h4>{{orderConfirmation.customerRef.name}}</h4>
+            </div>
+            <div class="row">
+                {{orderConfirmation.billAddr.line1}}
+                <span ng-show="orderConfirmation.billAddr.line2">orderConfirmation.billAddr.line2</span>
+                <span ng-show="orderConfirmation.billAddr.line3">orderConfirmation.billAddr.line3</span>
+                <span ng-show="orderConfirmation.billAddr.line4">orderConfirmation.billAddr.line4</span>
+                <span ng-show="orderConfirmation.billAddr.line5">orderConfirmation.billAddr.line5</span>
+            </div>
+            <div class="row">
+                {{orderConfirmation.billAddr.city}},
+                {{orderConfirmation.billAddr.countrySubDivisionCode}},
+                {{orderConfirmation.billAddr.postalCode}}
+            </div>
+        </div>
+        <div class="container col-md-6">
+            <div class="row">
+                <h3>Shipping Address:</h3>
+            </div>
+            <div class="row">
+                <h4>{{orderConfirmation.customerRef.name}}</h4>
+            </div>
+            <div class="row">
+                {{orderConfirmation.shipAddr.line1}}
+                <span ng-show="orderConfirmation.shipAddr.line2">orderConfirmation.shipAddr.line2</span>
+                <span ng-show="orderConfirmation.shipAddr.line3">orderConfirmation.shipAddr.line3</span>
+                <span ng-show="orderConfirmation.shipAddr.line4">orderConfirmation.shipAddr.line4</span>
+                <span ng-show="orderConfirmation.shipAddr.line5">orderConfirmation.shipAddr.line5</span>
+            </div>
+            <div class="row">
+                {{orderConfirmation.shipAddr.city}},
+                {{orderConfirmation.shipAddr.countrySubDivisionCode}},
+                {{orderConfirmation.shipAddr.postalCode}}
+            </div>
+        </div>
+        <div class="container-fluid">
+            <table class="table table-striped">
+                <thead>
+                <tr>
+                    <th>Item</th>
+                    <th style="text-align: right">Quantity</th>
+                    <th style="text-align: right">Rate</th>
+                    <th style="text-align: right">Price</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr ng-repeat="line in orderConfirmation.lines | filter:{detailType:'SALES_ITEM_LINE_DETAIL'}">
+                    <td>{{line.description}}</td>
+                    <td align="right">{{line.salesItemLineDetail.qty}}</td>
+                    <td align="right">{{line.salesItemLineDetail.unitPrice | currency}}</td>
+                    <td align="right">{{line.amount | currency}}</td>
+                </tr>
+                </tbody>
+            </table>
+            <hr>
+            <div class="container col-md-4 col-md-offset-8">
+                <div class="row" ng-repeat="line in orderConfirmation.lines | filter:{detailType:'SUBTOTAL_LINE_DETAIL'}">
+                    <h5 class="col-md-6">Subtotal</h5>
+                    <h5 class="col-md-6" style="text-align: right">{{line.amount | currency}}</h5>
+                </div>
+                <div class="row" ng-repeat="line in orderConfirmation.lines | filter:{detailType:'DISCOUNT_LINE_DETAIL'}">
+                    <h5 class="col-md-6">Promotion - %{{line.discountLineDetail.discountPercent}}</h5>
+                    <h5 class="col-md-6" style="text-align: right">{{line.amount | currency}}</h5>
+                </div>
+                <div class="row">
+                    <h5 class="col-md-6">Total</h5>
+                    <h5 class="col-md-6" style="text-align: right">{{orderConfirmation.total | currency}}</h5>
+                </div>
+                <div clas="row">
+                    <h5> Paid with {{orderConfirmation.paymentType}}. Thank you!</h5>
+                </div>
+            </div>
+            <hr/>
+        </div>
+    </div>
 </div>

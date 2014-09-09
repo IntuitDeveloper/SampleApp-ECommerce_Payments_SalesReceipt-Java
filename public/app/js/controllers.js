@@ -51,7 +51,7 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
             }
 
             $scope.disableSalesItemsSyncButton = function () {
-                return disableSyncButton($scope.model.company.salesItemsSycned);
+                return disableSyncButton($scope.model.company.salesItemSynced);
             }
 
             $scope.syncCustomers = function() {
@@ -116,7 +116,8 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
                 $scope.creditCard,
                 $scope.billingInfo,
                 function(data) {
-                    $scope.orderMessage = 'Your order has been placed and is in status ' + data.status + '.'
+                    $scope.orderConfirmation = data;
+                    $scope.showView("Confirmation");
                 },
                 function(data) {
                     $scope.orderMessage = 'Unexpected error placing your order.'

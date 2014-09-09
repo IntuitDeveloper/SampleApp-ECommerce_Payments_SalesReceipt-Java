@@ -14,6 +14,7 @@ import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import javax.persistence.criteria.Order;
 import java.lang.Class;
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -34,7 +35,7 @@ public class QBOGateway {
     @Autowired
     private SalesItemRepository salesItemRepository;
 
-    public void createSalesReceiptInQBO(ShoppingCart cart, OrderConfirmation confirmation) {
+    public SalesReceipt createSalesReceiptInQBO(ShoppingCart cart) {
         Customer customer = cart.getCustomer();
         DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
         // Make a sales receipt
@@ -47,11 +48,11 @@ public class QBOGateway {
         ReferenceType customerRef = new ReferenceType();
         customerRef.setValue(customer.getQboId());
         receipt.setCustomerRef(customerRef);
-        receipt.setPaymentType(PaymentTypeEnum.CREDIT_CARD);
+        receipt.setPaymentMethodRef(findPaymentMethodReference(dataService, "Credit Card"));
         receipt = createObjectInQBO(dataService, receipt);
 
-        // Keep the receipt document number to send in the confirmation.
-        confirmation.setOrderNumber(receipt.getDocNumber());
+        // Construct an order confirmation from the
+        return receipt;
     }
 
 	public void createCustomerInQBO(Customer customer) {
@@ -143,6 +144,14 @@ public class QBOGateway {
 		return referenceType;
 	}
 
+    private ReferenceType findPaymentMethodReference(DataService dataService, String paymentMethodName) {
+        PaymentMethod paymentMethod = findPaymentMethod(dataService, paymentMethodName);
+        ReferenceType referenceType = new ReferenceType();
+        referenceType.setValue(paymentMethod.getId());
+        referenceType.setName(paymentMethod.getName());
+        return referenceType;
+    }
+
 	/**
 	 * Search for an account in QBO based on AccountType and AccountSubType
 	 */
@@ -161,6 +170,22 @@ public class QBOGateway {
 			throw new RuntimeException("Failed to execute income account query: " + accountQuery, e);
 		}
 	}
+
+    public static final String PAYMENT_METHOD_QUERY = "select * from paymentmethod where name= '%s'";
+    private PaymentMethod findPaymentMethod(DataService dataService, String paymentMethodName) {
+        String accountQuery = String.format(PAYMENT_METHOD_QUERY, paymentMethodName);
+        try {
+            final QueryResult queryResult = dataService.executeQuery(accountQuery);
+            if (queryResult.getEntities().size() == 0) {
+                throw new RuntimeException("Could not find a payment method with name: " + paymentMethodName);
+            }
+
+            final List<PaymentMethod> entities = (List<PaymentMethod>) queryResult.getEntities();
+            return entities.get(0);
+        } catch (FMSException e) {
+            throw new RuntimeException("Failed to execute payment method query: " + accountQuery, e);
+        }
+    }
 
 	/**
 	 * Finds a QBO customer where the customer's first & last name equals the passed in application's customer's first & last name.

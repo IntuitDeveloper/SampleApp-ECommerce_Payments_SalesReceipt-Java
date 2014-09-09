@@ -281,15 +281,15 @@ ecommerceServices.factory('OrderSvc', ['$http', '$rootScope', 'RootUrlSvc', 'Mod
             request.card = {};
             var card = request.card;
             card.number = creditCard.number;
-            card.exp_month = creditCard.expMonth;
-            card.exp_year = creditCard.expYear;
+            card.expMonth = creditCard.expMonth;
+            card.expYear = creditCard.expYear;
             card.cvc = creditCard.CVC;
             card.address = {};
-            card.address.street_address = billingInfo.address;
+            card.address.streetAddress = billingInfo.address;
             card.address.city = billingInfo.cityStateZip.split(",")[0];
             card.address.region = billingInfo.cityStateZip.split(",")[1].trim().split(" ")[0];
             card.address.country = "US";
-            card.address.postal_code = billingInfo.cityStateZip.split(",")[1].trim().split(" ")[1];;
+            card.address.postalCode = billingInfo.cityStateZip.split(",")[1].trim().split(" ")[1];;
 
             tokenize(request, successCallback, errorCallback);
         };
@@ -301,12 +301,12 @@ ecommerceServices.factory('OrderSvc', ['$http', '$rootScope', 'RootUrlSvc', 'Mod
                     console.log('placing order to: ' + RootUrlSvc.rootUrls.orders + ' with args: ' + token + ", " + ModelSvc.model.shoppingCart.id);
                     $http.post(
                         RootUrlSvc.rootUrls.orders,
-                        { shoppingCartId: ModelSvc.model.shoppingCart.id, paymentToken: token })
+                        { shoppingCartId: ModelSvc.model.shoppingCart.id, paymentToken: "" })
                         .success(successCallback)
                         .error(errorCallback);
                 }
                 else {
-                    // "Error during tokenization " + response.code +"<br/>" + response.message + "<br/>" + response.detail + "<br/>" + response.moreinfo
+                    "Error during tokenization " + response.code +"<br/>" + response.message + "<br/>" + response.detail + "<br/>" + response.moreinfo
                     errorCallback(response);
                 }
             });

@@ -271,6 +271,20 @@ public class QBOGatewayUnitTests {
             assertEquals(customer.getLastName(), passedInCustomer.getFamilyName());
             assertEquals(customer.getEmailAddress(), passedInCustomer.getPrimaryEmailAddr().getAddress());
             assertEquals(customer.getPhoneNumber(), passedInCustomer.getPrimaryPhone().getFreeFormNumber());
+            PhysicalAddress mappedBillAddress = passedInCustomer.getBillAddr();
+            assertEquals(customer.getCity(), mappedBillAddress.getCity());
+            assertEquals(customer.getCountry(), mappedBillAddress.getCountry());
+            assertEquals(customer.getPostalCode(), mappedBillAddress.getPostalCode());
+            assertEquals(customer.getCountrySubDivisionCode(), mappedBillAddress.getCountrySubDivisionCode());
+            assertEquals(customer.getLine1(), mappedBillAddress.getLine1());
+            assertEquals(customer.getLine2(), mappedBillAddress.getLine2());
+            PhysicalAddress mappedShipAddress = passedInCustomer.getShipAddr();
+            assertEquals(customer.getCity(), mappedShipAddress.getCity());
+            assertEquals(customer.getCountry(), mappedShipAddress.getCountry());
+            assertEquals(customer.getPostalCode(), mappedShipAddress.getPostalCode());
+            assertEquals(customer.getCountrySubDivisionCode(), mappedShipAddress.getCountrySubDivisionCode());
+            assertEquals(customer.getLine1(), mappedShipAddress.getLine1());
+            assertEquals(customer.getLine2(), mappedShipAddress.getLine2());
 
             // The salesItemRepository should save the sales item
             customerRepository.save(customer);
@@ -345,13 +359,21 @@ public class QBOGatewayUnitTests {
 		cartItems.add(cartItem);
 		shoppingCart.setCartItems(cartItems);
 
-        TaxCode taxCode = new TaxCode();
-        taxCode.setId("23");
-        taxCode.setName("California Sales Tax");
-        taxCode.setTaxable(true);
-        taxCode.setActive(true);
-        final QueryResult taxCodeQueryResult = new QueryResult();
-        taxCodeQueryResult.setEntities(Arrays.asList(taxCode));
+//        TaxCode taxCode = new TaxCode();
+//        taxCode.setId("23");
+//        taxCode.setName("California Sales Tax");
+//        taxCode.setTaxable(true);
+//        taxCode.setActive(true);
+//        final QueryResult taxCodeQueryResult = new QueryResult();
+//        taxCodeQueryResult.setEntities(Arrays.asList(taxCode));
+
+        PaymentMethod paymentMethod = new PaymentMethod();
+        paymentMethod.setName("Credit Card");
+        paymentMethod.setActive(true);
+        paymentMethod.setId("45");
+        paymentMethod.setType(PaymentMethodEnum.OTHER_CREDIT_CARD.value());
+        final QueryResult paymentMethodQueryResult = new QueryResult();
+        paymentMethodQueryResult.setEntities(Arrays.asList(paymentMethod));
 
         final SalesReceipt receiptReturned = new SalesReceipt();
         receiptReturned.setDocNumber("1001");
@@ -360,20 +382,19 @@ public class QBOGatewayUnitTests {
 			qboServiceFactory.getDataService(withAny(new Company()));
 			result = dataService;
 
-            dataService.executeQuery(anyString);
-            result = taxCodeQueryResult;
+            dataService.executeQuery(String.format(QBOGateway.PAYMENT_METHOD_QUERY, "Credit Card"));
+            result = paymentMethodQueryResult;
 
             dataService.add(withAny(new SalesReceipt()));
             result =  receiptReturned;
 		}};
 
-        OrderConfirmation orderConfirmation = new OrderConfirmation();
-		gateway.createSalesReceiptInQBO(shoppingCart, orderConfirmation);
+		SalesReceipt createdReceipt = gateway.createSalesReceiptInQBO(shoppingCart);
 
         assertEquals(
                 "The order confirmation shoud contain the receipt document number",
                 receiptReturned.getDocNumber(),
-                orderConfirmation.getOrderNumber());
+                createdReceipt.getDocNumber());
 
 		new Verifications() {{
             // Capture the sales receipt passed to the dataService

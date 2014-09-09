@@ -7,6 +7,7 @@ import com.intuit.developer.sampleapp.ecommerce.repository.CartItemRepository;
 import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
 import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
 import com.intuit.developer.sampleapp.ecommerce.repository.ShoppingCartRepository;
+import com.intuit.ipp.data.SalesReceipt;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,18 +45,16 @@ public class OrdersController {
     public OrderConfirmation createPurchaseRequest(@RequestBody final OrderRequest orderRequest) {
         ShoppingCart cart = shoppingCartRepository.findOne(orderRequest.getShoppingCartId());
 
-        // Payments
-        OrderConfirmation confirmation = new OrderConfirmation();
         //paymentGateway.chargeCustomerForOrder(cart, orderRequest.getPaymentToken(), confirmation);
 
         // Accounting
         // We need to create sales receipts in orderRequest to manage inventory/ accounting
-        qboGateway.createSalesReceiptInQBO(cart, confirmation);
+        SalesReceipt salesReceipt = qboGateway.createSalesReceiptInQBO(cart);
 
         // Empty out the cart items
         cart.getCartItems().clear();
         shoppingCartRepository.save(cart);
 
-        return confirmation;
+        return OrderConfirmation.fromSalesReceipt(salesReceipt);
     }
 }
