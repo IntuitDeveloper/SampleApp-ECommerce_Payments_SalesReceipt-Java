@@ -1,8 +1,9 @@
 package com.intuit.developer.sampleapp.ecommerce.qbo;
 
-import com.intuit.developer.sampleapp.ecommerce.controllers.OrderConfirmation;
-import com.intuit.developer.sampleapp.ecommerce.domain.*;
+import com.intuit.developer.sampleapp.ecommerce.domain.CartItem;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
+import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;
+import com.intuit.developer.sampleapp.ecommerce.domain.ShoppingCart;
 import com.intuit.developer.sampleapp.ecommerce.mappers.CustomerMapper;
 import com.intuit.developer.sampleapp.ecommerce.mappers.SalesItemMapper;
 import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
@@ -11,18 +12,15 @@ import com.intuit.ipp.core.IEntity;
 import com.intuit.ipp.data.*;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.DataService;
-import com.intuit.ipp.services.QueryResult;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import javax.persistence.criteria.Order;
-import java.lang.Class;
 import java.math.BigDecimal;
-import java.math.BigInteger;
-import java.sql.Ref;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 /**
- * Interface to QBO via QBO v3 SDK.
+ * This class contains the needed code to interface with QBO via QBO v3 SDK.
  */
 public class QBOGateway {
 
@@ -35,6 +33,12 @@ public class QBOGateway {
     @Autowired
     private SalesItemRepository salesItemRepository;
 
+    /**
+     * Called when "Place Order" is clicked in the UI
+     * Creates a sales receipt based upon the passed in cart and makes all needed references
+     * @param cart - the cart that was "ordered" which a sales receipt must be created for
+     * @return - returns the created sales receipt as sent back from QBO API.
+     */
     public SalesReceipt createSalesReceiptInQBO(ShoppingCart cart) {
         Customer customer = cart.getCustomer();
         DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
@@ -44,29 +48,49 @@ public class QBOGateway {
         //Append the necessary lines items from the shopping cart
         appendLineItems(receipt, cart);
 
+        /**
+         * In a real application more judgement would be required to associate the correct tax code to a purchase.
+         * Uncomment these lines to associate the receipt with a tax code in order to apply sales tax.
+         * A Tax code must be correctly configured in the QBO Company, Sales Tax (As a feature) must be turned on,
+         * and the sales item referenced must be have the taxable flag set.
+         */
+        TxnTaxDetail txnTaxDetail = new TxnTaxDetail();
+        txnTaxDetail.setTxnTaxCodeRef(QBOQueryMethods.findTaxCodeReference(dataService, "California"));
+        receipt.setApplyTaxAfterDiscount(true);
+        receipt.setTxnTaxDetail(txnTaxDetail);
+
         // Set the reference to the customer
         ReferenceType customerRef = new ReferenceType();
         customerRef.setValue(customer.getQboId());
         receipt.setCustomerRef(customerRef);
-        receipt.setPaymentMethodRef(findPaymentMethodReference(dataService, "Credit Card"));
+        receipt.setPaymentMethodRef(QBOQueryMethods.findPaymentMethodReference(dataService, "Visa"));
         receipt = createObjectInQBO(dataService, receipt);
 
         // Construct an order confirmation from the
         return receipt;
     }
 
+    /**
+     * Called when "Sync" on the Admin->Settings page is invoked in the UI
+     *
+     * Customers are pushed to QBO as QBO Customers.
+     *
+     * NOTE: this example is simplified for the sample application; if you are syncing large sets of objects,
+     *       please use the BatchOperation API
+     */
 	public void createCustomerInQBO(Customer customer) {
 		DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
 
-        /* In order to prevent syncing the same data into QBO more than once, query to see if the entity already exists.
-           This solution is only meant to provide a better sample app experience (e.g. if you wipe out your database,
-           we don't want the sample app to keep creating the same data over and over in QBO).
-
-           In a production app keeping data in two systems in sync is a difficult problem to solve; this code is not
-           meant to demonstrate production quality sync functionality.
+        /**
+         * In order to prevent syncing the same data into QBO more than once, query to see if the entity already exists.
+         * This solution is only meant to provide a better sample app experience (e.g. if you wipe out your database,
+         * we don't want the sample app to keep creating the same data over and over in QBO).
+         *
+         * In a production app keeping data in two systems in sync is a difficult problem to solve; this code is not
+         * meant to demonstrate production quality sync functionality.
          */
 
-		com.intuit.ipp.data.Customer returnedQBOObject = findCustomer(dataService, customer);
+		com.intuit.ipp.data.Customer returnedQBOObject = QBOQueryMethods.findCustomer(dataService, customer);
 		if (returnedQBOObject == null) {
 			final com.intuit.ipp.data.Customer qboObject = CustomerMapper.buildQBOObject(customer);
 			returnedQBOObject = createObjectInQBO(dataService, qboObject);
@@ -89,16 +113,16 @@ public class QBOGateway {
 	 */
     public void createItemInQBO(SalesItem salesItem) {
 	    DataService dataService = qboServiceFactory.getDataService(salesItem.getCompany());
-        /* In order to prevent syncing the same data into QBO more than once, query to see if the entity already exists.
-           This solution is only meant to provide a better sample app experience (e.g. if you wipe out your database,
-           we don't want the sample app to keep creating the same data over and over in QBO).
 
-           In a production app keeping data in two systems in sync is a difficult problem to solve; this code is not
-           meant to demonstrate production quality sync functionality.
-
+        /**
+         * In order to prevent syncing the same data into QBO more than once, query to see if the entity already exists.
+         * This solution is only meant to provide a better sample app experience (e.g. if you wipe out your database,
+         * we don't want the sample app to keep creating the same data over and over in QBO).
+         *
+         * In a production app keeping data in two systems in sync is a difficult problem to solve; this code is not
+         * meant to demonstrate production quality sync functionality.
          */
-
-	    com.intuit.ipp.data.Item returnedQBOObject = findItem(dataService, salesItem);
+	    com.intuit.ipp.data.Item returnedQBOObject = QBOQueryMethods.findItem(dataService, salesItem);
 	    if (returnedQBOObject == null) {
 		    // copy SalesItem to QBO Item
 		    // This also populates some necessary default constant values
@@ -108,15 +132,15 @@ public class QBOGateway {
 		    //
 
 		    // find an Income Account to associate with QBO item
-		    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME);
+		    ReferenceType accountRef = QBOQueryMethods.findAccountReference(dataService, AccountTypeEnum.INCOME, AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME);
 		    qboItem.setIncomeAccountRef(accountRef);
 
 		    // find an Asset Account to associate with QBO item
-		    ReferenceType assetAccountRef = findAccountReference(dataService, AccountTypeEnum.OTHER_CURRENT_ASSET, AccountSubTypeEnum.INVENTORY);
+		    ReferenceType assetAccountRef = QBOQueryMethods.findAccountReference(dataService, AccountTypeEnum.OTHER_CURRENT_ASSET, AccountSubTypeEnum.INVENTORY);
 		    qboItem.setAssetAccountRef(assetAccountRef);
 
 		    // find a Cost of Goods Sold account to use as the expense account reference on the QBO Item
-		    ReferenceType cogAccountRef = findAccountReference(dataService, AccountTypeEnum.COST_OF_GOODS_SOLD, AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS);
+		    ReferenceType cogAccountRef = QBOQueryMethods.findAccountReference(dataService, AccountTypeEnum.COST_OF_GOODS_SOLD, AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS);
 		    qboItem.setExpenseAccountRef(cogAccountRef);
 
 		    // Set the inventory start date to be today
@@ -130,107 +154,6 @@ public class QBOGateway {
 	    // update the SalesItem in app
 	    salesItem.setQboId(returnedQBOObject.getId());
 	    salesItemRepository.save(salesItem);
-    }
-
-	/**
-	 * Get a ReferenceType wrapper for a QBO Account
-	 *
-	 * ReferenceType values are used to associate different QBO entities to each other.
-	 */
-	private ReferenceType findAccountReference(DataService dataService, AccountTypeEnum accountType, AccountSubTypeEnum accountSubType) {
-		Account account = findAccount(dataService, accountType, accountSubType.value());
-		ReferenceType referenceType = new ReferenceType();
-		referenceType.setValue(account.getId());
-		return referenceType;
-	}
-
-    private ReferenceType findPaymentMethodReference(DataService dataService, String paymentMethodName) {
-        PaymentMethod paymentMethod = findPaymentMethod(dataService, paymentMethodName);
-        ReferenceType referenceType = new ReferenceType();
-        referenceType.setValue(paymentMethod.getId());
-        referenceType.setName(paymentMethod.getName());
-        return referenceType;
-    }
-
-	/**
-	 * Search for an account in QBO based on AccountType and AccountSubType
-	 */
-	public static final String ACCOUNT_TYPE_QUERY = "select * from account where accounttype = '%s' and accountsubtype = '%s'";
-	private Account findAccount(DataService dataService, AccountTypeEnum accountType, String accountSubType) {
-		String accountQuery = String.format(ACCOUNT_TYPE_QUERY, accountType.value(), accountSubType);
-		try {
-			final QueryResult queryResult = dataService.executeQuery(accountQuery);
-			if (queryResult.getEntities().size() == 0) {
-				throw new RuntimeException("Could not find an account of type " + accountType.value() + " and subtype " + accountSubType);
-			}
-
-			final List<Account> entities = (List<Account>) queryResult.getEntities();
-			return entities.get(0);
-		} catch (FMSException e) {
-			throw new RuntimeException("Failed to execute income account query: " + accountQuery, e);
-		}
-	}
-
-    public static final String PAYMENT_METHOD_QUERY = "select * from paymentmethod where name= '%s'";
-    private PaymentMethod findPaymentMethod(DataService dataService, String paymentMethodName) {
-        String accountQuery = String.format(PAYMENT_METHOD_QUERY, paymentMethodName);
-        try {
-            final QueryResult queryResult = dataService.executeQuery(accountQuery);
-            if (queryResult.getEntities().size() == 0) {
-                throw new RuntimeException("Could not find a payment method with name: " + paymentMethodName);
-            }
-
-            final List<PaymentMethod> entities = (List<PaymentMethod>) queryResult.getEntities();
-            return entities.get(0);
-        } catch (FMSException e) {
-            throw new RuntimeException("Failed to execute payment method query: " + accountQuery, e);
-        }
-    }
-
-	/**
-	 * Finds a QBO customer where the customer's first & last name equals the passed in application's customer's first & last name.
-	 */
-	public static final String CUSTOMER_QUERY = "select * from customer where active = true and givenName = '%s' and familyName = '%s'";
-	public com.intuit.ipp.data.Customer findCustomer(DataService dataService, Customer customer) {
-		String query = String.format(CUSTOMER_QUERY, customer.getFirstName(), customer.getLastName());
-		return executeQuery(dataService, query, com.intuit.ipp.data.Customer.class);
-	}
-
-	/**
-	 * Finds a QBO item where the item's name equals the passed in salesItem's name.
-	 */
-	public static final String ITEM_QUERY = "select * from item where active = true and name = '%s'";
-	public com.intuit.ipp.data.Item findItem(DataService dataService, SalesItem salesItem) {
-		String query = String.format(ITEM_QUERY, salesItem.getName());
-		return executeQuery(dataService, query, com.intuit.ipp.data.Item.class);
-	}
-
-	private <T extends IEntity> T executeQuery(DataService dataService, String query, Class<T> qboType) {
-		try {
-			final QueryResult queryResult = dataService.executeQuery(query);
-			final List<? extends IEntity> entities = queryResult.getEntities();
-			if (entities.size() == 0) {
-				return null;
-			} else {
-				final IEntity entity = entities.get(0);
-				return (T) entity;
-			}
-
-		} catch (FMSException e) {
-			throw new RuntimeException("Failed to execute an entity query: " + query, e);
-		}
-	}
-
-    private <T extends IEntity> T createObjectInQBO(DataService dataService, T qboObject) {
-        try {
-            final T createdObject = dataService.add(qboObject);
-            return createdObject;
-        } catch (FMSException e) {
-            //NOTE: a StaleObjectException can be received while creating a new object; this error indicates that an
-            //      object with that QBO ID already exists.
-            throw new RuntimeException("Failed create an " + qboObject.getClass().getName() + " in QBO", e);
-        }
-
     }
 
     /**
@@ -257,6 +180,15 @@ public class QBOGateway {
 			ReferenceType itemRef = new ReferenceType();
 			itemRef.setValue(cartItem.getSalesItem().getQboId());
 			lineDetail.setItemRef(itemRef);
+
+            /**
+             * These lines make the line item reference the TaxCode "TAX" so that
+             * The sales receipt will include the amount of this line item in the tax calculation
+             * "TAX" is a special reference value
+             */
+            ReferenceType taxRef = new ReferenceType();
+            taxRef.setValue("TAX");
+            lineDetail.setTaxCodeRef(taxRef);
 
 			// Set the quantity
 			lineDetail.setQty(BigDecimal.valueOf(cartItem.getQuantity()));
@@ -306,4 +238,24 @@ public class QBOGateway {
         // Add the line items to the receipt
         salesReceipt.setLine(lineItems);
 	}
+
+    /**
+     * Type generic wrapper for {@link com.intuit.ipp.services.DataService#add(com.intuit.ipp.core.IEntity)}
+     * which translates a a somewhat confusing exception case.
+     * @param dataService - the data service to use.
+     * @param qboObject - the object to add to qbo
+     * @param <T> - the type of the object to create
+     * @return create object
+     */
+    private <T extends IEntity> T createObjectInQBO(DataService dataService, T qboObject) {
+        try {
+            final T createdObject = dataService.add(qboObject);
+            return createdObject;
+        } catch (FMSException e) {
+            //NOTE: a StaleObjectException can be received while creating a new object; this error indicates that an
+            //      object with that QBO ID already exists.
+            throw new RuntimeException("Failed create an " + qboObject.getClass().getName() + " in QBO", e);
+        }
+
+    }
 }

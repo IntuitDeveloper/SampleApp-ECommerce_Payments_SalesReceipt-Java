@@ -301,12 +301,12 @@ ecommerceServices.factory('OrderSvc', ['$http', '$rootScope', 'RootUrlSvc', 'Mod
                     console.log('placing order to: ' + RootUrlSvc.rootUrls.orders + ' with args: ' + token + ", " + ModelSvc.model.shoppingCart.id);
                     $http.post(
                         RootUrlSvc.rootUrls.orders,
-                        { shoppingCartId: ModelSvc.model.shoppingCart.id, paymentToken: "" })
+                        { shoppingCartId: ModelSvc.model.shoppingCart.id, paymentToken: token })
                         .success(successCallback)
                         .error(errorCallback);
                 }
                 else {
-                    "Error during tokenization " + response.code +"<br/>" + response.message + "<br/>" + response.detail + "<br/>" + response.moreinfo
+                    console.log("Error during tokenization " + response.code +"<br/>" + response.message + "<br/>" + response.detail + "<br/>" + response.moreinfo);
                     errorCallback(response);
                 }
             });

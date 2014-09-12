@@ -4,6 +4,7 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
@@ -12,7 +13,7 @@ import java.util.List;
 public class ShoppingCart {
 
     public static final double SHIPPING_PERCENTAGE = .05d;
-    public static final double TAX_MULTIPLIER = .0793d;
+    public static final double TAX_MULTIPLIER = .08d;
     public static final double PROMOTION_MULTIPLIER = .2d;
 	
 	@Id
@@ -77,8 +78,12 @@ public class ShoppingCart {
         return getSubTotal().multipliedBy(PROMOTION_MULTIPLIER, RoundingMode.CEILING);
     }
 
+    public Money getTaxable() {
+        return getSubTotal().minus(getPromotionSavings());
+    }
+
     public Money getTax() {
-        return getSubTotal().minus(getPromotionSavings()).multipliedBy(TAX_MULTIPLIER, RoundingMode.CEILING);
+        return getTaxable().multipliedBy(TAX_MULTIPLIER, RoundingMode.FLOOR);
     }
 
 	public Money getShipping() {
@@ -86,7 +91,7 @@ public class ShoppingCart {
 	}
 
     public Money getTotal() {
-        return getSubTotal().minus(getPromotionSavings());
+        return getTaxable().plus(getTax());
     }
 
 }
