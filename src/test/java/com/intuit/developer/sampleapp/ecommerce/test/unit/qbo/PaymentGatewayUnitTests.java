@@ -4,8 +4,10 @@ import com.intuit.developer.sampleapp.ecommerce.controllers.OrderConfirmation;
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.qbo.PaymentGateway;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
+import com.intuit.ipp.data.Payment;
 import com.intuit.ipp.data.payment.Capture;
 import com.intuit.ipp.data.payment.Charge;
+import com.intuit.ipp.data.payment.ChargeStatus;
 import com.intuit.ipp.services.payment.ChargeService;
 import mockit.*;
 import org.hamcrest.Description;
@@ -65,11 +67,30 @@ public class PaymentGatewayUnitTests {
         shoppingCart.setCartItems(cartItems);
 
         //
-        // Setup non-strict expectations (mocking)
+        final Charge chargeResponse1 = new Charge();
+        chargeResponse1.setAmount(shoppingCart.getTotal().getAmount());
+        chargeResponse1.setStatus(ChargeStatus.AUTHORIZED);
+        chargeResponse1.setDescription(PaymentGateway.CHARGE_DESCRIPTION);
+        chargeResponse1.setId("14553");
+        final Charge chargeResponse2 = new Charge();
+        chargeResponse1.setAmount(shoppingCart.getTotal().getAmount());
+        chargeResponse2.setStatus(ChargeStatus.SETTLED);
+
         //
-        new NonStrictExpectations() {{
+        // Setup strict expectations (mocking, but order matters)
+        //
+        new NonStrictExpectations(){{
             qboServiceFactory.getChargeService(withAny(new Company()));
             result = chargeService;
+
+            qboServiceFactory.getChargeService(withAny(new Company()));
+            result = chargeService;
+
+            chargeService.charge(withAny(new Charge()));
+            result = chargeResponse1;
+
+            chargeService.capture(anyString, withAny(new Capture()));
+            result = chargeResponse2;
         }};
 
         //
@@ -82,15 +103,17 @@ public class PaymentGatewayUnitTests {
         //
         new VerificationsInOrder() {{
             // Verify that the authorization was requested with the right parameters
-            Charge chargePassed;
-            chargeService.charge(chargePassed = withCapture());
-            assertTrue(chargePassed.getCapture());
-            assertEquals(shoppingCart.getTotal().getAmount(), chargePassed.getAmount());
-            assertEquals(PaymentGateway.CHARGE_DESCRIPTION, chargePassed.getDescription());
+            Charge chargePassedForCharge;
+            chargeService.charge(chargePassedForCharge = withCapture());
+            assertFalse(chargePassedForCharge.getCapture());
+            assertEquals(shoppingCart.getTotal().getAmount(), chargePassedForCharge.getAmount());
+            assertEquals(PaymentGateway.CHARGE_DESCRIPTION, chargePassedForCharge.getDescription());
 
-            // Verify that the capture was request with the right parameters.
-            // There be another call to "capture" - See matcher for checks
-            //  chargeService.capture(anyString, withArgThat(new CaptureMatcher(shoppingCart)));
+            // Verify that the capture was called with the right parameters.
+            Capture capturePassedForCapture;
+            chargeService.capture(chargeResponse1.getId(), capturePassedForCapture = withCapture());
+            assertEquals(shoppingCart.getTotal().getAmount(), capturePassedForCapture.getAmount());
+            assertEquals(PaymentGateway.CHARGE_DESCRIPTION, capturePassedForCapture.getDescription());
         }};
     }
 }
