@@ -5,6 +5,7 @@ import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOGateway;
+import com.intuit.developer.sampleapp.ecommerce.qbo.QBOQueryMethods;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
 import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
 import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
@@ -108,12 +109,12 @@ public class QBOGatewayUnitTests {
             qboServiceFactory.getDataService(salesItem.getCompany());
             result = dataService;
 
-	        dataService.executeQuery(String.format(QBOGateway.ITEM_QUERY, salesItem.getName()));
+	        dataService.executeQuery(String.format(QBOQueryMethods.ITEM_QUERY, salesItem.getName()));
 	        result = itemQueryResult;
 
             // The dataService will try to execute a query for income accounts
             dataService.executeQuery(String.format(
-                            QBOGateway.ACCOUNT_TYPE_QUERY,
+                            QBOQueryMethods.ACCOUNT_TYPE_QUERY,
                             AccountTypeEnum.INCOME.value(),
                             AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME.value())
             );
@@ -121,7 +122,7 @@ public class QBOGatewayUnitTests {
 
             // The dataService will try to execute a query for asset accounts
             dataService.executeQuery(String.format(
-                            QBOGateway.ACCOUNT_TYPE_QUERY,
+                            QBOQueryMethods.ACCOUNT_TYPE_QUERY,
                             AccountTypeEnum.OTHER_CURRENT_ASSET.value(),
                             AccountSubTypeEnum.INVENTORY.value())
             );
@@ -129,7 +130,7 @@ public class QBOGatewayUnitTests {
 
             // The dataService will try to execute a query for cost of goods sold accounts
             dataService.executeQuery(String.format(
-                            QBOGateway.ACCOUNT_TYPE_QUERY,
+                            QBOQueryMethods.ACCOUNT_TYPE_QUERY,
                             AccountTypeEnum.COST_OF_GOODS_SOLD.value(),
                             AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS.value())
             );
@@ -244,7 +245,7 @@ public class QBOGatewayUnitTests {
             qboServiceFactory.getDataService(customer.getCompany());
             result = dataService;
 
-	        dataService.executeQuery(String.format(QBOGateway.CUSTOMER_QUERY, customer.getFirstName(), customer.getLastName()));
+	        dataService.executeQuery(String.format(QBOQueryMethods.CUSTOMER_QUERY, customer.getFirstName(), customer.getLastName()));
 	        result = customerQueryResult;
 
             // The data service will try to add an Item
@@ -359,16 +360,16 @@ public class QBOGatewayUnitTests {
 		cartItems.add(cartItem);
 		shoppingCart.setCartItems(cartItems);
 
-//        TaxCode taxCode = new TaxCode();
-//        taxCode.setId("23");
-//        taxCode.setName("California Sales Tax");
-//        taxCode.setTaxable(true);
-//        taxCode.setActive(true);
-//        final QueryResult taxCodeQueryResult = new QueryResult();
-//        taxCodeQueryResult.setEntities(Arrays.asList(taxCode));
+        final TaxCode taxCode = new TaxCode();
+        taxCode.setId("23");
+        taxCode.setName("California");
+        taxCode.setTaxable(true);
+        taxCode.setActive(true);
+        final QueryResult taxCodeQueryResult = new QueryResult();
+        taxCodeQueryResult.setEntities(Arrays.asList(taxCode));
 
         PaymentMethod paymentMethod = new PaymentMethod();
-        paymentMethod.setName("Credit Card");
+        paymentMethod.setName("Visa");
         paymentMethod.setActive(true);
         paymentMethod.setId("45");
         paymentMethod.setType(PaymentMethodEnum.OTHER_CREDIT_CARD.value());
@@ -382,7 +383,10 @@ public class QBOGatewayUnitTests {
 			qboServiceFactory.getDataService(withAny(new Company()));
 			result = dataService;
 
-            dataService.executeQuery(String.format(QBOGateway.PAYMENT_METHOD_QUERY, "Credit Card"));
+            dataService.executeQuery(String.format(QBOQueryMethods.TAX_CODE_QUERY, taxCode.getName()));
+            result = taxCodeQueryResult;
+
+            dataService.executeQuery(String.format(QBOQueryMethods.PAYMENT_METHOD_QUERY, "Visa"));
             result = paymentMethodQueryResult;
 
             dataService.add(withAny(new SalesReceipt()));

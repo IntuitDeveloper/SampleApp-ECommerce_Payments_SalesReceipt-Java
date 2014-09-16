@@ -125,11 +125,17 @@ public class DataLoader {
         AppInfoRepository repository = context.getBean(AppInfoRepository.class);
 
         final JsonNode jsonAppInfo = jsonNode.get("appInfo");
+        AppInfo appInfo;
 
-        AppInfo appInfo = new AppInfo(jsonAppInfo.get("appToken").asText(),
-                jsonAppInfo.get("consumerKey").asText(),
-                jsonAppInfo.get("consumerSecret").asText());
-
+        try {
+            appInfo = new AppInfo(jsonAppInfo.get("appToken").asText(),
+                    jsonAppInfo.get("consumerKey").asText(),
+                    jsonAppInfo.get("consumerSecret").asText());
+        } catch (NullPointerException e) {
+            RuntimeException rte = new RuntimeException("Exception occurred loading oauth.json verify that file contains valid json and that field names are correct.");
+            rte.setStackTrace(e.getStackTrace());
+            throw rte;
+        }
         repository.save(appInfo);
 
         return appInfo;

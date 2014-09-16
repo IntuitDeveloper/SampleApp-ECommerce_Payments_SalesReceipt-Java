@@ -45,7 +45,7 @@ public class OrdersController {
     public OrderConfirmation createPurchaseRequest(@RequestBody final OrderRequest orderRequest) {
         ShoppingCart cart = shoppingCartRepository.findOne(orderRequest.getShoppingCartId());
 
-        //paymentGateway.chargeCustomerForOrder(cart, orderRequest.getPaymentToken(), confirmation);
+        paymentGateway.chargeCustomerForOrder(cart, orderRequest.getPaymentToken());
 
         // Accounting
         // We need to create sales receipts in orderRequest to manage inventory/ accounting

@@ -72,11 +72,10 @@ public class PaymentGatewayUnitTests {
             result = chargeService;
         }};
 
-        OrderConfirmation confirmation = new OrderConfirmation();
         //
         // Execute method under test
         //
-       gateway.chargeCustomerForOrder(shoppingCart, "1235FF22345CD987741", confirmation);
+       gateway.chargeCustomerForOrder(shoppingCart, "1235FF22345CD987741");
 
         //
         // Explicitly verify strict conditions. In ORDER because authorization must come before capture

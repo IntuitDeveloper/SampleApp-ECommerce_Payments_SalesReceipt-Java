@@ -20,25 +20,44 @@
         </table>
         <hr>
         <div class="container-fluid">
-            <h5 class="col-sm-2">Subtotal</h5>
-            <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.subTotal | currency}}</h5>
-        </div>
-        <div class="container-fluid">
-            <h5 class="col-sm-2">Promotion - 20%</h5>
-            <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.promotionSavings | currency}}</h5>
-        </div>
-        <div class="container-fluid">
-            <h5 class="col-sm-2">Total</h5>
-            <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.total | currency}}</h5>
-        </div>
-        <hr/>
-        <div class="container-fluid">
+            <div class="row">
+                <h5 class="col-sm-6">Subtotal</h5>
+                <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.subTotal | currency}}</h5>
+            </div>
+            <div class="row">
+                <h5 class="col-sm-6">Promotion - 20%</h5>
+                <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.promotionSavings | currency}}</h5>
+            </div>
+            <div class="row">
+                <h5 class="col-sm-6">California Sales Tax - 8%</h5>
+                <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.tax | currency}}</h5>
+            </div>
+            <div class="row">
+                <h5 class="col-sm-6">Total</h5>
+                <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.total | currency}}</h5>
+            </div>
+            <hr/>
             <button type="button" class="btn btn-default col-sm-2 pull-right" ng-click="showView('Checkout')">
                 Proceed to Checkout >>
             </button>
         </div>
+        <div class="container col-md-6 col-md-push-3 voffset4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Developer Note:</h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        You've already populated this app's database with items for sales and customer accounts.
+                        But these may not exist in QuickBooks, so the Small Business owner manually syncs this data to qickbooks
+                        after signing up for the first time.
+                    </p>
+                    <h6>See it in the code:</h6>
+                    <pre>com.intuit.developer.sampleapp.ecommerce.controllers.SyncRequestController</pre>
+                </div>
+            </div>
+        </div>
     </div>
-
     <div class="container" ng-switch-when="Checkout">
         <div class="container">
             <form class="form-horizontal" role="form" ng-submit="submitCharge()">
@@ -103,84 +122,77 @@
                     </div>
                 </div>
                 <hr>
-                <div class="form-group">
-                    <label class="col-sm-2 pull-left">Subtotal</label>
-
-                    <div class="col-sm-1 pull-right">
-                        <h5 style="text-align: right">{{model.shoppingCart.subTotal | currency}}</h5>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-6 pull-left">Promotional Discount</label>
-
-                    <div class="col-sm-1 pull-right">
-                        <h5 style="text-align: right">-{{model.shoppingCart.promotionSavings | currency}}</h5>
-                    </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-sm-2 pull-left">Shipping</label>
-
-                    <div class="col-sm-1 pull-right">
-                        <h5 style="text-align: right">{{model.shoppingCart.shipping | currency}}</h5>
-                    </div>
-                </div>
-                <hr>
-                <div class="form-group">
-                    <label class="col-sm-2 pull-left">Total</label>
-
-                    <div class="col-sm-1 pull-right">
-                        <h5 style="text-align: right">{{model.shoppingCart.total | currency}}</h5>
-                    </div>
-                </div>
-                <hr>
-                <button type="button" class="btn btn-default pull-left" ng-click="showView('Review')"><< Cancel</button>
-                <button type="button" class="btn btn-default pull-right" ng-click="placeOrder()">Submit Order</button>
             </form>
+            <div class="container-fluid">
+                <div class="row">
+                    <h5 class="col-sm-6">Subtotal</h5>
+                    <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.subTotal | currency}}</h5>
+                </div>
+                <div class="row">
+                    <h5 class="col-sm-6">Promotion - 20%</h5>
+                    <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.promotionSavings | currency}}</h5>
+                </div>
+                <div class="row">
+                    <h5 class="col-sm-6">California Sales Tax - 8%</h5>
+                    <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.tax | currency}}</h5>
+                </div>
+                <div class="row">
+                    <h5 class="col-sm-6">Total</h5>
+                    <h5 class="pull-right" style="text-align: right">{{model.shoppingCart.total | currency}}</h5>
+                </div>
+                <div class="row">
+                    <button type="button" class="btn btn-default pull-left" ng-click="showView('Review')"><< Cancel</button>
+                    <button type="button" class="btn btn-default pull-right" ng-click="placeOrder()">Submit Order</button>
+                </div>
+            </div>
         </div>
-
+        <div class="container col-md-6 col-md-push-3 voffset4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Developer Note:</h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        You've already populated this app's database with items for sales and customer accounts.
+                        But these may not exist in QuickBooks, so the Small Business owner manually syncs this data to qickbooks
+                        after signing up for the first time.
+                    </p>
+                    <h6>See it in the code:</h6>
+                    <pre>com.intuit.developer.sampleapp.ecommerce.controllers.SyncRequestController</pre>
+                </div>
+            </div>
+        </div>
     </div>
     <div class="container" ng-switch-when="Confirmation">
         <h1>Sales Receipt #{{orderConfirmation.orderNumber}}</h1>
         <hr />
         <div class="container col-md-6">
-            <div class="row">
+            <address>
                 <h3>Billing Address:</h3>
-            </div>
-            <div class="row">
-                <h4>{{orderConfirmation.customerRef.name}}</h4>
-            </div>
-            <div class="row">
-                {{orderConfirmation.billAddr.line1}}
-                <span ng-show="orderConfirmation.billAddr.line2">orderConfirmation.billAddr.line2</span>
-                <span ng-show="orderConfirmation.billAddr.line3">orderConfirmation.billAddr.line3</span>
-                <span ng-show="orderConfirmation.billAddr.line4">orderConfirmation.billAddr.line4</span>
-                <span ng-show="orderConfirmation.billAddr.line5">orderConfirmation.billAddr.line5</span>
-            </div>
-            <div class="row">
+                <b>{{orderConfirmation.customerRef.name}}</b><br/>
+                {{orderConfirmation.billAddr.line1}}<br/>
+                <span ng-show="orderConfirmation.billAddr.line2">{{orderConfirmation.billAddr.line2}}<br/></span>
+                <span ng-show="orderConfirmation.billAddr.line3">{{orderConfirmation.billAddr.line3}}<br/></span>
+                <span ng-show="orderConfirmation.billAddr.line4">{{orderConfirmation.billAddr.line4}}<br/></span>
+                <span ng-show="orderConfirmation.billAddr.line5">{{orderConfirmation.billAddr.line5}}<br/></span>
                 {{orderConfirmation.billAddr.city}},
                 {{orderConfirmation.billAddr.countrySubDivisionCode}},
                 {{orderConfirmation.billAddr.postalCode}}
-            </div>
+            </address>
         </div>
         <div class="container col-md-6">
-            <div class="row">
+            <address>
                 <h3>Shipping Address:</h3>
-            </div>
-            <div class="row">
-                <h4>{{orderConfirmation.customerRef.name}}</h4>
-            </div>
-            <div class="row">
-                {{orderConfirmation.shipAddr.line1}}
-                <span ng-show="orderConfirmation.shipAddr.line2">orderConfirmation.shipAddr.line2</span>
-                <span ng-show="orderConfirmation.shipAddr.line3">orderConfirmation.shipAddr.line3</span>
-                <span ng-show="orderConfirmation.shipAddr.line4">orderConfirmation.shipAddr.line4</span>
-                <span ng-show="orderConfirmation.shipAddr.line5">orderConfirmation.shipAddr.line5</span>
-            </div>
-            <div class="row">
+                <b>{{orderConfirmation.customerRef.name}}</b><br/>
+                {{orderConfirmation.shipAddr.line1}}<br/>
+                <span ng-show="orderConfirmation.shipAddr.line2">{{orderConfirmation.shipAddr.line2}}<br/></span>
+                <span ng-show="orderConfirmation.shipAddr.line3">{{orderConfirmation.shipAddr.line3}}<br/></span>
+                <span ng-show="orderConfirmation.shipAddr.line4">{{orderConfirmation.shipAddr.line4}}<br/></span>
+                <span ng-show="orderConfirmation.shipAddr.line5">{{orderConfirmation.shipAddr.line5}}<br/></span>
                 {{orderConfirmation.shipAddr.city}},
                 {{orderConfirmation.shipAddr.countrySubDivisionCode}},
                 {{orderConfirmation.shipAddr.postalCode}}
-            </div>
+            </address>
         </div>
         <div class="container-fluid">
             <table class="table table-striped">
@@ -204,22 +216,42 @@
             <hr>
             <div class="container col-md-4 col-md-offset-8">
                 <div class="row" ng-repeat="line in orderConfirmation.lines | filter:{detailType:'SUBTOTAL_LINE_DETAIL'}">
-                    <h5 class="col-md-6">Subtotal</h5>
-                    <h5 class="col-md-6" style="text-align: right">{{line.amount | currency}}</h5>
+                    <h5 class="col-md-7">Subtotal</h5>
+                    <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
                 </div>
                 <div class="row" ng-repeat="line in orderConfirmation.lines | filter:{detailType:'DISCOUNT_LINE_DETAIL'}">
-                    <h5 class="col-md-6">Promotion - %{{line.discountLineDetail.discountPercent}}</h5>
-                    <h5 class="col-md-6" style="text-align: right">{{line.amount | currency}}</h5>
+                    <h5 class="col-md-7">Promotion - {{line.discountLineDetail.discountPercent}}%</h5>
+                    <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
+                </div>
+                <div class="row" ng-repeat="line in orderConfirmation.txnTaxDetail.taxLine">
+                    <h5 class="col-md-7">California Sales Tax - {{line.taxLineDetail.taxPercent}}%</h5>
+                    <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
                 </div>
                 <div class="row">
-                    <h5 class="col-md-6">Total</h5>
-                    <h5 class="col-md-6" style="text-align: right">{{orderConfirmation.total | currency}}</h5>
+                    <h5 class="col-md-7">Total</h5>
+                    <h5 class="col-md-5" style="text-align: right">{{orderConfirmation.total | currency}}</h5>
                 </div>
-                <div clas="row">
-                    <h5> Paid with {{orderConfirmation.paymentType}}. Thank you!</h5>
+                <div class="row">
+                    <h5 class="col-md-12" ng-show="orderConfirmation.paymentType"> Paid with {{orderConfirmation.paymentType}}. Thank you!</h5>
                 </div>
             </div>
             <hr/>
+        </div>
+        <div class="container col-md-6 col-md-push-3 voffset4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Developer Note:</h3>
+                </div>
+                <div class="panel-body">
+                    <p>
+                        You've already populated this app's database with items for sales and customer accounts.
+                        But these may not exist in QuickBooks, so the Small Business owner manually syncs this data to qickbooks
+                        after signing up for the first time.
+                    </p>
+                    <h6>See it in the code:</h6>
+                    <pre>com.intuit.developer.sampleapp.ecommerce.controllers.SyncRequestController</pre>
+                </div>
+            </div>
         </div>
     </div>
 </div>

@@ -15,6 +15,7 @@ public class OrderConfirmation {
     private String paymentType;
     private List<Line> lines;
     private ReferenceType customerRef;
+    private TxnTaxDetail txnTaxDetail;
 
     public static OrderConfirmation fromSalesReceipt(SalesReceipt salesReceipt) {
         OrderConfirmation orderConfirmation = new OrderConfirmation();
@@ -25,6 +26,7 @@ public class OrderConfirmation {
         orderConfirmation.setPaymentType(salesReceipt.getPaymentMethodRef().getName());
         orderConfirmation.setLines(salesReceipt.getLine());
         orderConfirmation.setCustomerRef(salesReceipt.getCustomerRef());
+        orderConfirmation.setTxnTaxDetail(salesReceipt.getTxnTaxDetail());
         return orderConfirmation;
     }
 
@@ -82,5 +84,13 @@ public class OrderConfirmation {
 
     public ReferenceType getCustomerRef() {
         return customerRef;
+    }
+
+    public void setTxnTaxDetail(TxnTaxDetail txnTaxDetail) {
+        this.txnTaxDetail = txnTaxDetail;
+    }
+
+    public TxnTaxDetail getTxnTaxDetail() {
+        return txnTaxDetail;
     }
 }
