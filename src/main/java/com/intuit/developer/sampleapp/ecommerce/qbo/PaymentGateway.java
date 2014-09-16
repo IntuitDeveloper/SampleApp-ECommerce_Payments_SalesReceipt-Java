@@ -55,11 +55,6 @@ public class PaymentGateway {
          * and credit it to the merchants account.
          */
         charge = captureFundsForCharge(charge, chargeService1);
-
-        if (charge.getStatus() != ChargeStatus.SETTLED) {
-            throw new RuntimeException("The card charge was not successfully settled");
-        }
-
     }
 
     /**

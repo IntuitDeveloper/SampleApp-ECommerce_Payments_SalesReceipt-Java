@@ -74,7 +74,6 @@ public class PaymentGatewayUnitTests {
         chargeResponse1.setId("14553");
         final Charge chargeResponse2 = new Charge();
         chargeResponse1.setAmount(shoppingCart.getTotal().getAmount());
-        chargeResponse2.setStatus(ChargeStatus.SETTLED);
 
         //
         // Setup strict expectations (mocking, but order matters)
