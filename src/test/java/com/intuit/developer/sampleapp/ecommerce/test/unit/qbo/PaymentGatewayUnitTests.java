@@ -1,17 +1,13 @@
 package com.intuit.developer.sampleapp.ecommerce.test.unit.qbo;
 
-import com.intuit.developer.sampleapp.ecommerce.controllers.OrderConfirmation;
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.qbo.PaymentGateway;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
-import com.intuit.ipp.data.Payment;
 import com.intuit.ipp.data.payment.Capture;
 import com.intuit.ipp.data.payment.Charge;
 import com.intuit.ipp.data.payment.ChargeStatus;
 import com.intuit.ipp.services.payment.ChargeService;
 import mockit.*;
-import org.hamcrest.Description;
-import org.hamcrest.TypeSafeMatcher;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 import org.junit.Test;

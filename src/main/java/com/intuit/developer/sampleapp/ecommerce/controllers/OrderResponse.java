@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Created by akuchta on 9/4/14.
  */
-public class OrderConfirmation {
+public class OrderResponse {
     private String orderNumber;
     private BigDecimal total;
     private PhysicalAddress billAddr;
@@ -17,17 +17,17 @@ public class OrderConfirmation {
     private ReferenceType customerRef;
     private TxnTaxDetail txnTaxDetail;
 
-    public static OrderConfirmation fromSalesReceipt(SalesReceipt salesReceipt) {
-        OrderConfirmation orderConfirmation = new OrderConfirmation();
-        orderConfirmation.setOrderNumber(salesReceipt.getDocNumber());
-        orderConfirmation.setTotal(salesReceipt.getTotalAmt());
-        orderConfirmation.setBillAddr(salesReceipt.getBillAddr());
-        orderConfirmation.setShipAddr(salesReceipt.getShipAddr());
-        orderConfirmation.setPaymentType(salesReceipt.getPaymentMethodRef().getName());
-        orderConfirmation.setLines(salesReceipt.getLine());
-        orderConfirmation.setCustomerRef(salesReceipt.getCustomerRef());
-        orderConfirmation.setTxnTaxDetail(salesReceipt.getTxnTaxDetail());
-        return orderConfirmation;
+    public static OrderResponse fromSalesReceipt(SalesReceipt salesReceipt) {
+        OrderResponse orderResponse = new OrderResponse();
+        orderResponse.setOrderNumber(salesReceipt.getDocNumber());
+        orderResponse.setTotal(salesReceipt.getTotalAmt());
+        orderResponse.setBillAddr(salesReceipt.getBillAddr());
+        orderResponse.setShipAddr(salesReceipt.getShipAddr());
+        orderResponse.setPaymentType(salesReceipt.getPaymentMethodRef().getName());
+        orderResponse.setLines(salesReceipt.getLine());
+        orderResponse.setCustomerRef(salesReceipt.getCustomerRef());
+        orderResponse.setTxnTaxDetail(salesReceipt.getTxnTaxDetail());
+        return orderResponse;
     }
 
     public void setOrderNumber(String orderNumber) {

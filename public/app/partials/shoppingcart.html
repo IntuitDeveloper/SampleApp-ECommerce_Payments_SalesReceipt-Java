@@ -48,12 +48,11 @@
                 </div>
                 <div class="panel-body">
                     <p>
-                        You've already populated this app's database with items for sales and customer accounts.
-                        But these may not exist in QuickBooks, so the Small Business owner manually syncs this data to qickbooks
-                        after signing up for the first time.
+                        This shopping cart is represented by a <code>ShoppingCart</code> object. Which contains references
+                        to sales items and calculates totals.
                     </p>
                     <h6>See it in the code:</h6>
-                    <pre>com.intuit.developer.sampleapp.ecommerce.controllers.SyncRequestController</pre>
+                    <pre>com.intuit.developer.sampleapp.ecommerce.domain.ShoppingCart</pre>
                 </div>
             </div>
         </div>
@@ -153,45 +152,51 @@
                 </div>
                 <div class="panel-body">
                     <p>
-                        You've already populated this app's database with items for sales and customer accounts.
-                        But these may not exist in QuickBooks, so the Small Business owner manually syncs this data to qickbooks
-                        after signing up for the first time.
+                        The credit card information has been pre-filled with a test credit card that will work with
+                        our payments service. When the 'Submit Order' button is clicked. This information is sent to a
+                        PCI compliant payments server to be <b>tokenized</b>. This process will create a temporary unique
+                        identifier for the payment information. Because only the token-issuing server knows what the
+                        credit card information actually is, this token can be passed to this app's non-accredited
+                        server backend and used to charge the customer for the items.
                     </p>
-                    <h6>See it in the code:</h6>
-                    <pre>com.intuit.developer.sampleapp.ecommerce.controllers.SyncRequestController</pre>
+                    <h4>See it in the code:</h4>
+                    Client Side:
+                    <pre>public/js/controllers.js:277</pre>
+                    Server Side:
+                    <pre>com.intuit.developer.sampleapp.ecommerce.controllers.OrdersController</pre>
                 </div>
             </div>
         </div>
     </div>
     <div class="container" ng-switch-when="Confirmation">
-        <h1>Sales Receipt #{{orderConfirmation.orderNumber}}</h1>
+        <h1>Sales Receipt #{{orderResponse.orderNumber}}</h1>
         <hr />
         <div class="container col-md-6">
             <address>
                 <h3>Billing Address:</h3>
-                <b>{{orderConfirmation.customerRef.name}}</b><br/>
-                {{orderConfirmation.billAddr.line1}}<br/>
-                <span ng-show="orderConfirmation.billAddr.line2">{{orderConfirmation.billAddr.line2}}<br/></span>
-                <span ng-show="orderConfirmation.billAddr.line3">{{orderConfirmation.billAddr.line3}}<br/></span>
-                <span ng-show="orderConfirmation.billAddr.line4">{{orderConfirmation.billAddr.line4}}<br/></span>
-                <span ng-show="orderConfirmation.billAddr.line5">{{orderConfirmation.billAddr.line5}}<br/></span>
-                {{orderConfirmation.billAddr.city}},
-                {{orderConfirmation.billAddr.countrySubDivisionCode}},
-                {{orderConfirmation.billAddr.postalCode}}
+                <b>{{orderResponse.customerRef.name}}</b><br/>
+                {{orderResponse.billAddr.line1}}<br/>
+                <span ng-show="orderResponse.billAddr.line2">{{orderResponse.billAddr.line2}}<br/></span>
+                <span ng-show="orderResponse.billAddr.line3">{{orderResponse.billAddr.line3}}<br/></span>
+                <span ng-show="orderResponse.billAddr.line4">{{orderResponse.billAddr.line4}}<br/></span>
+                <span ng-show="orderResponse.billAddr.line5">{{orderResponse.billAddr.line5}}<br/></span>
+                {{orderResponse.billAddr.city}},
+                {{orderResponse.billAddr.countrySubDivisionCode}},
+                {{orderResponse.billAddr.postalCode}}
             </address>
         </div>
         <div class="container col-md-6">
             <address>
                 <h3>Shipping Address:</h3>
-                <b>{{orderConfirmation.customerRef.name}}</b><br/>
-                {{orderConfirmation.shipAddr.line1}}<br/>
-                <span ng-show="orderConfirmation.shipAddr.line2">{{orderConfirmation.shipAddr.line2}}<br/></span>
-                <span ng-show="orderConfirmation.shipAddr.line3">{{orderConfirmation.shipAddr.line3}}<br/></span>
-                <span ng-show="orderConfirmation.shipAddr.line4">{{orderConfirmation.shipAddr.line4}}<br/></span>
-                <span ng-show="orderConfirmation.shipAddr.line5">{{orderConfirmation.shipAddr.line5}}<br/></span>
-                {{orderConfirmation.shipAddr.city}},
-                {{orderConfirmation.shipAddr.countrySubDivisionCode}},
-                {{orderConfirmation.shipAddr.postalCode}}
+                <b>{{orderResponse.customerRef.name}}</b><br/>
+                {{orderResponse.shipAddr.line1}}<br/>
+                <span ng-show="orderResponse.shipAddr.line2">{{orderResponse.shipAddr.line2}}<br/></span>
+                <span ng-show="orderResponse.shipAddr.line3">{{orderResponse.shipAddr.line3}}<br/></span>
+                <span ng-show="orderResponse.shipAddr.line4">{{orderResponse.shipAddr.line4}}<br/></span>
+                <span ng-show="orderResponse.shipAddr.line5">{{orderResponse.shipAddr.line5}}<br/></span>
+                {{orderResponse.shipAddr.city}},
+                {{orderResponse.shipAddr.countrySubDivisionCode}},
+                {{orderResponse.shipAddr.postalCode}}
             </address>
         </div>
         <div class="container-fluid">
@@ -205,7 +210,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr ng-repeat="line in orderConfirmation.lines | filter:{detailType:'SALES_ITEM_LINE_DETAIL'}">
+                <tr ng-repeat="line in orderResponse.lines | filter:{detailType:'SALES_ITEM_LINE_DETAIL'}">
                     <td>{{line.description}}</td>
                     <td align="right">{{line.salesItemLineDetail.qty}}</td>
                     <td align="right">{{line.salesItemLineDetail.unitPrice | currency}}</td>
@@ -215,24 +220,24 @@
             </table>
             <hr>
             <div class="container col-md-4 col-md-offset-8">
-                <div class="row" ng-repeat="line in orderConfirmation.lines | filter:{detailType:'SUBTOTAL_LINE_DETAIL'}">
+                <div class="row" ng-repeat="line in orderResponse.lines | filter:{detailType:'SUBTOTAL_LINE_DETAIL'}">
                     <h5 class="col-md-7">Subtotal</h5>
                     <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
                 </div>
-                <div class="row" ng-repeat="line in orderConfirmation.lines | filter:{detailType:'DISCOUNT_LINE_DETAIL'}">
+                <div class="row" ng-repeat="line in orderResponse.lines | filter:{detailType:'DISCOUNT_LINE_DETAIL'}">
                     <h5 class="col-md-7">Promotion - {{line.discountLineDetail.discountPercent}}%</h5>
                     <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
                 </div>
-                <div class="row" ng-repeat="line in orderConfirmation.txnTaxDetail.taxLine">
+                <div class="row" ng-repeat="line in orderResponse.txnTaxDetail.taxLine">
                     <h5 class="col-md-7">California Sales Tax - {{line.taxLineDetail.taxPercent}}%</h5>
                     <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
                 </div>
                 <div class="row">
                     <h5 class="col-md-7">Total</h5>
-                    <h5 class="col-md-5" style="text-align: right">{{orderConfirmation.total | currency}}</h5>
+                    <h5 class="col-md-5" style="text-align: right">{{orderResponse.total | currency}}</h5>
                 </div>
                 <div class="row">
-                    <h5 class="col-md-12" ng-show="orderConfirmation.paymentType"> Paid with {{orderConfirmation.paymentType}}. Thank you!</h5>
+                    <h5 class="col-md-12" ng-show="orderResponse.paymentType"> Paid with {{orderResponse.paymentType}}. Thank you!</h5>
                 </div>
             </div>
             <hr/>

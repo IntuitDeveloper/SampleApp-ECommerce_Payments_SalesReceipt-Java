@@ -42,7 +42,7 @@ public class OrdersController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
     @ResponseBody
-    public OrderConfirmation createPurchaseRequest(@RequestBody final OrderRequest orderRequest) {
+    public OrderResponse createPurchaseRequest(@RequestBody final OrderRequest orderRequest) {
         ShoppingCart cart = shoppingCartRepository.findOne(orderRequest.getShoppingCartId());
 
         paymentGateway.chargeCustomerForOrder(cart, orderRequest.getPaymentToken());
@@ -55,6 +55,6 @@ public class OrdersController {
         cart.getCartItems().clear();
         shoppingCartRepository.save(cart);
 
-        return OrderConfirmation.fromSalesReceipt(salesReceipt);
+        return OrderResponse.fromSalesReceipt(salesReceipt);
     }
 }

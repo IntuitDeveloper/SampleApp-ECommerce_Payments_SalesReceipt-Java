@@ -11,7 +11,9 @@ import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
 import com.intuit.ipp.core.IEntity;
 import com.intuit.ipp.data.*;
 import com.intuit.ipp.exception.FMSException;
+import com.intuit.ipp.services.BatchOperation;
 import com.intuit.ipp.services.DataService;
+import org.apache.commons.lang.math.IEEE754rUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.math.BigDecimal;
@@ -234,7 +236,7 @@ public class QBOGateway {
 
         // Add the discount line to the sales recept
 		lineItems.add(discountLine);
-
+    
         // Add the line items to the receipt
         salesReceipt.setLine(lineItems);
 	}

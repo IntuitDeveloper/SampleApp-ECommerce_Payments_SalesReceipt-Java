@@ -150,7 +150,7 @@ public class DataLoader {
             throw new RuntimeException("In 'oauth.json': 'consumerSecret' property is empty");
         }
 
-        AppInfo appInfo = new AppInfo(appToken,consumerKey, consumerSecret)
+        AppInfo appInfo = new AppInfo(appToken,consumerKey, consumerSecret);
         repository.save(appInfo);
 
         return appInfo;

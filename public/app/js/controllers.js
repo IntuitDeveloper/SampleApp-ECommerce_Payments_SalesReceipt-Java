@@ -116,7 +116,7 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
                 $scope.creditCard,
                 $scope.billingInfo,
                 function(data) {
-                    $scope.orderConfirmation = data;
+                    $scope.orderResponse = data;
                     $scope.showView("Confirmation");
                 },
                 function(data) {

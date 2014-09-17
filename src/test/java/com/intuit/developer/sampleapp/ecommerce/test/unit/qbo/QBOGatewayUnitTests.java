@@ -1,6 +1,5 @@
 package com.intuit.developer.sampleapp.ecommerce.test.unit.qbo;
 
-import com.intuit.developer.sampleapp.ecommerce.controllers.OrderConfirmation;
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
