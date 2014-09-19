@@ -125,17 +125,32 @@ public class DataLoader {
         AppInfoRepository repository = context.getBean(AppInfoRepository.class);
 
         final JsonNode jsonAppInfo = jsonNode.get("appInfo");
-        AppInfo appInfo;
+
+        String appToken;
+        String consumerKey;
+        String consumerSecret;
 
         try {
-            appInfo = new AppInfo(jsonAppInfo.get("appToken").asText(),
-                    jsonAppInfo.get("consumerKey").asText(),
-                    jsonAppInfo.get("consumerSecret").asText());
+            appToken = jsonAppInfo.get("appToken").asText();
+            consumerKey = jsonAppInfo.get("consumerKey").asText();
+            consumerSecret = jsonAppInfo.get("consumerSecret").asText();
         } catch (NullPointerException e) {
             RuntimeException rte = new RuntimeException("Exception occurred loading oauth.json verify that file contains valid json and that field names are correct.");
             rte.setStackTrace(e.getStackTrace());
             throw rte;
         }
+
+        if (appToken.isEmpty()) {
+            throw new RuntimeException("In 'oauth.json': 'appToken' property is empty");
+        }
+        if (consumerKey.isEmpty()) {
+            throw new RuntimeException("In 'oauth.json': 'consumerKey' property is empty");
+        }
+        if (consumerSecret.isEmpty()) {
+            throw new RuntimeException("In 'oauth.json': 'consumerSecret' property is empty");
+        }
+
+        AppInfo appInfo = new AppInfo(appToken,consumerKey, consumerSecret)
         repository.save(appInfo);
 
         return appInfo;
