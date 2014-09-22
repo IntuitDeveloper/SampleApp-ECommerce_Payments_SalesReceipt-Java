@@ -1,6 +1,6 @@
 exports.config = {
     seleniumAddress: 'http://localhost:4444/wd/hub',
-    baseUrl: 'http://localhost:8080/app/index.html',
+    baseUrl: 'http://localhost:9001/app/index.html',
 
     specs: [
         './**/*_spec.js'
@@ -27,7 +27,7 @@ exports.config = {
     params: {
         qbo_username: 'jyangqbotest',
         qbo_password: 'intuit1234',
-        endpoint_host: 'http://localhost:8080',
+        endpoint_host: 'http://localhost:9001',
         endpoint_companyuri: "/companies",
         endpoint_customeruri: "/customers",
         endpoint_employeeuri: "/employees",
