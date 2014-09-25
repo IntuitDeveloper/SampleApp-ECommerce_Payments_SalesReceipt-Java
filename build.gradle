@@ -10,29 +10,47 @@ buildscript {
     }
 }
 
-apply plugin: 'java'
-apply plugin: 'eclipse'
-apply plugin: 'spring-boot'
-apply plugin: 'jacoco'
+allprojects {
 
+    apply plugin: 'java'
 
-sourceCompatibility = 1.7
-version = '1.0'
+    sourceCompatibility = 1.7
+    version = '1.0'
+
+    // define repos for all the dependant jars
+    repositories {
+
+        mavenLocal()
+        mavenCentral()
+        maven { url "http://repo.spring.io/libs-release" }
+        maven { url "http://repo.spring.io/libs-milestone" }
+        maven { url "https://repository.jboss.org/nexus/content/repositories/releases" }
+    }
+
+    // Use http://search.maven.org/ to find the correct groupId, artifactId and version
+    ext.libraries = [
+
+        apache : 'commons-lang:commons-lang:2.4',
+
+        jackson: ['org.codehaus.jackson:jackson-core-asl:1.9.7',
+                  'org.codehaus.jackson:jackson-mapper-asl:1.9.7'
+        ],
+
+        logging: 'org.slf4j:slf4j-api:1.6.4'
+    ]
+}
 
 //custom variables for this project
 project.ext {
 
 }
 
-repositories {
-    mavenLocal()
-    mavenCentral()
-    maven { url "http://repo.spring.io/libs-release" }
-    maven { url "http://repo.spring.io/libs-milestone" }
-    maven { url "https://repository.jboss.org/nexus/content/repositories/releases" }
-}
+apply plugin: 'eclipse'
+apply plugin: 'spring-boot'
+apply plugin: 'jacoco'
 
 dependencies {
+    compile project('libs:payments-sdk')
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.hsqldb:hsqldb")
@@ -40,8 +58,7 @@ dependencies {
     compile("commons-io:commons-io:2.4")
     compile("org.joda:joda-money:0.9.1")
     compile("ma.glasnost.orika:orika-core:1.4.5")
-    compile fileTree(dir: "libs/qbo-sdk-2.3.1", include: "*.jar")
-    compile fileTree(dir: "libs/qbo-sdk-3.0.0", include: "*.jar")
+    compile fileTree(dir: "libs/qbo-sdk", include: "*.jar")
 
     testCompile("org.jmockit:jmockit:1.10")
     testCompile("org.springframework.boot:spring-boot-starter-test")

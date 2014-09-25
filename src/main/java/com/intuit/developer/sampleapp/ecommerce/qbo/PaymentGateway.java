@@ -3,15 +3,16 @@ package com.intuit.developer.sampleapp.ecommerce.qbo;
 import com.intuit.developer.sampleapp.ecommerce.domain.ShoppingCart;
 import com.intuit.ipp.data.payment.Capture;
 import com.intuit.ipp.data.payment.Charge;
-import com.intuit.ipp.data.payment.ChargeStatus;
+import com.intuit.ipp.data.payment.Charge.ChargeStatus;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.payment.ChargeService;
+import com.intuit.ipp.services.payment.RequestContext;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.Date;
 
 /**
- * This class contains methods to interface with the Payments API via the QBO v3 SDK.
+ * This class contains methods to interface with the Payments API via the payments SDK.
  * Created by akuchta on 8/28/14.
  */
 public class PaymentGateway {
@@ -71,8 +72,12 @@ public class PaymentGateway {
         charge.setAmount(cart.getTotal().getAmount());
         charge.setToken(paymentToken);
         charge.setCapture(true);
+
+        // Create request id
+        RequestContext requestContext = new RequestContext();
+
         try {
-            return chargeService.charge(charge);
+            return chargeService.charge(requestContext, charge);
         } catch (FMSException e) {
             throw new RuntimeException(e);
         }
@@ -105,9 +110,12 @@ public class PaymentGateway {
         // Supply the credit card information in the form of a payment token
         charge.setToken(paymentToken);
 
+        // Create request id
+        RequestContext requestContext = new RequestContext();
+
         // Try to authorize the charge
         try {
-            return chargeService.charge(charge);
+            return chargeService.charge(requestContext,charge);
         } catch (FMSException e) {
             throw new RuntimeException(e);
         }
@@ -133,9 +141,12 @@ public class PaymentGateway {
         //  but it makes sense in this situation
         capture.setDescription(charge.getDescription());
 
+        // Create request id
+        RequestContext requestContext = new RequestContext();
+
         // Try to capture the funds
         try {
-            return chargeService.capture(charge.getId(), capture);
+            return chargeService.capture(requestContext, charge.getId(), capture);
         } catch (FMSException e) {
             throw new RuntimeException(e);
         }

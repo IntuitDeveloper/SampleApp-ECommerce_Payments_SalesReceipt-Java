@@ -5,8 +5,9 @@ import com.intuit.developer.sampleapp.ecommerce.qbo.PaymentGateway;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
 import com.intuit.ipp.data.payment.Capture;
 import com.intuit.ipp.data.payment.Charge;
-import com.intuit.ipp.data.payment.ChargeStatus;
+import com.intuit.ipp.data.payment.Charge.ChargeStatus;
 import com.intuit.ipp.services.payment.ChargeService;
+import com.intuit.ipp.services.payment.RequestContext;
 import mockit.*;
 import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
@@ -81,10 +82,10 @@ public class PaymentGatewayUnitTests {
             qboServiceFactory.getChargeService(withAny(new Company()));
             result = chargeService;
 
-            chargeService.charge(withAny(new Charge()));
+            chargeService.charge(withAny(new RequestContext()), withAny(new Charge()));
             result = chargeResponse1;
 
-            chargeService.capture(anyString, withAny(new Capture()));
+            chargeService.capture(withAny(new RequestContext()), anyString, withAny(new Capture()));
             result = chargeResponse2;
         }};
 
@@ -99,14 +100,14 @@ public class PaymentGatewayUnitTests {
         new VerificationsInOrder() {{
             // Verify that the authorization was requested with the right parameters
             Charge chargePassedForCharge;
-            chargeService.charge(chargePassedForCharge = withCapture());
+            chargeService.charge(null, chargePassedForCharge = withCapture());
             assertFalse(chargePassedForCharge.getCapture());
             assertEquals(shoppingCart.getTotal().getAmount(), chargePassedForCharge.getAmount());
             assertEquals(PaymentGateway.CHARGE_DESCRIPTION, chargePassedForCharge.getDescription());
 
             // Verify that the capture was called with the right parameters.
             Capture capturePassedForCapture;
-            chargeService.capture(chargeResponse1.getId(), capturePassedForCapture = withCapture());
+            chargeService.capture(null, chargeResponse1.getId(), capturePassedForCapture = withCapture());
             assertEquals(shoppingCart.getTotal().getAmount(), capturePassedForCapture.getAmount());
             assertEquals(PaymentGateway.CHARGE_DESCRIPTION, capturePassedForCapture.getDescription());
         }};

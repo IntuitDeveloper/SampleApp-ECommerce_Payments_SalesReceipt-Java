@@ -1,0 +1,10 @@
+project(':libs:payments-sdk') {
+
+    dependencies {
+        compile files('../qbo-sdk/ipp-v3-java-devkit-2.3.4-jar-with-dependencies.jar')
+        compile libraries.apache
+        compile libraries.jackson
+        compile libraries.logging
+    }
+
+}
