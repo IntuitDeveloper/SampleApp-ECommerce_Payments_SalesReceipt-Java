@@ -6,10 +6,10 @@
         <platformService>https://qa-appcenter.intuit.com/db</platformService>
         <quickbooks-api>https://transaction-api-qal.payments.intuit.com/qa2/v2</quickbooks-api>
     </baseURL>
-    <proxy>
-        <host>127.0.0.1</host>
-        <port>8888</port>
-    </proxy>
+    <!--<proxy>-->
+        <!--<host>127.0.0.1</host>-->
+        <!--<port>8888</port>-->
+    <!--</proxy>-->
     <!--<baseURL>-->
     <!--<baseURL>
         <qbd>https://quickbooks.api.intuit.com/v3/company</qbd>
