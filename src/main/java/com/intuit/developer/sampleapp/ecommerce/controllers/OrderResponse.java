@@ -16,6 +16,7 @@ public class OrderResponse {
     private List<Line> lines;
     private ReferenceType customerRef;
     private TxnTaxDetail txnTaxDetail;
+    private String txnId;
 
     public static OrderResponse fromSalesReceipt(SalesReceipt salesReceipt) {
         OrderResponse orderResponse = new OrderResponse();
@@ -27,6 +28,7 @@ public class OrderResponse {
         orderResponse.setLines(salesReceipt.getLine());
         orderResponse.setCustomerRef(salesReceipt.getCustomerRef());
         orderResponse.setTxnTaxDetail(salesReceipt.getTxnTaxDetail());
+        orderResponse.setTxnId(salesReceipt.getId());
         return orderResponse;
     }
 
@@ -92,5 +94,13 @@ public class OrderResponse {
 
     public TxnTaxDetail getTxnTaxDetail() {
         return txnTaxDetail;
+    }
+
+    public void setTxnId(String txnId) {
+        this.txnId = txnId;
+    }
+
+    public String getTxnId() {
+        return txnId;
     }
 }
