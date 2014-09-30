@@ -88,20 +88,15 @@ public class DataLoader {
     private static void createCustomers(Company company, ConfigurableApplicationContext springContext) {
         final CustomerRepository repository = springContext.getBean(CustomerRepository.class);
 
-        final Customer customer1 = new Customer("John", "Snow", "john.snow@winterfell.com", "916-555-7777");
-        customer1.setCity("Troy");
-        customer1.setPostalCode("95054");
+        final Customer customer1 = new Customer("John", "Smith", "john_smith@ipp.developer.com", "555-555-5555");
+        customer1.setCity("Mountain View");
+        customer1.setPostalCode("91354");
         customer1.setCountry("United States");
-        customer1.setLine1("950 Smith St.");
-        customer1.setLine2("Apt #25");
+        customer1.setLine1("2632 Marine Way");
         customer1.setCountrySubDivisionCode("CA");
         company.addCustomer(customer1);
 	    repository.save(customer1);
         createShoppingCart(customer1, springContext);
-
-        final Customer customer2 = new Customer("Jane", "Flowers", "jane.flowers@reach.com", "916-777-9999");
-        company.addCustomer(customer2);
-        repository.save(customer2);
     }
 
     private static void createShoppingCart(Customer customer, ConfigurableApplicationContext springContext) {
