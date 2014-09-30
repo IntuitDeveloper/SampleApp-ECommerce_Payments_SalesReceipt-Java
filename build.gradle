@@ -50,7 +50,7 @@ apply plugin: 'spring-boot'
 apply plugin: 'jacoco'
 
 dependencies {
-    compile project('libs:payments-helper')
+    compile project('libs:payments-reference-implementation')
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
     compile("org.hsqldb:hsqldb")

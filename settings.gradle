@@ -1,4 +1,4 @@
 rootProject.name = 'ecommerce'
 
-include 'libs:payments-helper'
+include 'libs:payments-reference-implementation'
 
