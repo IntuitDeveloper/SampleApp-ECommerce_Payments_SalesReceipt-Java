@@ -31,7 +31,6 @@ public class PaymentGateway {
      */
     public void chargeCustomerForOrder(ShoppingCart cart, String paymentToken) {
         ChargeService chargeService = qboServiceFactory.getChargeService(cart.getCustomer().getCompany());
-        ChargeService chargeService1 = qboServiceFactory.getChargeService(cart.getCustomer().getCompany());
 
         /**
          * Authorizing the charge will verify the credit card account has the funds available and
@@ -55,7 +54,7 @@ public class PaymentGateway {
          * Capturing the charge will actually transfer the funds from the card holder's account
          * and credit it to the merchants account.
          */
-        charge = captureFundsForCharge(charge, chargeService1);
+        charge = captureFundsForCharge(charge, chargeService);
     }
 
     /**
