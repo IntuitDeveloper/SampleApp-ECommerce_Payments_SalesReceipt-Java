@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.*;
 /**
  */
 @RestController
-@RequestMapping("/syncrequest")
+@RequestMapping(value = "/syncrequest", consumes = "application/json", produces = "application/json")
 public class SyncRequestController {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(SyncRequestController.class);
@@ -24,7 +24,7 @@ public class SyncRequestController {
 	@Autowired
 	private QBOGateway qboGateway;
 
-	@RequestMapping(method = RequestMethod.POST, consumes = "application/json", produces = "application/json")
+	@RequestMapping(method = RequestMethod.POST)
 	@ResponseBody
 	public SyncRequest createSyncRequest(@RequestBody final SyncRequest syncRequest) {
 

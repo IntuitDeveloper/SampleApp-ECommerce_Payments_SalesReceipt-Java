@@ -19,7 +19,7 @@
                     <p>
                         An app needs permission to access the Quickbooks data for a company.
                         The Small Business owner using the E-Commerce site <b> you built</b>
-                        uses this button to give permission. This button is powered by including this javascript file:
+                        uses this button to give permission. This button is powered by including the javascript file:
                         <code>https://js.appcenter.intuit.com/Content/IA/intuit.ipp.anywhere.js</code>
                     </p>
                     <h4>See it in the code:</h4>
@@ -56,6 +56,7 @@
                             </button>
                         </td>
                         <td>
+                            <div ng-show="loadingCustomers" class="spinner small"></div>
                             <span>{{syncCustomersMessage}}</span>
                         </td>
                         <td>
@@ -74,6 +75,7 @@
                             </button>
                         </td>
                         <td>
+                            <div ng-show="loadingSalesItems" class="spinner small"></div>
                             <span>{{syncSalesItemMessage}}</span>
                         </td>
                         <td>
@@ -92,8 +94,8 @@
                 <div class="panel-body">
                     <p>
                         You've already populated this app's database with items for sales and customer accounts.
-                        But these may not exist in QuickBooks, so the Small Business owner manually syncs this data to qickbooks
-                        after signing up for the first time.
+                        But these may not exist in QuickBooks, so the Small Business owner manually syncs this data to
+                        QuickBooks after signing up for the first time.
                      </p>
                     <h6>See it in the code:</h6>
                     <pre>com.intuit.developer.sampleapp.ecommerce.controllers.SyncRequestController</pre>

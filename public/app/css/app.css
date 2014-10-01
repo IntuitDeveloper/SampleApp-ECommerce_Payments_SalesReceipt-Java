@@ -16,3 +16,15 @@ body { padding-top: 50px; }
 .voffset7 { margin-top: 80px; }
 .voffset8 { margin-top: 100px; }
 .voffset9 { margin-top: 150px; }
+
+/* SpiffyGif: http://spiffygif.com */
+.spinner {
+    background-position: center center;
+    background-repeat: no-repeat;
+    border-radius: 50%; /* Rounds out the halo */
+    opacity: .7; /* Some subtle opacity to help blend with variable background colors */
+}
+.spinner.small {
+    height: 30px; width: 30px;
+    background: url("../assets/spiffygif_30x30.gif");
+}

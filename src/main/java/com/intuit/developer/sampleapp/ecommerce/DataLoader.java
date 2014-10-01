@@ -68,7 +68,7 @@ public class DataLoader {
         company.addSalesItem(salesItem1);
 	    repository.save(salesItem1);
 
-	    final SalesItem salesItem2 = new SalesItem("Mens Bike Jersey", "Tour de roads in style", Money.parse("USD 82.88"), "IntuitBikeJersey.jpg");
+	    final SalesItem salesItem2 = new SalesItem("Men's Bike Jersey", "Tour de roads in style", Money.parse("USD 82.88"), "IntuitBikeJersey.jpg");
         salesItem2.setQtyOnHand(new BigDecimal(5));
 
 	    company.addSalesItem(salesItem2);

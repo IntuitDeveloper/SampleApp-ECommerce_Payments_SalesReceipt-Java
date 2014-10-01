@@ -52,6 +52,10 @@ public class OAuthController {
             final Map<String, String> requestTokenAndSecret =
 		            client.getRequestTokenAndSecret(oAuthInfoProvider.getConsumerKey(), oAuthInfoProvider.getConsumerSecret());
 
+            if (requestTokenAndSecret == null) {
+                throw new RuntimeException("The system does not recognize the provided consumer key.  The development consumer key is only recognized in the sandbox environment; the production consumer key is only recognized in the 'published' environment.");
+            }
+
             //Pull the values out of the map
             final String requestToken = requestTokenAndSecret.get("requestToken");
             final String requestTokenSecret = requestTokenAndSecret.get("requestTokenSecret");

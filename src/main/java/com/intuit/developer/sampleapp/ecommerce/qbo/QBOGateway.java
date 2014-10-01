@@ -346,7 +346,7 @@ public class QBOGateway {
      */
     public static final String ITEM_QUERY = "select * from item where active = true and name = '%s'";
     public static com.intuit.ipp.data.Item findItem(DataService dataService, SalesItem salesItem) {
-        String query = String.format(ITEM_QUERY, salesItem.getName());
+        String query = String.format(ITEM_QUERY, salesItem.getName().replace("'", "\\'"));
         return executeQuery(dataService, query, com.intuit.ipp.data.Item.class);
     }
 

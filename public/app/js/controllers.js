@@ -21,6 +21,8 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
             $scope.model = ModelSvc.model;
             $scope.syncCustomersMessage = '';
             $scope.syncSalesItemMessage = '';
+            $scope.loadingSalesItems = false;
+            $scope.loadingCustomers = false;
 
             $scope.showConnectButton = function () {
                 return $scope.model.company.connectedToQbo === false;
@@ -55,10 +57,12 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
             }
 
             $scope.syncCustomers = function() {
+                $scope.loadingCustomers = true;
                 SyncRequestSvc.sendCustomerSyncRequest(syncCompleted);
             }
 
             $scope.syncSalesItems = function() {
+                $scope.loadingSalesItems = true;
                 SyncRequestSvc.sendSalesItemSyncRequest(syncCompleted);
             }
 
@@ -66,8 +70,10 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
                 var message = data.successful ? data.message : 'Error: ' + data.message;
                 if (data.type === 'Customer') {
                     $scope.syncCustomersMessage = message;
+                    $scope.loadingCustomers = false;
                 } else if (data.type === 'SalesItem') {
                     $scope.syncSalesItemMessage = message;
+                    $scope.loadingSalesItems = false;
                 }
                 CompanySvc.initializeModel();
             }

@@ -1,5 +1,7 @@
 package com.intuit.developer.sampleapp.ecommerce.domain;
 
+import org.hibernate.annotations.DynamicUpdate;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,6 +13,7 @@ import java.util.List;
  * Time: 5:41 PM
  */
 @Entity
+@DynamicUpdate
 public class Company {
 
     @Id
