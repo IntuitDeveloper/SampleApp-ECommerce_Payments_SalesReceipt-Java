@@ -61,7 +61,7 @@ public class QBOGateway {
          */
         TxnTaxDetail txnTaxDetail = new TxnTaxDetail();
         txnTaxDetail.setTxnTaxCodeRef(findTaxCodeReference(dataService, "California"));
-        receipt.setApplyTaxAfterDiscount(true);
+        receipt.setApplyTaxAfterDiscount(false);
         receipt.setTxnTaxDetail(txnTaxDetail);
 
         // Set the reference to the customer

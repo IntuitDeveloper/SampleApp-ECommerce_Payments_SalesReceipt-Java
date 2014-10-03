@@ -78,12 +78,8 @@ public class ShoppingCart {
         return getSubTotal().multipliedBy(PROMOTION_MULTIPLIER, RoundingMode.CEILING);
     }
 
-    public Money getTaxable() {
-        return getSubTotal().minus(getPromotionSavings());
-    }
-
     public Money getTax() {
-        return getTaxable().multipliedBy(TAX_MULTIPLIER, RoundingMode.FLOOR);
+        return getSubTotal().multipliedBy(TAX_MULTIPLIER, RoundingMode.FLOOR);
     }
 
 	public Money getShipping() {
@@ -91,7 +87,7 @@ public class ShoppingCart {
 	}
 
     public Money getTotal() {
-        return getTaxable().plus(getTax());
+        return getSubTotal().plus(getTax()).minus(getPromotionSavings());
     }
 
 }

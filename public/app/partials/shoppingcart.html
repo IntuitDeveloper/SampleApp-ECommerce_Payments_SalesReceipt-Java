@@ -238,12 +238,12 @@
                     <h5 class="col-md-7">Subtotal</h5>
                     <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
                 </div>
-                <div class="row" ng-repeat="line in orderResponse.lines | filter:{detailType:'DISCOUNT_LINE_DETAIL'}">
-                    <h5 class="col-md-7">Promotion - {{line.discountLineDetail.discountPercent}}%</h5>
-                    <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
-                </div>
                 <div class="row" ng-repeat="line in orderResponse.txnTaxDetail.taxLine">
                     <h5 class="col-md-7">California Sales Tax - {{line.taxLineDetail.taxPercent}}%</h5>
+                    <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
+                </div>
+                <div class="row" ng-repeat="line in orderResponse.lines | filter:{detailType:'DISCOUNT_LINE_DETAIL'}">
+                    <h5 class="col-md-7">Promotion - {{line.discountLineDetail.discountPercent}}%</h5>
                     <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
                 </div>
                 <div class="row">
