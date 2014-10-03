@@ -362,7 +362,7 @@ ecommerceServices.factory('DeepLinkSvc', ['ModelSvc',
         };
 
         var getSalesReceiptLink = function (entityId) {
-            return getSingleEntityUrl("salesReceipt", entityId);
+            return getSingleEntityUrl("salesreceipt", entityId);
         };
 
         var getItemsLink = function () {
