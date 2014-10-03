@@ -28,3 +28,8 @@ body { padding-top: 50px; }
     height: 30px; width: 30px;
     background: url("../assets/spiffygif_30x30.gif");
 }
+
+.spinner.large {
+    height: 138px; width: 138px;
+    background: url("../assets/spiffygif_138x138.gif") no-repeat center;
+}

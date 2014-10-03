@@ -149,12 +149,16 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
             $scope.shoppingCartView = viewName
         }
         $scope.placeOrder = function() {
+            $('#loadingOrder').modal({show: true, keyboard: false, backdrop: 'static'});
+            $scope.orderMessage = "";
             OrderSvc.sendOrder(
                 $scope.creditCard,
                 $scope.billingInfo,
                 function(data) {
                     $scope.orderResponse = data;
                     $scope.showView("Confirmation");
+                    $('#loadingOrder').modal('hide');
+
                 },
                 function(data) {
                     $scope.orderMessage = 'Unexpected error placing your order.'

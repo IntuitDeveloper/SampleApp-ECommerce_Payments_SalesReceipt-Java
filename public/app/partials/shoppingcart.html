@@ -108,7 +108,6 @@
                 </div>
                 <div class="form-group">
                     <label class="col-sm-2 control-label pull-left">Email</label>
-
                     <div class="col-sm-4">
                         <input class="form-control" placeholder="{{billingInfo.email}}" ng-disabled="true">
                     </div>
@@ -142,6 +141,17 @@
                 <div class="row">
                     <button type="button" class="btn btn-default pull-left" ng-click="showView('Review')"><< Cancel</button>
                     <button type="button" class="btn btn-default pull-right" ng-click="placeOrder()">Submit Order</button>
+                </div>
+            </div>
+            <div class="modal fade" id="loadingOrder">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <h1>Placing Order....</h1>
+                            <div class="spinner large center-block"></div>
+                            <div class="alert alert-danger" ng-show="orderMessage">{{orderMessage}}</div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
