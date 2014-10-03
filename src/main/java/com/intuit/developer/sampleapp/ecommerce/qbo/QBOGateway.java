@@ -68,7 +68,7 @@ public class QBOGateway {
         ReferenceType customerRef = new ReferenceType();
         customerRef.setValue(customer.getQboId());
         receipt.setCustomerRef(customerRef);
-        //receipt.setPaymentMethodRef(findPaymentMethodReference(dataService, "Visa"));
+
         receipt.setTxnSource("IntuitPayment");
         CreditCardPayment creditCardPayment = new CreditCardPayment();
         CreditChargeInfo creditChargeInfo = new CreditChargeInfo();
