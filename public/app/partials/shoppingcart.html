@@ -147,6 +147,10 @@
                 <div class="modal-dialog">
                     <div class="modal-content">
                         <div class="modal-body">
+                            <button type="button" ng-show="orderMessage" class="close" data-dismiss="modal">
+                                <span aria-hidden="true">&times;</span>
+                                <span class="sr-only">Close</span>
+                            </button>
                             <h1>Placing Order....</h1>
                             <div class="spinner large center-block"></div>
                             <div class="alert alert-danger" ng-show="orderMessage">{{orderMessage}}</div>
@@ -230,7 +234,7 @@
             </table>
             <hr>
             <div class="container col-md-4 col-md-offset-8">
-                <div class="row" ng-repeat="line in orderResponse.lines | filter:{detailType:'SUBTOTAL_LINE_DETAIL'}">
+                <div class="row" ng-repeat="line in orderResponse.lines | filter:{detailType:'SUB_TOTAL_LINE_DETAIL'}">
                     <h5 class="col-md-7">Subtotal</h5>
                     <h5 class="col-md-5" style="text-align: right">{{line.amount | currency}}</h5>
                 </div>
