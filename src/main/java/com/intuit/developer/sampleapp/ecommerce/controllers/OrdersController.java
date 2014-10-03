@@ -45,11 +45,11 @@ public class OrdersController {
     public OrderResponse createPurchaseRequest(@RequestBody final OrderRequest orderRequest) {
         ShoppingCart cart = shoppingCartRepository.findOne(orderRequest.getShoppingCartId());
 
-        paymentGateway.chargeCustomerForOrder(cart, orderRequest.getPaymentToken());
+        String txnId = paymentGateway.chargeCustomerForOrder(cart, orderRequest.getPaymentToken());
 
         // Accounting
         // We need to create sales receipts in orderRequest to manage inventory/ accounting
-        SalesReceipt salesReceipt = qboGateway.createSalesReceiptInQBO(cart);
+        SalesReceipt salesReceipt = qboGateway.createSalesReceiptInQBO(cart, txnId);
 
         // Empty out the cart items
         cart.getCartItems().clear();

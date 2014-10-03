@@ -15,8 +15,8 @@ controllersModule.controller('NavCtrl', ['$scope', '$routeParams', '$location', 
     }]);
 
 
-controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'ModelSvc', 'CompanySvc',
-        function ($scope, SyncRequestSvc, ModelSvc, CompanySvc) {
+controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'ModelSvc', 'CompanySvc', 'DeepLinkSvc', '$window',
+        function ($scope, SyncRequestSvc, ModelSvc, CompanySvc, DeepLinkSvc, $window) {
 
             $scope.model = ModelSvc.model;
             $scope.syncCustomersMessage = '';
@@ -48,6 +48,30 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
                 }
             }
 
+            var disableViewInQBOButton = function (entitySynced) {
+                if (connectedToQBO()) {
+                    //we can synced
+                    if (entitySynced) {
+                        //don't disable the view button
+                        return false;
+                    } else {
+                        //do disable the view button
+                        return true;
+                    }
+                } else {
+                    //we can't view, disable the button
+                    return true;
+                }
+            };
+
+            $scope.disableViewItemsInQBOButton = function () {
+                return disableViewInQBOButton($scope.model.company.salesItemSynced);
+            }
+
+            $scope.disableViewCustomersInQBOButton = function () {
+                return disableViewInQBOButton($scope.model.company.customersSynced);
+            }
+
             $scope.disableCustomersSyncButton = function () {
                 return disableSyncButton($scope.model.company.customersSynced);
             }
@@ -65,6 +89,14 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
                 $scope.loadingSalesItems = true;
                 SyncRequestSvc.sendSalesItemSyncRequest(syncCompleted);
             }
+
+            $scope.openCustomersScreenInQBO = function () {
+                $window.open(DeepLinkSvc.getCustomersLink());
+            };
+
+            $scope.openItemsScreenInQBO = function () {
+                $window.open(DeepLinkSvc.getItemsLink());
+            };
 
             var syncCompleted = function(data, status, headers, config) {
                 var message = data.successful ? data.message : 'Error: ' + data.message;
@@ -91,15 +123,15 @@ controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemS
         };
     }]);
 
-controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc', 'OrderSvc',
-    function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc, OrderSvc) {
+controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc', 'OrderSvc', 'DeepLinkSvc',
+    function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc, OrderSvc, DeepLinkSvc) {
 
         ShoppingCartSvc.refreshShoppingCart();
         CartItemSvc.getCartItems();
         $scope.model = ModelSvc.model;
 
         $scope.shoppingCartView = "Review";
-
+        $scope.orderResponse = {};
         $scope.creditCard = {};
         $scope.creditCard.number = '4111111111111111';
         $scope.creditCard.CVC = '123';
@@ -116,7 +148,6 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
         $scope.showView = function(viewName) {
             $scope.shoppingCartView = viewName
         }
-
         $scope.placeOrder = function() {
             OrderSvc.sendOrder(
                 $scope.creditCard,
@@ -129,6 +160,10 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
                     $scope.orderMessage = 'Unexpected error placing your order.'
                 }
             );
+        }
+
+        $scope.getSalesReceiptLinkUrl = function () {
+            return DeepLinkSvc.getSalesReceiptLink($scope.orderResponse.txnId);
         }
 
 

@@ -6,6 +6,7 @@ import com.intuit.developer.sampleapp.ecommerce.controllers.OAuthInfoProviderImp
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
 import com.intuit.developer.sampleapp.ecommerce.domain.ShoppingCart;
+import com.intuit.developer.sampleapp.ecommerce.domain.SystemProperty;
 import com.intuit.developer.sampleapp.ecommerce.oauth.OAuthInfoProvider;
 import com.intuit.developer.sampleapp.ecommerce.qbo.PaymentGateway;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
@@ -47,35 +48,24 @@ public class Application extends RepositoryRestMvcConfiguration {
 
     public static void main(String[] args) {
 
-        try {
-            FileUtils.deleteDirectory(new File("database"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
         final ConfigurableApplicationContext context = SpringApplication.run(Application.class, args);
 	    final DataSource dataSource = (DataSource)context.getBean("dataSource");
         DataLoader.initializeData(context);
+
+        System.out.println(
+            "______ _____  ___ ________   __\n" +
+            "| ___ \\  ___|/ _ \\|  _  \\ \\ / /\n" +
+            "| |_/ / |__ / /_\\ \\ | | |\\ V /\n" +
+            "|    /|  __||  _  | | | | \\ /\n" +
+            "| |\\ \\| |___| | | | |/ /  | |\n" +
+            "\\_| \\_\\____/\\_| |_/___/   \\_/\n");
     }
 
     @Override
     protected void configureRepositoryRestConfiguration(RepositoryRestConfiguration config) {
         config.setReturnBodyOnCreate(true);
-        config.exposeIdsFor(Company.class, Customer.class, ShoppingCart.class);
+        config.exposeIdsFor(Company.class, Customer.class, ShoppingCart.class, SystemProperty.class);
     }
-
-//    @Override
-//    protected void configureValidatingRepositoryEventListener(ValidatingRepositoryEventListener validatingListener) {
-//        //add validators here
-//        validatingListener.addValidator("beforeCreate", new RoleValidator());
-//    }
-
-
-    //add REST event handler beans here
-//    @Bean
-//    RoleEventHandler roleEventHandler() {
-//        return new RoleEventHandler();
-//    }
 
     @Override
     protected void configureJacksonObjectMapper(ObjectMapper objectMapper) {
@@ -85,7 +75,6 @@ public class Application extends RepositoryRestMvcConfiguration {
         myCustomModule.addDeserializer(Money.class, new MoneyDeserializer());
 
         objectMapper.registerModule(myCustomModule);
-
     }
 
     @Bean

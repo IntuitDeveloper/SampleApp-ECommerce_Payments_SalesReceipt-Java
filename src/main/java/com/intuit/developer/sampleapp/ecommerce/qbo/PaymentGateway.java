@@ -29,7 +29,7 @@ public class PaymentGateway {
      * @param cart - the cart to create an order for
      * @param paymentToken - - the tokenized credit card information
      */
-    public void chargeCustomerForOrder(ShoppingCart cart, String paymentToken) {
+    public String chargeCustomerForOrder(ShoppingCart cart, String paymentToken) {
         ChargeService chargeService = qboServiceFactory.getChargeService(cart.getCustomer().getCompany());
 
         /**
@@ -55,6 +55,11 @@ public class PaymentGateway {
          * and credit it to the merchants account.
          */
         charge = captureFundsForCharge(charge, chargeService);
+
+        return charge.getId();
+//        if (charge.getStatus() != ChargeStatus.SETTLED) {
+//            throw new RuntimeException("The credit card charge was not successfully settled.");
+//        }
     }
 
     /**

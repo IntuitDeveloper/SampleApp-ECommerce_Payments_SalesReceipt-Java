@@ -60,8 +60,10 @@
                             <span>{{syncCustomersMessage}}</span>
                         </td>
                         <td>
-                            <a ng-show="disableCustomersSyncButton()"
-                               ng-href="https://qa.qbo.intuit.com/login?pagereq=customers&deeplinkcompanyid={{model.company.qboId}}">See Customers</a>
+                            <button type="button" class="btn btn-default btn-xs" style="margin-top: 10px"
+                                    ng-click="openCustomersScreenInQBO()" ng-disabled="disableViewCustomersInQBOButton()">
+                                <span class="glyphicon glyphicon-eye-open"></span> View in QuickBooks
+                            </button>
                         </td>
                     </tr>
                     <tr>
@@ -79,8 +81,10 @@
                             <span>{{syncSalesItemMessage}}</span>
                         </td>
                         <td>
-                            <a ng-show="disableCustomersSyncButton()"
-                               ng-href="https://qa.qbo.intuit.com/login?pagereq=items&deeplinkcompanyid={{model.company.qboId}}">See Items</a>
+                        <button type="button" class="btn btn-default btn-xs" style="margin-top: 10px"
+                                ng-click="openItemsScreenInQBO()" ng-disabled="disableViewItemsInQBOButton()">
+                            <span class="glyphicon glyphicon-eye-open"></span> View in QuickBooks
+                        </button>
                         </td>
                     </tr>
                 </table>

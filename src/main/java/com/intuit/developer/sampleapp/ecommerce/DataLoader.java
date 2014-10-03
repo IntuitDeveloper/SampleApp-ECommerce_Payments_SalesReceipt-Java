@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.repository.*;
 import com.intuit.ipp.data.PhysicalAddress;
+import com.intuit.ipp.util.Config;
 import org.apache.commons.io.FileUtils;
 import org.joda.money.Money;
 import org.springframework.context.ConfigurableApplicationContext;
@@ -36,6 +37,7 @@ public class DataLoader {
 
                 createAppInfo(jsonNode, context);
                 createCompany(context);
+                createSystemProperties(context);
 
             } catch (IOException e) {
                 throw new RuntimeException("Failed to read oauth information from oauth.json. Please make sure" +
@@ -44,6 +46,31 @@ public class DataLoader {
                         " readme for more information.");
             }
         }
+    }
+
+    private static void createSystemProperties(ConfigurableApplicationContext springContext) {
+        final SystemPropertyRepository repository = springContext.getBean(SystemPropertyRepository.class);
+
+        //create the QBO UI URL system property
+        String qboUiHostname;
+
+        //grab the API URL from the SDK configuration
+        final String qboApiURL = Config.getProperty(Config.BASE_URL_QBO);
+
+        switch (qboApiURL) {
+            case "https://quickbooks.api.intuit.com/v3/company":
+                qboUiHostname = "qbo.intuit.com";
+                break;
+            case "https://sandbox-quickbooks.api.intuit.com/v3/company":
+                qboUiHostname = "sandbox.qbo.intuit.com";
+                break;
+            default:
+                qboUiHostname = "qa.qbo.intuit.com";
+        }
+
+        SystemProperty systemProperty = new SystemProperty("qboUiHostname", qboUiHostname);
+        repository.save(systemProperty);
+
     }
 
 	private static void createCompany(ConfigurableApplicationContext springContext) {

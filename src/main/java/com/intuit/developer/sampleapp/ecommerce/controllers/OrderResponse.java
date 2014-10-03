@@ -24,7 +24,7 @@ public class OrderResponse {
         orderResponse.setTotal(salesReceipt.getTotalAmt());
         orderResponse.setBillAddr(salesReceipt.getBillAddr());
         orderResponse.setShipAddr(salesReceipt.getShipAddr());
-        orderResponse.setPaymentType(salesReceipt.getPaymentMethodRef().getName());
+//        orderResponse.setPaymentType(salesReceipt.getPaymentMethodRef().getName());
         orderResponse.setLines(salesReceipt.getLine());
         orderResponse.setCustomerRef(salesReceipt.getCustomerRef());
         orderResponse.setTxnTaxDetail(salesReceipt.getTxnTaxDetail());

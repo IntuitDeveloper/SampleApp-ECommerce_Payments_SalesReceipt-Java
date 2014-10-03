@@ -43,7 +43,7 @@ public class QBOGateway {
      * @param cart - the cart that was "ordered" which a sales receipt must be created for
      * @return - returns the created sales receipt as sent back from QBO API.
      */
-    public SalesReceipt createSalesReceiptInQBO(ShoppingCart cart) {
+    public SalesReceipt createSalesReceiptInQBO(ShoppingCart cart, String transactionId) {
         Customer customer = cart.getCustomer();
         DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
         // Make a sales receipt
@@ -54,7 +54,8 @@ public class QBOGateway {
 
         /**
          * In a real application more judgement would be required to associate the correct tax code to a purchase.
-         * Uncomment these lines to associate the receipt with a tax code in order to apply sales tax.
+         * Uncomment these lines to associate the receipt with a\
+         * tax code in order to apply sales tax.
          * A Tax code must be correctly configured in the QBO Company, Sales Tax (As a feature) must be turned on,
          * and the sales item referenced must be have the taxable flag set.
          */
@@ -67,7 +68,16 @@ public class QBOGateway {
         ReferenceType customerRef = new ReferenceType();
         customerRef.setValue(customer.getQboId());
         receipt.setCustomerRef(customerRef);
-        receipt.setPaymentMethodRef(findPaymentMethodReference(dataService, "Visa"));
+        //receipt.setPaymentMethodRef(findPaymentMethodReference(dataService, "Visa"));
+        receipt.setTxnSource("IntuitPayment");
+        CreditCardPayment creditCardPayment = new CreditCardPayment();
+        CreditChargeInfo creditChargeInfo = new CreditChargeInfo();
+        CreditChargeResponse creditChargeResponse = new CreditChargeResponse();
+        creditChargeInfo.setProcessPayment(true);
+        creditChargeResponse.setCCTransId(transactionId);
+        creditCardPayment.setCreditChargeInfo(creditChargeInfo);
+        creditCardPayment.setCreditChargeResponse(creditChargeResponse);
+        receipt.setCreditCardPayment(creditCardPayment);
         receipt = createObjectInQBO(dataService, receipt);
 
         // Construct an order confirmation from the

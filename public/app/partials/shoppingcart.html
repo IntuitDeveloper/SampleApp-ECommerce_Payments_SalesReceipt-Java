@@ -169,7 +169,7 @@
         </div>
     </div>
     <div class="container" ng-switch-when="Confirmation">
-        <h1>Sales Receipt <a ng-href="https://qa.qbo.intuit.com/login?pagereq=salesreceipt?txnId={{orderResponse.txnId}}&deeplinkcompanyid={{model.company.qboId}}">#{{orderResponse.orderNumber}}</a></h1>
+        <h1>Sales Receipt <a ng-href="{{getSalesReceiptLinkUrl()}}">#{{orderResponse.orderNumber}}</a></h1>
         <hr />
         <div class="container col-md-6">
             <address>

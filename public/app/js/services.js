@@ -7,14 +7,15 @@ var ecommerceServices = angular.module('myApp.services', ['ngResource']);
 
 ecommerceServices.value('version', '0.1');
 
-ecommerceServices.factory('InitializerSvc', ['$rootScope', 'RootUrlSvc', 'CompanySvc', 'SalesItemSvc', 'CustomerSvc', 'ShoppingCartSvc', 'CartItemSvc',
-    function ($rootScope, RootUrlSvc, CompanySvc, SalesItemSvc, CustomerSvc, ShoppingCartSvc, CartItemSvc) {
+ecommerceServices.factory('InitializerSvc', ['$rootScope', 'RootUrlSvc', 'CompanySvc', 'SalesItemSvc', 'CustomerSvc', 'ShoppingCartSvc', 'CartItemSvc', 'SystemPropertySvc',
+    function ($rootScope, RootUrlSvc, CompanySvc, SalesItemSvc, CustomerSvc, ShoppingCartSvc, CartItemSvc, SystemPropertySvc) {
 
         var initialized = false;
 
         var initialize = function () {
 
             $rootScope.$on('api.loaded', function() {
+                SystemPropertySvc.initializeModel();
                 CompanySvc.initialize();
                 SalesItemSvc.initialize();
                 CustomerSvc.initialize();
@@ -341,3 +342,65 @@ ecommerceServices.factory('SyncRequestSvc', ['$http', '$rootScope', 'RootUrlSvc'
         }
     }]);
 
+ecommerceServices.factory('DeepLinkSvc', ['ModelSvc',
+    function (ModelSvc) {
+
+        var getQboDeepLinkURLRoot = function () {
+            return "https://" + ModelSvc.model.systemProperties.qboUiHostname + "/login?";
+        };
+
+        var getMultipleEntitiesUrl = function (entityType) {
+            return getQboDeepLinkURLRoot() + "deeplinkcompanyid=" + ModelSvc.model.company.qboId + "&pagereq=" + entityType;
+        };
+
+        var getSingleEntityUrl = function (entityType, entityId) {
+            return getQboDeepLinkURLRoot() + "pagereq=" + entityType + "?txnId=" + entityId + "&deeplinkcompanyid=" + ModelSvc.model.company.qboId;
+        };
+
+        var getCustomersLink = function () {
+            return getMultipleEntitiesUrl("customers");
+        };
+
+        var getSalesReceiptLink = function (entityId) {
+            return getSingleEntityUrl("salesReceipt", entityId);
+        };
+
+        var getItemsLink = function () {
+            return getMultipleEntitiesUrl("items");
+        };
+
+        return {
+            getCustomersLink: getCustomersLink,
+            getItemsLink: getItemsLink,
+            getSalesReceiptLink: getSalesReceiptLink
+        }
+    }
+]);
+
+ecommerceServices.factory('SystemPropertySvc', [ '$resource', 'RootUrlSvc', 'ModelSvc',
+    function ($resource, RootUrlSvc, ModelSvc) {
+
+        var SystemProperty;
+
+        var initializeModel = function () {
+            SystemProperty = $resource(RootUrlSvc.rootUrls.systemProperties, {},
+                {
+                    query: {
+                        isArray: false
+                    }
+                });
+            SystemProperty.query(function (data) {
+                ModelSvc.model.systemProperties = {};
+
+                if (data._embedded) {
+                    angular.forEach(data._embedded.systemProperties, function (systemProperty) {
+                        ModelSvc.model.systemProperties[systemProperty.key] = systemProperty.value;
+                    });
+                }
+            });
+        }
+
+        return {
+            initializeModel: initializeModel
+        }
+}]);
