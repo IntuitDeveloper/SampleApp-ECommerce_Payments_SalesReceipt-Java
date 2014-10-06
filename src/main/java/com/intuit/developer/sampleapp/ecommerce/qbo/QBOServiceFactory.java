@@ -25,7 +25,7 @@ public class QBOServiceFactory {
     private AppInfoRepository appInfoRepository;
 
     public DataService getDataService(Company domainCompany) {
-        return new DataService(buildContext(domainCompany, ServiceType.QBD));
+        return new DataService(buildContext(domainCompany, ServiceType.QBO));
     }
 
     public ChargeService getChargeService(Company domainCompany) {
