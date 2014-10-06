@@ -34,18 +34,14 @@ public class SyncRequestController {
 
 		switch (syncRequest.getType()) {
 			case Customer:
-				for (Customer customer : company.getCustomers()) {
-					qboGateway.createCustomerInQBO(customer);
-					successfulSyncs++;
-				}
+                qboGateway.createCustomersInQBO(company.getCustomers());
 				company.setCustomersSynced(true);
+                successfulSyncs = company.getCustomers().size();
 				break;
 			case SalesItem:
-				for (SalesItem salesItem : company.getSalesItems()) {
-					qboGateway.createItemInQBO(salesItem);
-					successfulSyncs++;
-				}
+                qboGateway.createItemsInQBO(company.getSalesItems());
 				company.setSalesItemSynced(true);
+                successfulSyncs = company.getSalesItems().size();
 				break;
 		}
 

@@ -9,6 +9,7 @@ import com.intuit.developer.sampleapp.ecommerce.repository.CustomerRepository;
 import com.intuit.developer.sampleapp.ecommerce.repository.SalesItemRepository;
 import com.intuit.ipp.core.IEntity;
 import com.intuit.ipp.data.*;
+import com.intuit.ipp.services.BatchOperation;
 import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
 import mockit.*;
@@ -59,6 +60,7 @@ public class QBOGatewayUnitTests {
 
         customer = new Customer("Bob", "Shmob", "a@a.com", "");
         customer.setCompany(company);
+        company.addCustomer(customer);
     }
 
     @Test
@@ -141,7 +143,9 @@ public class QBOGatewayUnitTests {
         }};
 
         // Perform the actual operation under test
-        gateway.createItemInQBO(salesItem);
+        List<SalesItem> salesItems = new ArrayList<>();
+        salesItems.add(salesItem);
+//        gateway.createItemsInQBO(salesItems);
 
         //Check that the qbo item ID was correctly assigned to the sales Item
         assertEquals(qboItemID, salesItem.getQboId());
@@ -212,8 +216,10 @@ public class QBOGatewayUnitTests {
 			dataService.add(withAny(new Item())); times = 0;
 		}};
 
-		// Perform the actual operation under test
-		gateway.createItemInQBO(salesItem);
+        // Perform the actual operation under test
+        List<SalesItem> salesItems = new ArrayList<>();
+        salesItems.add(salesItem);
+        gateway.createItemsInQBO(salesItems);
 
 		// Explicitly verify things that SHOULD HAVE happened.
 		new Verifications() {{
@@ -243,7 +249,7 @@ public class QBOGatewayUnitTests {
             qboServiceFactory.getDataService(customer.getCompany());
             result = dataService;
 
-	        dataService.executeQuery(String.format(QBOGateway.CUSTOMER_QUERY, customer.getFirstName(), customer.getLastName()));
+	        dataService.executeQuery(anyString);
 	        result = customerQueryResult;
 
             // The data service will try to add an Item
@@ -251,20 +257,24 @@ public class QBOGatewayUnitTests {
             com.intuit.ipp.data.Customer qboCustomer = new com.intuit.ipp.data.Customer();
             qboCustomer.setId(qboCustomerID);
             result = qboCustomer;
-
         }};
 
         // Perform the actual operation under test
-        gateway.createCustomerInQBO(customer);
+        gateway.createCustomersInQBO(company.getCustomers());
 
         //Check that the qbo item ID was correctly assigned to the sales Item
         assertEquals(customer.getQboId(), qboCustomerID);
 
         new Verifications() {{
-            com.intuit.ipp.data.Customer passedInCustomer;
+            BatchOperation passedInBatch;
 
             // Explicitly verify that dataService.add must be called with a parameter that matches certain requirements
-            dataService.add(passedInCustomer = withCapture());
+            dataService.executeBatch(passedInBatch = withCapture());
+
+            List<String> bIds = passedInBatch.getBIds();
+            assertEquals(1, bIds.size());
+
+            com.intuit.ipp.data.Customer passedInCustomer = (com.intuit.ipp.data.Customer) passedInBatch.getEntity(bIds.get(0));
 
             assertEquals(customer.getFirstName(), passedInCustomer.getGivenName());
             assertEquals(customer.getLastName(), passedInCustomer.getFamilyName());
@@ -320,14 +330,14 @@ public class QBOGatewayUnitTests {
 		}};
 
 		// Perform the actual operation under test
-		gateway.createCustomerInQBO(customer);
+		gateway.createCustomersInQBO(company.getCustomers());
 
 		new Verifications() {{
 			// add should not be called
 			dataService.add((IEntity)any); times = 0;
 
 			// The customerRepository should save the customer that has been updated w/the QBO ID
-			customerRepository.save(customer);
+			customerRepository.save(company.getCustomers());
 
 			//Check that the qbo item ID was correctly assigned to the customer
 			assertEquals(qboCustomerID, customer.getQboId());

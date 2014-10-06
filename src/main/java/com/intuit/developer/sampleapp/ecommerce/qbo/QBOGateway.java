@@ -14,14 +14,21 @@ import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.BatchOperation;
 import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
-import org.apache.commons.lang.math.IEEE754rUtils;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.collections.MultiMap;
+import org.apache.commons.collections.Predicate;
+import org.apache.commons.collections.map.MultiValueMap;
 import org.springframework.beans.factory.annotation.Autowired;
+
+
+import static com.intuit.ipp.query.GenerateQuery.select;
+import static com.intuit.ipp.query.GenerateQuery.$;
+import static com.intuit.ipp.query.GenerateQuery.createQueryEntity;
+
 
 import java.lang.Class;
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * This class contains the needed code to interface with QBO via QBO v3 SDK.
@@ -37,6 +44,295 @@ public class QBOGateway {
     @Autowired
     private SalesItemRepository salesItemRepository;
 
+    /**
+     * Called when "Sync" on the Admin->Settings page is invoked in the UI
+     *
+     * Customers are pushed to QBO as QBO Customers.
+     * QBO Customers can be viewed on the "Customers" page within QBO
+     * @param customers - the Customers to create in QBO
+     */
+    public void createCustomersInQBO(List<Customer> customers) {
+        if (customers == null) {
+            throw new RuntimeException("No customers to create");
+        }
+        DataService dataService = qboServiceFactory.getDataService(customers.get(0).getCompany());
+
+        // Determine which customers need to be pushed to QBO
+        Set<Customer> customersToPush = new HashSet<>();
+        Set<Customer> customersToSave = new HashSet<>();
+        determineCustomersToPushAndSave(dataService, customers, customersToPush, customersToSave);
+        // Save the customers which already exist in QBO, but have had their qboId's updated
+        customerRepository.save(customersToSave);
+        // Push the Sales Item which do not already exist in QBO to QBO
+        pushCustomersToQBO(dataService, customersToPush);
+        // Save the updated customers which were pushed to QBO
+        customerRepository.save(customersToPush);
+    }
+
+    /**
+     * Queries QBO to determine which Customers need to be pushed and places them in customersToPush.
+     * Updates the local instances of those Sales Items which already exist in QBO with the correct qboId and
+     * places them in customersToSave.
+     * NOTE: This method implements a very weak matching approach based on first name and last name only.
+     * A true sync operation would require more robust matching.
+     * @param dataService - the data service to use for querying QBO.
+     * @param allCustomers - the iterable of all Customers which are intended to be in QBO
+     * @param customersToPush - Pass in empty set. Will be filled with Customers which do not already exist in qbo, subset of all Customers: qboId will be null
+     * @param customersToSave - Pass in empty set. Will be filled with Customers which already exist in qbo, subset of all Customers: qboId will not be null
+     */
+    private void determineCustomersToPushAndSave(DataService dataService, Iterable<Customer> allCustomers, Set<Customer> customersToPush, Set<Customer> customersToSave) {
+        // Build up a query to find customers whose have a last name matching one of the last names of _OUR_ customers.
+        // This will limit the set of customers returned without excluding any possible matches
+        com.intuit.ipp.data.Customer queryCustomer = createQueryEntity(com.intuit.ipp.data.Customer.class);
+        List<String> names = new ArrayList<>();
+        for (Customer customer : allCustomers) {
+            names.add(customer.getLastName());
+        }
+        String[] namesArr = new String[names.size()];
+        names.toArray(namesArr);
+
+        // SELECT * FROM Customer WHERE familyName IN (...) ORDER BY familyName
+        String query = select($(queryCustomer)).where($(queryCustomer.getFamilyName()).in(namesArr)).orderBy($(queryCustomer.getFamilyName())).generate();
+
+        // Execute the query
+        QueryResult queryResult;
+        try {
+            queryResult = dataService.executeQuery(query);
+        } catch (FMSException e) {
+            throw new RuntimeException(e);
+        }
+
+        // Build a hashmap to group customers by last name
+        Map<String, List<com.intuit.ipp.data.Customer>> customerMap = new HashMap<>();
+        for (IEntity iEntity : queryResult.getEntities()) {
+            com.intuit.ipp.data.Customer customer = (com.intuit.ipp.data.Customer) iEntity;
+            if (!customerMap.containsKey(customer.getFamilyName())) {
+                customerMap.put(customer.getFamilyName(), new ArrayList<com.intuit.ipp.data.Customer>());
+            }
+            customerMap.get(customer.getFamilyName()).add(customer);
+        }
+
+        // For each customer we want to create in qbo, search through qbo customers with matching last name.
+        for (Customer customer: allCustomers) {
+            List<com.intuit.ipp.data.Customer> qboCustomersWithSameLastName = customerMap.get(customer.getLastName());
+
+            // Create a qbo customer object to use a search key
+            com.intuit.ipp.data.Customer searchCustomer = new com.intuit.ipp.data.Customer();
+            searchCustomer.setGivenName(customer.getFirstName());
+            if (qboCustomersWithSameLastName != null) {
+                int pos = Collections.binarySearch(qboCustomersWithSameLastName, searchCustomer, new CustomerComparator());
+                // If a match is found
+                if (pos >= 0) {
+                    // Grab the id of the qbo customer
+                    customer.setQboId(qboCustomersWithSameLastName.get(pos).getId());
+                    // Put this customer in the save set
+                    customersToSave.add(customer);
+                    // If a match is not found
+                } else {
+                    // Put this customer in the push sets
+                    customersToPush.add(customer);
+                }
+            } else {
+                customersToPush.add(customer);
+            }
+        }
+    }
+
+    /**
+     * Push Customers (as Customers) to QBO using a Batch Operation which will allow multiple customers to be created with one
+     * request. This method assumes all the customers should be created successfully and throws an exception if there are failures.
+     * @param dataService - the data service to use for executing the BatchOperation.
+     * @param customersToPush - the Customers to be pushed to qbo
+     */
+    private void pushCustomersToQBO(DataService dataService, Iterable<Customer> customersToPush) {
+
+        // 1 Build the BatchOperation object
+        BatchOperation batchOperation = new BatchOperation();
+        for (Customer customer : customersToPush) {
+            // We will use the "batchId" to associate request with response - to tell which entities were successfully
+            // added.
+            String bid = Long.toString(customer.getId());
+            // Construct a qboItem from our Domain Object
+            com.intuit.ipp.data.Customer qboCustomer = CustomerMapper.buildQBOObject(customer);
+            // Add the item to the batch operation
+            batchOperation.addEntity(qboCustomer, OperationEnum.CREATE, bid);
+        }
+
+        // 2 Execute the BatchOperation
+        try {
+            dataService.executeBatch(batchOperation);
+        } catch (FMSException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 3 Process the BatchOperation (which now has response data)
+        Map<String, IEntity> entityResults = batchOperation.getEntityResult();
+        for (Customer customer : customersToPush) {
+            // We will use the "batchId" to retrieve the entity result that corresponds to the current Customer
+            String bid = Long.toString(customer.getId());
+            /**
+             * We expected all entities to be created because this method is called after
+             * {@code determineCustomersToPushAndSave()}. In a real application, more robust, intelligent
+             * error handling would be needed for situations when the service was unavailable or some validation failed,
+             * etc.
+             */
+            if (batchOperation.getFault(bid) != null) {
+                List<com.intuit.ipp.data.Error> errors = batchOperation.getFault(bid).getError();
+                String errorString = "";
+                for (com.intuit.ipp.data.Error error : errors) {
+                    errorString = error.getDetail();
+                }
+                throw new RuntimeException(errorString);
+            } else {
+                // Grab the id of the qboCustomer and store it as the qboId on our domain model
+                com.intuit.ipp.data.Customer qboCustomer = (com.intuit.ipp.data.Customer) entityResults.get(bid);
+                customer.setQboId(qboCustomer.getId());
+            }
+        }
+    }
+
+    /**
+     * Called when "Sync" on the Admin->Settings page is invoked in the UI
+     *
+     * SalesItems are pushed to QBO as QBO Items.
+     * QBO Items can be viewed on the "Products and Services" page within QBO.
+     * @param salesItems - the items to create in QBO
+     */
+    public void createItemsInQBO(List<SalesItem> salesItems) {
+        if (salesItems == null) {
+            throw new RuntimeException("No Sales Items to create");
+        }
+
+        DataService dataService = qboServiceFactory.getDataService(salesItems.get(0).getCompany());
+
+        // Determine which items need to be pushed to QBO
+        Set<SalesItem> salesItemsToPush = new HashSet<>();
+        Set<SalesItem> salesItemsToSave = new HashSet<>();
+        determineSalesItemsToPushAndSave(dataService, salesItems, salesItemsToPush, salesItemsToSave);
+        // Save the Sales Items which already exist in QBO, but have had their qboId's updated
+        salesItemRepository.save(salesItemsToSave);
+        // Push the Sales Item which do not already exist in QBO to QBO
+        pushSalesItemsToQBO(dataService, salesItemsToPush);
+        // Save the updated Sales Items which were pushed to QBO
+        salesItemRepository.save(salesItemsToPush);
+    }
+
+    /**
+     * Queries QBO to determine which Sales Items need to be pushed and places them in customersToPush. The query keys off of name. This lookup is done to avoid
+     * duplicate name errors when trying to push items.
+     * Updates the local instances of those Sales Items which already exist in QBO with the correct qboId and places them in salesItemsToSave
+     * @param dataService - the data service to use for querying QBO.
+     * @param allSalesItems - the iterable of all SalesItems which are intended to be in QBO
+     * @param salesItemsToPush - Pass in empty set. Will be filled with Sales Items which do not already exist in qbo, subset of allSalesItems: qboId will be null
+     * @param salesItemsToSave - Pass in empty set. Will be filled with Sales Items which already exist in qbo, subset of allSalesItems: qboId will not be null
+     */
+    private void determineSalesItemsToPushAndSave(DataService dataService, Iterable<SalesItem> allSalesItems, Set<SalesItem> salesItemsToPush, Set<SalesItem> salesItemsToSave) {
+        // Build up a query string to query for multiple named items
+        Item queryItem = createQueryEntity(Item.class);
+        List<String> names = new ArrayList<>();
+        for (SalesItem salesItem : allSalesItems) {
+            names.add(salesItem.getName().replace("'", "\\'"));
+        }
+        String[] namesArr = new String[names.size()];
+        names.toArray(namesArr);
+
+        String query = select($(queryItem)).where($(queryItem.getName()).in(namesArr)).generate();
+
+        // Execute the query
+        QueryResult queryResult;
+        try {
+            queryResult = dataService.executeQuery(query);
+        } catch (FMSException e) {
+            throw new RuntimeException(e);
+        }
+
+        // The query results may or may not contain an Item for each SalesItem name
+        // build a hashmap of Item name and Item to allow better lookup
+        HashMap<String, Item> itemMap = new HashMap<>();
+        for (IEntity iEntity : queryResult.getEntities()) {
+            Item item = (Item) iEntity;
+            itemMap.put(item.getName(), item);
+        }
+
+        // Lookup each Sales Item from the master set in the map
+        for (SalesItem salesItem: allSalesItems) {
+            Item qboItem = itemMap.get(salesItem.getName());
+            // If an item with matching name is not already in QBO
+            if (qboItem == null) {
+                // Add the corresponding SalesItem to the set of items to be pushed
+                salesItemsToPush.add(salesItem);
+            // If an Item with marching name already exists in QBO
+            } else {
+                // Grab the id of the matching Item and store it on the Sales Item
+                salesItem.setQboId(qboItem.getId());
+                salesItemsToSave.add(salesItem);
+            }
+        }
+    }
+
+    /**
+     * Push SalesItems (as Items) to QBO using a Batch Operation which will allow multiple items to be created with one
+     * request. This method assumes all the Items should be created successfully and throws an exception if there are failures.
+     * @param dataService - the data service to use for executing the BatchOperation.
+     * @param salesItemsToPush - the Sales Items to be pushed to qbo
+     */
+    private void pushSalesItemsToQBO(DataService dataService, Iterable<SalesItem> salesItemsToPush) {
+        // find an Income Account to associate with QBO items
+        ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME);
+        // find an Asset Account to associate with QBO items
+        ReferenceType assetAccountRef = findAccountReference(dataService, AccountTypeEnum.OTHER_CURRENT_ASSET, AccountSubTypeEnum.INVENTORY);
+        // find a Cost of Goods Sold account to use as the expense account reference on the QBO Items
+        ReferenceType cogAccountRef = findAccountReference(dataService, AccountTypeEnum.COST_OF_GOODS_SOLD, AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS);
+
+        // 1 Build the BatchOperation object
+        BatchOperation batchOperation = new BatchOperation();
+        for (SalesItem salesItem : salesItemsToPush) {
+            // We will use the "batchId" to associate request with response - to tell which entities were successfully
+            // added.
+            String bid = Long.toString(salesItem.getId());
+            // Construct a qboItem from our Domain Object
+            Item qboItem = SalesItemMapper.buildQBOObject(salesItem);
+            // Set the account references
+            qboItem.setIncomeAccountRef(accountRef);
+            qboItem.setExpenseAccountRef(cogAccountRef);
+            qboItem.setAssetAccountRef(assetAccountRef);
+            qboItem.setInvStartDate(new Date());
+            // Add the item to the batch operation
+            batchOperation.addEntity(qboItem, OperationEnum.CREATE, bid);
+        }
+
+        // 2 Execute the BatchOperation
+        try {
+            dataService.executeBatch(batchOperation);
+        } catch (FMSException e) {
+            throw new RuntimeException(e);
+        }
+
+        // 3 Process the BatchOperation (which now has response data)
+        Map<String, IEntity> entityResults = batchOperation.getEntityResult();
+        for (SalesItem salesItem : salesItemsToPush) {
+            // We will use the "batchId" to retrieve the entity result that corresponds to the current SalesItem
+            String bid = Long.toString(salesItem.getId());
+            /**
+             * We expected all entities to be created because this method is called after
+             * {@code determineSalesItemsToPushAndSave()}. In a real application, more robust, intelligent
+             * error handling would be needed for situations when the service was unavailable or some validation failed,
+             * etc.
+             */
+            if (batchOperation.getFault(bid) != null) {
+                List<com.intuit.ipp.data.Error> errors = batchOperation.getFault(bid).getError();
+                String errorString = "";
+                for (com.intuit.ipp.data.Error error : errors) {
+                    errorString = error.getDetail();
+                }
+                throw new RuntimeException(errorString);
+            } else {
+                // Grab the id of the qboItem and store it as the qboId on our domain model
+                Item qboItem = (Item) entityResults.get(bid);
+                salesItem.setQboId(qboItem.getId());
+            }
+        }
+    }
     /**
      * Called when "Place Order" is clicked in the UI
      * Creates a sales receipt based upon the passed in cart and makes all needed references
@@ -95,92 +391,6 @@ public class QBOGateway {
 
         // Construct an order confirmation from the
         return receipt;
-    }
-
-    /**
-     * Called when "Sync" on the Admin->Settings page is invoked in the UI
-     *
-     * Customers are pushed to QBO as QBO Customers.
-     *
-     * NOTE: this example is simplified for the sample application; if you are syncing large sets of objects,
-     *       please use the BatchOperation API
-     */
-	public void createCustomerInQBO(Customer customer) {
-		DataService dataService = qboServiceFactory.getDataService(customer.getCompany());
-
-        /**
-         * In order to prevent syncing the same data into QBO more than once, query to see if the entity already exists.
-         * This solution is only meant to provide a better sample app experience (e.g. if you wipe out your database,
-         * we don't want the sample app to keep creating the same data over and over in QBO).
-         *
-         * In a production app keeping data in two systems in sync is a difficult problem to solve; this code is not
-         * meant to demonstrate production quality sync functionality.
-         */
-
-		com.intuit.ipp.data.Customer returnedQBOObject = findCustomer(dataService, customer);
-		if (returnedQBOObject == null) {
-			final com.intuit.ipp.data.Customer qboObject = CustomerMapper.buildQBOObject(customer);
-			returnedQBOObject = createObjectInQBO(dataService, qboObject);
-		}
-
-		// TODO: comment on best practice of not embedding QBO ID on app domain class
-		customer.setQboId(returnedQBOObject.getId());
-		customerRepository.save(customer);
-	}
-
-
-	/**
-	 * Called when "Sync" on the Admin->Settings page is invoked in the UI
-	 *
-	 * SalesItems are pushed to QBO as QBO Items.
-	 * QBO Items can be viewed on the "Products and Services" page within QBO.
-	 *
-	 * NOTE: this example is simplified for the sample application; if you are syncing large sets of objects,
-	 *       please use the BatchOperation API
-	 */
-    public void createItemInQBO(SalesItem salesItem) {
-	    DataService dataService = qboServiceFactory.getDataService(salesItem.getCompany());
-
-        /**
-         * In order to prevent syncing the same data into QBO more than once, query to see if the entity already exists.
-         * This solution is only meant to provide a better sample app experience (e.g. if you wipe out your database,
-         * we don't want the sample app to keep creating the same data over and over in QBO).
-         *
-         * In a production app keeping data in two systems in sync is a difficult problem to solve; this code is not
-         * meant to demonstrate production quality sync functionality.
-         */
-	    com.intuit.ipp.data.Item returnedQBOObject = findItem(dataService, salesItem);
-	    if (returnedQBOObject == null) {
-		    // copy SalesItem to QBO Item
-		    // This also populates some necessary default constant values
-		    Item qboItem = SalesItemMapper.buildQBOObject(salesItem);
-		    //
-		    // We need to do lookups for accounts to associate the item to
-		    //
-
-		    // find an Income Account to associate with QBO item
-		    ReferenceType accountRef = findAccountReference(dataService, AccountTypeEnum.INCOME, AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME);
-		    qboItem.setIncomeAccountRef(accountRef);
-
-		    // find an Asset Account to associate with QBO item
-		    ReferenceType assetAccountRef = findAccountReference(dataService, AccountTypeEnum.OTHER_CURRENT_ASSET, AccountSubTypeEnum.INVENTORY);
-		    qboItem.setAssetAccountRef(assetAccountRef);
-
-		    // find a Cost of Goods Sold account to use as the expense account reference on the QBO Item
-		    ReferenceType cogAccountRef = findAccountReference(dataService, AccountTypeEnum.COST_OF_GOODS_SOLD, AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS);
-		    qboItem.setExpenseAccountRef(cogAccountRef);
-
-		    // Set the inventory start date to be today
-		    // This is not set in the mapper because this should only be set when the item is first created in QBO
-		    qboItem.setInvStartDate(new Date());
-
-		    // save the item in OBO
-		    returnedQBOObject = createObjectInQBO(dataService, qboItem);
-	    }
-
-	    // update the SalesItem in app
-	    salesItem.setQboId(returnedQBOObject.getId());
-	    salesItemRepository.save(salesItem);
     }
 
     /**
@@ -301,22 +511,6 @@ public class QBOGateway {
     }
 
     /**
-     * Get a ReferenceType wrapper for a QBO PaymentMethod
-     *
-     * ReferenceType values are used to associate different QBO entities to each other.
-     */
-    public static ReferenceType findPaymentMethodReference(DataService dataService, String paymentMethodName) {
-        PaymentMethod paymentMethod = findPaymentMethod(dataService, paymentMethodName);
-        if (paymentMethod == null) {
-            throw new RuntimeException(String.format("Could not find a payment method with name: %s", paymentMethodName));
-        }
-        ReferenceType referenceType = new ReferenceType();
-        referenceType.setValue(paymentMethod.getId());
-        referenceType.setName(paymentMethod.getName());
-        return referenceType;
-    }
-
-    /**
      * Get a ReferenceType wrapper for a QBO TaxCode
      *
      * ReferenceType values are used to associate different QBO entities to each other.
@@ -365,7 +559,7 @@ public class QBOGateway {
     }
 
     /**
-     * Finds a QBO item where the item's name equals the passed in salesItem's name.
+     * Finds a QBO item where the item's name equals the passed in customer's name.
      */
     public static final String ITEM_QUERY = "select * from item where active = true and name = '%s'";
     public static com.intuit.ipp.data.Item findItem(DataService dataService, SalesItem salesItem) {
@@ -389,6 +583,14 @@ public class QBOGateway {
 
         } catch (FMSException e) {
             throw new RuntimeException("Failed to execute an entity query: " + query, e);
+        }
+    }
+
+    public class CustomerComparator implements Comparator<com.intuit.ipp.data.Customer> {
+        @Override
+        public int compare(com.intuit.ipp.data.Customer o1, com.intuit.ipp.data.Customer o2) {
+
+            return ((o1.getGivenName().compareTo(o2.getGivenName()) == 0) ? 0 : 1);
         }
     }
 }

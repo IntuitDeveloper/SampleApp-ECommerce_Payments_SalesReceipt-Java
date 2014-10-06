@@ -11,6 +11,9 @@ import mockit.*;
 import org.joda.money.Money;
 import org.junit.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static junit.framework.Assert.*;
 /**
  * Created by connorm659 on 8/27/14.
@@ -46,8 +49,8 @@ public class SyncRequestControllerTests {
         assertFalse(company.isSalesItemSynced());
 
         new Verifications() {{
-            mockedQBOGateway.createCustomerInQBO(withSameInstance(customer)); times = 1;
-            mockedQBOGateway.createItemInQBO(withInstanceOf(SalesItem.class)); times = 0;
+            mockedQBOGateway.createCustomersInQBO(withSameInstance(company.getCustomers())); times = 1;
+            mockedQBOGateway.createItemsInQBO(withAny(new ArrayList<SalesItem>())); times = 0;
             companyRepository.save(withSameInstance(company)); times = 1;
         }};
     }
@@ -73,8 +76,8 @@ public class SyncRequestControllerTests {
         assertFalse(company.isCustomersSynced());
 
         new Verifications() {{
-            mockedQBOGateway.createItemInQBO(withSameInstance(salesItem)); times = 1;
-            mockedQBOGateway.createCustomerInQBO(withInstanceOf(Customer.class)); times = 0;
+            mockedQBOGateway.createItemsInQBO(withSameInstance(company.getSalesItems())); times = 1;
+            mockedQBOGateway.createCustomersInQBO(withAny(new ArrayList<Customer>())); times = 0;
             companyRepository.save(withSameInstance(company)); times = 1;
         }};
     }
