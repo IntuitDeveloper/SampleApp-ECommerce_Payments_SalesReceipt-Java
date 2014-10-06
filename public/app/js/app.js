@@ -10,10 +10,11 @@ angular.module('myApp', [
     'myApp.controllers'
 ]).
     config(['$routeProvider', function ($routeProvider) {
+        $routeProvider.when('/landing', {templateUrl: 'partials/landing.html', controller: 'LandingCtrl'});
         $routeProvider.when('/settings', {templateUrl: 'partials/settings.html', controller: 'SettingsCtrl'});
         $routeProvider.when('/storefront', {templateUrl: 'partials/storefront.html', controller: 'StoreFrontCtrl'});
         $routeProvider.when('/shoppingcart', {templateUrl: 'partials/shoppingcart.html', controller: 'ShoppingCartCtrl'});
-        $routeProvider.otherwise({redirectTo: '/settings'});
+        $routeProvider.otherwise({redirectTo: '/landing'});
     }])
     .run(['InitializerSvc', function(InitializerSvc) {
         InitializerSvc.initialize();

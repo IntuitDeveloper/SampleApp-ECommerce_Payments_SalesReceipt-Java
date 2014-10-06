@@ -1,7 +1,7 @@
 /* app css stylesheet */
 
 /* push the body down so the navbar doesnt hide anything */
-body { padding-top: 50px; }
+body { padding-top: 70px; }
 
 /* required for angular-ui-bootstrap */
 .nav, .pagination, .carousel, .panel-title a { cursor: pointer; }

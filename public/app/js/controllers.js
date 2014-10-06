@@ -11,9 +11,12 @@ controllersModule.controller('NavCtrl', ['$scope', '$routeParams', '$location', 
             return page === currentRoute ? 'active' : '';
         };
 
+        $scope.isStorefront = function() {
+            return $location.path() === '/storefront' || $location.path() === '/shoppingcart';
+        }
+
         $scope.model = ModelSvc.model;
     }]);
-
 
 controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'ModelSvc', 'CompanySvc', 'DeepLinkSvc', '$window',
         function ($scope, SyncRequestSvc, ModelSvc, CompanySvc, DeepLinkSvc, $window) {
