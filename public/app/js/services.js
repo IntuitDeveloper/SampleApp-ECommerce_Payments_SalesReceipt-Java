@@ -296,7 +296,7 @@ ecommerceServices.factory('OrderSvc', ['$http', '$rootScope', 'RootUrlSvc', 'Mod
         };
 
         var tokenize = function(card, successCallback, errorCallback) {
-            intuit.ipp.payments.tokenize(card, function(token, response) {
+            intuit.ipp.payments.tokenize(ModelSvc.model.systemProperties.appToken, card, function(token, response) {
                 if (token) {
                     // step 2 - place order to backend
                     console.log('placing order to: ' + RootUrlSvc.rootUrls.orders + ' with args: ' + token + ", " + ModelSvc.model.shoppingCart.id);
@@ -404,3 +404,4 @@ ecommerceServices.factory('SystemPropertySvc', [ '$resource', 'RootUrlSvc', 'Mod
             initializeModel: initializeModel
         }
 }]);
+

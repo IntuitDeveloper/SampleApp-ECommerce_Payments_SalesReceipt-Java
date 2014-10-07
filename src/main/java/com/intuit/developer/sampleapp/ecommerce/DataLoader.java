@@ -145,7 +145,7 @@ public class DataLoader {
 
     private static AppInfo createAppInfo(JsonNode jsonNode, ConfigurableApplicationContext context) {
         AppInfoRepository repository = context.getBean(AppInfoRepository.class);
-
+        SystemPropertyRepository systemPropertyRepository = context.getBean(SystemPropertyRepository.class);
         final JsonNode jsonAppInfo = jsonNode.get("appInfo");
 
         String appToken;
@@ -174,6 +174,9 @@ public class DataLoader {
 
         AppInfo appInfo = new AppInfo(appToken,consumerKey, consumerSecret);
         repository.save(appInfo);
+
+        SystemProperty systemProperty = new SystemProperty("appToken", appToken);
+        systemPropertyRepository.save(systemProperty);
 
         return appInfo;
     }

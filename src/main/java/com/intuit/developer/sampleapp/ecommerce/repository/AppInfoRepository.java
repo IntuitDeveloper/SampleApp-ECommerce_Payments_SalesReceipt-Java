@@ -11,7 +11,7 @@ import org.springframework.data.rest.core.annotation.RestResource;
  * Date: 6/24/14
  * Time: 1:01 PM
  */
-@RestResource(exported = true)
+@RestResource(exported = false)
 public interface AppInfoRepository extends PagingAndSortingRepository<AppInfo, Long> {
 
     @Query("select ai from AppInfo ai where ai.id = '1'")

@@ -70,13 +70,14 @@
 <script src="js/filters.js"></script>
 <script src="js/directives.js"></script>
 <script type="text/javascript" src="https://js.appcenter.intuit.com/Content/IA/intuit.ipp.anywhere.js"></script>
-<script type="text/javascript" src="https://qa-appcenter.intuit.com/Content/IA/intuit.ipp.payments-0.0.1.js"></script>
+<script type="text/javascript" src="js/intuit.ipp.payments-0.0.2.js"></script>
+<!--<script type="text/javascript" src="https://qa-appcenter.intuit.com/Content/IA/intuit.ipp.payments-0.0.2.js"></script>-->
 <script type="text/javascript">
     intuit.ipp.payments.tokenizationUrl = function tokenizationUrl(tokenizationHost, apiKey, isForIE) {
-        if (isForIE) {
-            return "https://" + tokenizationHost + "/qa2/v2/tokens/ie?intuit_apikey=" + apiKey;
-        }
-        return "https://" + tokenizationHost + "/qa2/v2/tokens";
+//        if (isForIE) {
+//            return "https://" + tokenizationHost + "/qa2/v2/tokens/ie?intuit_apikey=" + apiKey;
+//        }
+        return "https://sandbox.api.intuit.com/quickbooks/v4/payments/tokens";
     };
 </script>
 </body>
