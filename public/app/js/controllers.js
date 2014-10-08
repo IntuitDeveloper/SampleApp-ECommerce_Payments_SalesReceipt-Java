@@ -128,7 +128,7 @@ controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemS
 
 controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc', 'OrderSvc', 'DeepLinkSvc',
     function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc, OrderSvc, DeepLinkSvc) {
-
+        var customer = ModelSvc.model.company.customers[0];
         ShoppingCartSvc.refreshShoppingCart();
         CartItemSvc.getCartItems();
         $scope.model = ModelSvc.model;
@@ -142,12 +142,11 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
         $scope.creditCard.expYear = '2020';
 
         $scope.billingInfo = {};
-        $scope.billingInfo.name = 'Jason Smith';
-        $scope.billingInfo.address = '2632 Marine Way';
-        $scope.billingInfo.cityStateZip = 'Mountain View, CA 91354';
-        $scope.billingInfo.email = 'john_smith@ipp.developer.com';
-        $scope.billingInfo.phone = '555-555-5555';
-
+        $scope.billingInfo.name = customer.firstName + ' ' + customer.lastName;
+        $scope.billingInfo.address = customer.line1;
+        $scope.billingInfo.cityStateZip = customer.city + ", " + customer.countrySubDivisionCode + ", " + customer.postalCode;
+        $scope.billingInfo.email = customer.emailAddress;
+        $scope.billingInfo.phone = customer.phoneNumber;
         $scope.showView = function(viewName) {
             $scope.shoppingCartView = viewName
         }

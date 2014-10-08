@@ -90,7 +90,7 @@ public class DataLoader {
     private static void createSalesItems(Company company, ConfigurableApplicationContext springContext) {
         final SalesItemRepository repository = springContext.getBean(SalesItemRepository.class);
 
-        final SalesItem salesItem1 = new SalesItem("Baggies Jersey", "Premier League style", Money.parse("USD 75.00"), "IntuitWestBromAlbionJersey.jpg");
+        final SalesItem salesItem1 = new SalesItem("Jersey", "League style", Money.parse("USD 75.00"), "IntuitWestBromAlbionJersey.jpg");
         salesItem1.setQtyOnHand(new BigDecimal(5));
         company.addSalesItem(salesItem1);
 	    repository.save(salesItem1);
@@ -115,11 +115,11 @@ public class DataLoader {
     private static void createCustomers(Company company, ConfigurableApplicationContext springContext) {
         final CustomerRepository repository = springContext.getBean(CustomerRepository.class);
 
-        final Customer customer1 = new Customer("Jason", "Smith", "jason_smith@ipp.developer.com", "555-555-5555");
-        customer1.setCity("Mountain View");
-        customer1.setPostalCode("91354");
+        final Customer customer1 = new Customer("Aashi", "Mittal", "aashi.mittal@example.com", "555-555-5555");
+        customer1.setCity("Middlefield");
+        customer1.setPostalCode("98756");
         customer1.setCountry("United States");
-        customer1.setLine1("2632 Marine Way");
+        customer1.setLine1("333 Easy Street");
         customer1.setCountrySubDivisionCode("CA");
         company.addCustomer(customer1);
 	    repository.save(customer1);
