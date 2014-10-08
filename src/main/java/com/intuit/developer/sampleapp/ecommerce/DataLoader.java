@@ -115,7 +115,7 @@ public class DataLoader {
     private static void createCustomers(Company company, ConfigurableApplicationContext springContext) {
         final CustomerRepository repository = springContext.getBean(CustomerRepository.class);
 
-        final Customer customer1 = new Customer("John", "Smith", "john_smith@ipp.developer.com", "555-555-5555");
+        final Customer customer1 = new Customer("Jason", "Smith", "jason_smith@ipp.developer.com", "555-555-5555");
         customer1.setCity("Mountain View");
         customer1.setPostalCode("91354");
         customer1.setCountry("United States");

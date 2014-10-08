@@ -142,7 +142,7 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
         $scope.creditCard.expYear = '2020';
 
         $scope.billingInfo = {};
-        $scope.billingInfo.name = 'John Smith';
+        $scope.billingInfo.name = 'Jason Smith';
         $scope.billingInfo.address = '2632 Marine Way';
         $scope.billingInfo.cityStateZip = 'Mountain View, CA 91354';
         $scope.billingInfo.email = 'john_smith@ipp.developer.com';
