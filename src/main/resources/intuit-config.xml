@@ -1,18 +1,7 @@
 <?xml version="1.0" encoding="ISO-8859-1" ?>
 <intuit-config>
     <baseURL>
-        <qbo>https://qbo.qa.sbfinance.stage.intuit.com/v3/company</qbo>
-        <platformService>https://qa-appcenter.intuit.com/db</platformService>
-        <quickbooks-api>https://transaction-api-qal.payments.intuit.com/qa2/v2</quickbooks-api>
+        <qbo>https://sandbox-quickbooks.api.intuit.com/v3/company</qbo>
+        <quickbooks-api>https://sandbox.api.intuit.com/quickbooks/v4/payments</quickbooks-api>
     </baseURL>
-    <proxy>
-        <host>127.0.0.1</host>
-        <port>8888</port>
-    </proxy>
-    <!--<baseURL>-->
-    <!--<baseURL>
-        <qbo>https://quickbooks.api.intuit.com/v3/company</qbo>
-        <platformService>https://appcenter.intuit.com/db</platformService>
-        <quickbooks-api>https://transaction-api-e2e.payments.intuit.net/v2</quickbooks-api>
-    </baseURL>-->
 </intuit-config>

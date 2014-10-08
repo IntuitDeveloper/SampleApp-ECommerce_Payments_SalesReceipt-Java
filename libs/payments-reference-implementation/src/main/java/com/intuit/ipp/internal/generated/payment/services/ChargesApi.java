@@ -15,9 +15,21 @@ import java.util.*;
 
 public class ChargesApi extends ServiceBase {
 
-    private static final String baseURL = Utils.getPaymentAPIBaseURL();
+    private static final String defaultURL = " https://api.intuit.com/quickbooks/v4/payments";
+    private final String baseURL;
 
     private static final Logger logger = Utils.getPrefixedLogger(ChargesApi.class.getSimpleName());
+
+    public ChargesApi()
+    {
+        String paymentsURL = Utils.getPaymentAPIBaseURL();
+        if (paymentsURL == null)
+        {
+            paymentsURL = defaultURL;
+        }
+
+        baseURL = paymentsURL;
+    }
 
     public Charge create(Context context, String requestId, Charge body) throws FMSException {
         //switch to string builder
