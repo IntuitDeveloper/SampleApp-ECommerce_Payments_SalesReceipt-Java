@@ -64,7 +64,9 @@ public class QBOGateway {
         // Save the customers which already exist in QBO, but have had their qboId's updated
         customerRepository.save(customersToSave);
         // Push the Sales Item which do not already exist in QBO to QBO
-        pushCustomersToQBO(dataService, customersToPush);
+        if (!customersToPush.isEmpty()) {
+            pushCustomersToQBO(dataService, customersToPush);
+        }
         // Save the updated customers which were pushed to QBO
         customerRepository.save(customersToPush);
     }
@@ -212,7 +214,9 @@ public class QBOGateway {
         // Save the Sales Items which already exist in QBO, but have had their qboId's updated
         salesItemRepository.save(salesItemsToSave);
         // Push the Sales Item which do not already exist in QBO to QBO
-        pushSalesItemsToQBO(dataService, salesItemsToPush);
+        if (!salesItemsToPush.isEmpty()) {
+            pushSalesItemsToQBO(dataService, salesItemsToPush);
+        }
         // Save the updated Sales Items which were pushed to QBO
         salesItemRepository.save(salesItemsToPush);
     }

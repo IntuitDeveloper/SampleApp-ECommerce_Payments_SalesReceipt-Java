@@ -21,9 +21,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 import static org.junit.Assert.*;
 import static org.junit.Assert.assertEquals;
@@ -109,51 +107,62 @@ public class QBOGatewayUnitTests {
             qboServiceFactory.getDataService(salesItem.getCompany());
             result = dataService;
 
-	        dataService.executeQuery(String.format(QBOGateway.ITEM_QUERY, salesItem.getName()));
-	        result = itemQueryResult;
+            dataService.executeQuery(withAny(anyString));
+            result = new Delegate() {
+                QueryResult executeQuery(String queryString) {
+                    // The dataService will try to execute a query for income accounts
+                    if (String.format(
+                                    QBOGateway.ACCOUNT_TYPE_QUERY,
+                                    AccountTypeEnum.INCOME.value(),
+                                    AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME.value()).compareTo(queryString) == 0) {
+                        return incomeAccountQueryResult;
+                    } else if (String.format(
+                                    QBOGateway.ACCOUNT_TYPE_QUERY,
+                                    AccountTypeEnum.OTHER_CURRENT_ASSET.value(),
+                                    AccountSubTypeEnum.INVENTORY.value()).compareTo(queryString) == 0 ) {
+                        return assetAccountQueryResult;
+                    } else if (String.format(
+                                    QBOGateway.ACCOUNT_TYPE_QUERY,
+                                    AccountTypeEnum.COST_OF_GOODS_SOLD.value(),
+                                    AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS.value()).compareTo(queryString) == 0) {
+                        return cogAccountQueryResult;
+                    } else {
+                        return itemQueryResult;
+                    }
+                }
+            };
 
-            // The dataService will try to execute a query for income accounts
-            dataService.executeQuery(String.format(
-                            QBOGateway.ACCOUNT_TYPE_QUERY,
-                            AccountTypeEnum.INCOME.value(),
-                            AccountSubTypeEnum.SALES_OF_PRODUCT_INCOME.value())
-            );
-            result = incomeAccountQueryResult;
-
-            // The dataService will try to execute a query for asset accounts
-            dataService.executeQuery(String.format(
-                            QBOGateway.ACCOUNT_TYPE_QUERY,
-                            AccountTypeEnum.OTHER_CURRENT_ASSET.value(),
-                            AccountSubTypeEnum.INVENTORY.value())
-            );
-            result = assetAccountQueryResult;
-
-            // The dataService will try to execute a query for cost of goods sold accounts
-            dataService.executeQuery(String.format(
-                            QBOGateway.ACCOUNT_TYPE_QUERY,
-                            AccountTypeEnum.COST_OF_GOODS_SOLD.value(),
-                            AccountSubTypeEnum.SUPPLIES_MATERIALS_COGS.value())
-            );
-            result = cogAccountQueryResult;
-
-            // The data service will try to add the item to QBO
-            dataService.add((Item)any);
-            result = qboItem;
+            // The data service will execute a batch operation
+            dataService.executeBatch(withAny(new BatchOperation()));
+            result = new Delegate() {
+                void executeBatch(BatchOperation batchOperation) {
+                    com.intuit.ipp.data.Item qboItem = new com.intuit.ipp.data.Item();
+                    qboItem.setId(qboItemID);
+                    batchOperation.getEntityResult().put(Long.toString(salesItem.getId()), qboItem);
+                }
+            };
 
         }};
 
         // Perform the actual operation under test
         List<SalesItem> salesItems = new ArrayList<>();
         salesItems.add(salesItem);
-//        gateway.createItemsInQBO(salesItems);
+        gateway.createItemsInQBO(salesItems);
 
         //Check that the qbo item ID was correctly assigned to the sales Item
         assertEquals(qboItemID, salesItem.getQboId());
 
         // Explicitly verify things that SHOULD HAVE happened.
         new Verifications() {{
-            Item qboItemPassed;
-            dataService.add(qboItemPassed = withCapture());
+            BatchOperation passedInBatch;
+
+            // Explicitly verify that dataService.add must be called with a parameter that matches certain requirements
+            dataService.executeBatch(passedInBatch = withCapture());
+
+            List<String> bIds = passedInBatch.getBIds();
+            assertEquals(1, bIds.size());
+
+            Item qboItemPassed = (Item) passedInBatch.getBatchItemRequests().get(0).getIntuitObject().getValue();
 
             // Compare Values of Domain Object and QBO entity
             assertEquals(salesItem.getName(), qboItemPassed.getName());
@@ -176,7 +185,7 @@ public class QBOGatewayUnitTests {
             assertEquals(cogAccountRef, qboItemPassed.getExpenseAccountRef());
 
             // The salesItemRepository should save the sales item
-            salesItemRepository.save(salesItem); times = 1;
+            salesItemRepository.save(withAny(new ArrayList<SalesItem>())); times = 2;
         }};
     }
 
@@ -209,7 +218,7 @@ public class QBOGatewayUnitTests {
 			result = dataService;
 
 			// The dataService will try to execute a query for income accounts
-			dataService.executeQuery(anyString); times = 1;
+			dataService.executeQuery(anyString);
 			result = itemQueryResult;
 
 			// The data service will not try to add the item to QBO
@@ -224,7 +233,7 @@ public class QBOGatewayUnitTests {
 		// Explicitly verify things that SHOULD HAVE happened.
 		new Verifications() {{
 			// The salesItemRepository should save the sales item
-			salesItemRepository.save(salesItem);
+			salesItemRepository.save(withAny(company.getSalesItems()));
 
 			//Check that the qbo item ID was correctly assigned to the sales Item
 			assertEquals(qboItemID, salesItem.getQboId());
@@ -252,11 +261,16 @@ public class QBOGatewayUnitTests {
 	        dataService.executeQuery(anyString);
 	        result = customerQueryResult;
 
-            // The data service will try to add an Item
-            dataService.add(withAny(new com.intuit.ipp.data.Customer()));
-            com.intuit.ipp.data.Customer qboCustomer = new com.intuit.ipp.data.Customer();
-            qboCustomer.setId(qboCustomerID);
-            result = qboCustomer;
+            // The data service will execute a batch operation
+            dataService.executeBatch(withAny(new BatchOperation()));
+            result = new Delegate() {
+                void executeBatch(BatchOperation batchOperation) {
+                    com.intuit.ipp.data.Customer qboCustomer = new com.intuit.ipp.data.Customer();
+                    qboCustomer.setId(qboCustomerID);
+                    batchOperation.getEntityResult().put(Long.toString(customer.getId()), qboCustomer);
+                }
+            };
+
         }};
 
         // Perform the actual operation under test
@@ -274,7 +288,7 @@ public class QBOGatewayUnitTests {
             List<String> bIds = passedInBatch.getBIds();
             assertEquals(1, bIds.size());
 
-            com.intuit.ipp.data.Customer passedInCustomer = (com.intuit.ipp.data.Customer) passedInBatch.getEntity(bIds.get(0));
+            com.intuit.ipp.data.Customer passedInCustomer = (com.intuit.ipp.data.Customer) passedInBatch.getBatchItemRequests().get(0).getIntuitObject().getValue();
 
             assertEquals(customer.getFirstName(), passedInCustomer.getGivenName());
             assertEquals(customer.getLastName(), passedInCustomer.getFamilyName());
@@ -296,7 +310,8 @@ public class QBOGatewayUnitTests {
             assertEquals(customer.getLine2(), mappedShipAddress.getLine2());
 
             // The salesItemRepository should save the sales item
-            customerRepository.save(customer);
+
+            customerRepository.save(withAny(company.getCustomers()));
         }};
     }
 
@@ -327,6 +342,16 @@ public class QBOGatewayUnitTests {
 			QueryResult queryResult = new QueryResult();
 			queryResult.setEntities(Arrays.asList(qboCustomer));
 			result = queryResult;
+
+            // The data service will execute a batch operation
+            dataService.executeBatch(withAny(new BatchOperation()));
+            result = new Delegate() {
+                void executeBatch(BatchOperation batchOperation) {
+                    com.intuit.ipp.data.Customer qboCustomer = new com.intuit.ipp.data.Customer();
+                    qboCustomer.setId(qboCustomerID);
+                    batchOperation.getEntityResult().put(Long.toString(customer.getId()), qboCustomer);
+                }
+            };
 		}};
 
 		// Perform the actual operation under test
@@ -337,7 +362,7 @@ public class QBOGatewayUnitTests {
 			dataService.add((IEntity)any); times = 0;
 
 			// The customerRepository should save the customer that has been updated w/the QBO ID
-			customerRepository.save(company.getCustomers());
+			customerRepository.save(withAny(company.getCustomers()));
 
 			//Check that the qbo item ID was correctly assigned to the customer
 			assertEquals(qboCustomerID, customer.getQboId());
