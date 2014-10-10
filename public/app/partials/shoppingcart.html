@@ -51,7 +51,8 @@
                         This shopping cart is represented by a <code>ShoppingCart</code> object. Which contains references
                         to sales items and calculates totals.
                     </p>
-                    <h6>See it in the code:</h6>
+                    <h4>See it in the code</h4>
+                    Server Side:
                     <pre>com.intuit.developer.sampleapp.ecommerce.domain.ShoppingCart</pre>
                 </div>
             </div>
@@ -173,7 +174,7 @@
                         credit card information actually is, this token can be passed to this app's non-accredited
                         server backend and used to charge the customer for the items.
                     </p>
-                    <h4>See it in the code:</h4>
+                    <h4>See it in the code</h4>
                     Client Side:
                     <pre>public/js/controllers.js:277</pre>
                     Server Side:
@@ -260,12 +261,17 @@
                 </div>
                 <div class="panel-body">
                     <p>
-                        You've already populated this app's database with items for sales and customer accounts.
-                        But these may not exist in QuickBooks, so the Small Business owner manually syncs this data to qickbooks
-                        after signing up for the first time.
+                        You're looking at the SalesReceipt data that came directly from QuickBooks Online as a response
+                        to create the Sales Receipt. The Sales Receipt number is the Sales Receipt's "Doc Number" in Quick Books.
+                        Notice that it's possible to link directly to the Sales Receipt's page in QuickBooks Online.
                     </p>
-                    <h6>See it in the code:</h6>
-                    <pre>com.intuit.developer.sampleapp.ecommerce.controllers.SyncRequestController</pre>
+                    <h4>See it in the code</h4>
+                    Client Side:
+                    <pre>public/app/js/controller.js</pre>
+                    <h4>See it in the code</h4>
+                    Server Side:
+                    <pre>com.intuit.developer.sampleapp.ecommerce.controllers.OrderResponse</pre>
+                    <pre>com.intuit.developer.sampleapp.ecommerce.controllers.OrderResponse</pre>
                 </div>
             </div>
         </div>
