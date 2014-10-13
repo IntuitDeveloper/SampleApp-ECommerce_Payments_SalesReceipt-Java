@@ -4,16 +4,17 @@
 
 var controllersModule = angular.module('myApp.controllers', ['ngRoute', 'ui.bootstrap', 'ui.validate', 'myApp.services']);
 
-controllersModule.controller('NavCtrl', ['$scope', '$routeParams', '$location', 'ModelSvc',
-    function ($scope, $routeParams, $location, ModelSvc) {
+controllersModule.controller('NavCtrl', ['$scope', '$routeParams', '$location', 'ModelSvc', 'TrackingSvc',
+    function ($scope, $routeParams, $location, ModelSvc, TrackingSvc) {
         $scope.navClass = function (page) {
             var currentRoute = $location.path().substring(1);
+            TrackingSvc.trackPage(null, null, {"site_section" : page});
             return page === currentRoute ? 'active' : '';
         };
 
         $scope.isStorefront = function() {
             return $location.path() === '/storefront' || $location.path() === '/shoppingcart';
-        }
+        };
 
         $scope.model = ModelSvc.model;
     }]);
@@ -126,14 +127,14 @@ controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemS
         };
     }]);
 
-controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc', 'OrderSvc', 'DeepLinkSvc',
-    function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc, OrderSvc, DeepLinkSvc) {
+controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc', 'OrderSvc', 'DeepLinkSvc', 'TrackingSvc',
+    function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc, OrderSvc, DeepLinkSvc, TrackingSvc) {
         var customer = ModelSvc.model.company.customers[0];
         ShoppingCartSvc.refreshShoppingCart();
         CartItemSvc.getCartItems();
         $scope.model = ModelSvc.model;
 
-        $scope.shoppingCartView = "Review";
+        $scope.shoppingCartView = "ShoppingCart-Review";
         $scope.orderResponse = {};
         $scope.creditCard = {};
         $scope.creditCard.number = '4111111111111111';
@@ -148,8 +149,9 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
         $scope.billingInfo.email = customer.emailAddress;
         $scope.billingInfo.phone = customer.phoneNumber;
         $scope.showView = function(viewName) {
-            $scope.shoppingCartView = viewName
-        }
+            $scope.shoppingCartView = viewName;
+            TrackingSvc.trackPage(null, null, {"site_section" : viewName});
+        };
         $scope.placeOrder = function() {
             $('#loadingOrder').modal({show: true, keyboard: false, backdrop: 'static'});
             $scope.orderMessage = "";
@@ -158,7 +160,7 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
                 $scope.billingInfo,
                 function(data) {
                     $scope.orderResponse = data;
-                    $scope.showView("Confirmation");
+                    $scope.showView("ShoppingCart-Confirmation");
                     $('#loadingOrder').modal('hide');
 
                 },

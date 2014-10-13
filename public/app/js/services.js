@@ -405,3 +405,58 @@ ecommerceServices.factory('SystemPropertySvc', [ '$resource', 'RootUrlSvc', 'Mod
         }
 }]);
 
+ecommerceServices.factory('TrackingSvc', ['$resource', function ($resource) {
+
+
+    var NAME_OF_USER_ID_TRACKING_COOKIE = "tracking_user_id";
+
+    var getUserIdFromCookie = function (properties) {
+
+        var cookie = document.cookie;
+
+        if (cookie) {
+            var cStart = cookie.indexOf(NAME_OF_USER_ID_TRACKING_COOKIE + "=");
+
+            if (cStart > -1) {
+                cStart += (NAME_OF_USER_ID_TRACKING_COOKIE + "=").length;
+                var cEnd = cookie.indexOf(";", cStart);
+
+                if (cEnd == -1) {
+                    cEnd = cookie.length;
+                }
+                cookie = cookie.substring(cStart, cEnd);
+
+                if (!properties) {
+                    properties = { "user_id": cookie };
+                } else {
+                    properties["user_id"] = cookie;
+                }
+            }
+        }
+
+        return properties;
+
+    };
+
+    return {
+
+        trackPage: function (pageName, event, properties) {
+
+            properties = getUserIdFromCookie(properties);
+
+            wa.trackPage(pageName, event, properties);
+        },
+
+        trackEvent: function (event, properties) {
+
+            if (properties && typeof properties.user_id !== 'undefined') {
+                document.cookie = "tracking_user_id=" + properties.user_id;
+            } else {
+                properties = getUserIdFromCookie(properties);
+            }
+
+            wa.trackEvent(event, properties);
+        }
+
+    };
+}]);
