@@ -444,7 +444,7 @@ ecommerceServices.factory('TrackingSvc', ['$resource', function ($resource) {
 
             properties = getUserIdFromCookie(properties);
 
-            wa.trackPage(pageName, event, properties);
+//            wa.trackPage(pageName, event, properties);
         },
 
         trackEvent: function (event, properties) {
@@ -455,7 +455,7 @@ ecommerceServices.factory('TrackingSvc', ['$resource', function ($resource) {
                 properties = getUserIdFromCookie(properties);
             }
 
-            wa.trackEvent(event, properties);
+//            wa.trackEvent(event, properties);
         }
 
     };
