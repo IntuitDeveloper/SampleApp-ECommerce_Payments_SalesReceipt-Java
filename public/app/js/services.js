@@ -132,7 +132,14 @@ ecommerceServices.factory('CompanySvc', ['$resource', '$rootScope', 'RootUrlSvc'
                 ModelSvc.broadcastCompanyChange();
 
                 var grantUrl = RootUrlSvc.oauthGrantUrl() + '?appCompanyId=' + ModelSvc.model.company.id;
-                intuit.ipp.anywhere.setup({grantUrl: grantUrl});
+                intuit.ipp.anywhere.setup({
+                    grantUrl: grantUrl,
+                    datasources: {
+                        quickbooks: true,
+                        payments: true
+
+                    }
+                });
             });
         };
 
