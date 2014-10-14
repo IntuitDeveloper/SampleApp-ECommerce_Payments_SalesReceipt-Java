@@ -3,7 +3,7 @@ eCommerce Java Sample App
 
 
 For setup and run instructions, as well as topical guides, go to:
-[Intuit Developer Documentation]()
+[Intuit Developer Documentation](https://developer.intuit.com/v2/docs/0000_about_intuit_developer/0060_sample_app_tutorials/ecommerce)
 
 
 ### Project Structure
