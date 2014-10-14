@@ -5,20 +5,19 @@ In this directory you will find the most pertinent files for integrating with th
 
 By contrast, the code in the `/src-general` directory is not specific or pertinent to QuickBooks Online integration.
 
-**checkout these files in**
-
+### Checkout these Files
 `main/java/com/intuit/developer/sampleapp/ecommerce/`
 
 #### QBO Integration
-In `qbo/`
+In `main/java/com/intuit/developer/sampleapp/ecommerce/qbo`
 * `PaymentGateway.java`
 * `QBOGateway.java`
 * `QBOServiceFactory.java`
 
 #### Oauth Implementation
-In `oauth/`
+In `main/java/com/intuit/developer/sampleapp/ecommerce/qbo`
 * `OAuthInfoProvider.java`
 
-In `controllers/`
+In `main/java/com/intuit/developer/sampleapp/ecommerce/controllers`
 * `OAuthController.java`
 
