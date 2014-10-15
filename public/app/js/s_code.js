@@ -14,8 +14,8 @@ var wa = (function (document, wa) {
      */
     wa.reportSuitesQA = "intuitdeveloperqa";
     wa.reportSuitesProd = "intuitdeveloper";
-    wa.internalDomainsQA = "qa-developer.intuit.com,vm-developer.intuit.com,developer-stage.intuit.com,stage-developer.intuit.com";
-    wa.internalDomainsProd = "developer.intuit.com";
+    wa.internalDomainsQA = "localhost";
+    wa.internalDomainsProd = "localhost";
     wa.siteName = "developer";
 
     /*

@@ -8,7 +8,6 @@ controllersModule.controller('NavCtrl', ['$scope', '$routeParams', '$location', 
     function ($scope, $routeParams, $location, ModelSvc, TrackingSvc) {
         $scope.navClass = function (page) {
             var currentRoute = $location.path().substring(1);
-            TrackingSvc.trackPage(null, null, {"site_section" : page});
             return page === currentRoute ? 'active' : '';
         };
 
@@ -19,8 +18,9 @@ controllersModule.controller('NavCtrl', ['$scope', '$routeParams', '$location', 
         $scope.model = ModelSvc.model;
     }]);
 
-controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'ModelSvc', 'CompanySvc', 'DeepLinkSvc', '$window',
-        function ($scope, SyncRequestSvc, ModelSvc, CompanySvc, DeepLinkSvc, $window) {
+controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'ModelSvc', 'CompanySvc', 'DeepLinkSvc', '$window', 'TrackingSvc',
+        function ($scope, SyncRequestSvc, ModelSvc, CompanySvc, DeepLinkSvc, $window, TrackingSvc) {
+            TrackingSvc.trackPage('setup');
 
             $scope.model = ModelSvc.model;
             $scope.syncCustomersMessage = '';
@@ -116,8 +116,11 @@ controllersModule.controller('SettingsCtrl', ['$scope', 'SyncRequestSvc', 'Model
         }]);
 
 
-controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemSvc',
-    function ($scope, ModelSvc, CartItemSvc) {
+controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemSvc', 'TrackingSvc',
+    function ($scope, ModelSvc, CartItemSvc, TrackingSvc) {
+        TrackingSvc.trackPage('catalog');
+
+
         $scope.model = ModelSvc.model;
 
         $scope.shoppingCartView = "CartReview";
@@ -130,11 +133,18 @@ controllersModule.controller('StoreFrontCtrl', ['$scope', 'ModelSvc', 'CartItemS
 controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'ShoppingCartSvc', 'CartItemSvc', 'OrderSvc', 'DeepLinkSvc', 'TrackingSvc',
     function ($scope, ModelSvc, ShoppingCartSvc, CartItemSvc, OrderSvc, DeepLinkSvc, TrackingSvc) {
         var customer = ModelSvc.model.company.customers[0];
+
+        $scope.showView = function(viewName) {
+            $scope.shoppingCartView = viewName;
+            TrackingSvc.trackPage(viewName);
+        };
+
         ShoppingCartSvc.refreshShoppingCart();
         CartItemSvc.getCartItems();
         $scope.model = ModelSvc.model;
 
-        $scope.shoppingCartView = "ShoppingCart-Review";
+
+        $scope.showView("shoppingcart");
         $scope.orderResponse = {};
         $scope.creditCard = {};
         $scope.creditCard.number = '4111111111111111';
@@ -148,10 +158,7 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
         $scope.billingInfo.cityStateZip = customer.city + ", " + customer.countrySubDivisionCode + ", " + customer.postalCode;
         $scope.billingInfo.email = customer.emailAddress;
         $scope.billingInfo.phone = customer.phoneNumber;
-        $scope.showView = function(viewName) {
-            $scope.shoppingCartView = viewName;
-            TrackingSvc.trackPage(null, null, {"site_section" : viewName});
-        };
+
         $scope.placeOrder = function() {
             $('#loadingOrder').modal({show: true, keyboard: false, backdrop: 'static'});
             $scope.orderMessage = "";
@@ -160,7 +167,7 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
                 $scope.billingInfo,
                 function(data) {
                     $scope.orderResponse = data;
-                    $scope.showView("ShoppingCart-Confirmation");
+                    $scope.showView("confirm");
                     $('#loadingOrder').modal('hide');
 
                 },
@@ -173,6 +180,8 @@ controllersModule.controller('ShoppingCartCtrl', ['$scope', 'ModelSvc', 'Shoppin
         $scope.getSalesReceiptLinkUrl = function () {
             return DeepLinkSvc.getSalesReceiptLink($scope.orderResponse.txnId);
         }
-
-
     }]);
+
+controllersModule.controller('LandingCtrl', ['TrackingSvc', '$scope', function(TrackingSvc, $scope) {
+    TrackingSvc.trackPage('landing');
+}]);

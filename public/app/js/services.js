@@ -38,7 +38,7 @@ ecommerceServices.factory('InitializerSvc', ['$rootScope', 'RootUrlSvc', 'Compan
                  so that the connect to quickbooks button is rendered properly
                  */
                 if (initialized) { //only reinitialize from the 2nd time onwards
-                    intuit.ipp.anywhere.init();
+//                    intuit.ipp.anywhere.init();
                 }
                 initialized = true;
             });
@@ -103,7 +103,7 @@ ecommerceServices.factory('RootUrlSvc', ['$resource', '$rootScope', '$location',
         var onApiLoaded = function ($scope, callback) {
             $scope.$on('api.loaded', function () {
                 callback();
-            });
+            });out
         };
 
         return {
@@ -132,14 +132,14 @@ ecommerceServices.factory('CompanySvc', ['$resource', '$rootScope', 'RootUrlSvc'
                 ModelSvc.broadcastCompanyChange();
 
                 var grantUrl = RootUrlSvc.oauthGrantUrl() + '?appCompanyId=' + ModelSvc.model.company.id;
-                intuit.ipp.anywhere.setup({
-                    grantUrl: grantUrl,
-                    datasources: {
-                        quickbooks: true,
-                        payments: true
-
-                    }
-                });
+//                intuit.ipp.anywhere.setup({
+//                    grantUrl: grantUrl,
+//                    datasources: {
+//                        quickbooks: true,
+//                        payments: true
+//
+//                    }
+//                });
             });
         };
 
@@ -417,7 +417,7 @@ ecommerceServices.factory('TrackingSvc', ['$resource', function ($resource) {
 
     var NAME_OF_USER_ID_TRACKING_COOKIE = "tracking_user_id";
 
-    var getUserIdFromCookie = function (properties) {
+    var getUserIdFromCookie = function () {
 
         var cookie = document.cookie;
 
@@ -433,36 +433,31 @@ ecommerceServices.factory('TrackingSvc', ['$resource', function ($resource) {
                 }
                 cookie = cookie.substring(cStart, cEnd);
 
-                if (!properties) {
-                    properties = { "user_id": cookie };
-                } else {
-                    properties["user_id"] = cookie;
-                }
+                return cookie;
             }
         }
 
-        return properties;
+        return null;
 
     };
 
     return {
 
         trackPage: function (pageName, event, properties) {
+            var props = properties || {};
+            props['user_id'] = getUserIdFromCookie();
+            props['site_section'] = 'sampleapps';
+            pageName = 'sampleapps/ecommerce/' + pageName;
 
-            properties = getUserIdFromCookie(properties);
-
-//            wa.trackPage(pageName, event, properties);
+            wa.trackPage(pageName, event, properties);
         },
 
         trackEvent: function (event, properties) {
+            var props = properties || {};
+            props['user_id'] = getUserIdFromCookie();
+            props['site_section'] = 'sampleapps';
 
-            if (properties && typeof properties.user_id !== 'undefined') {
-                document.cookie = "tracking_user_id=" + properties.user_id;
-            } else {
-                properties = getUserIdFromCookie(properties);
-            }
-
-//            wa.trackEvent(event, properties);
+            wa.trackEvent(event, properties);
         }
 
     };
