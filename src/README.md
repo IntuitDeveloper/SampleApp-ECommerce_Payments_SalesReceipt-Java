@@ -6,11 +6,11 @@ In this directory you will find the most pertinent files for integrating with th
 By contrast, the code in the [`src-general`](../src-general) directory is not specific or pertinent to QuickBooks Online integration.
 
 For OAuth implementation see:
-  - [`OAuthController.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/controller/OAuthController.java)
-  - [`OAuthInfoProvider.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/oauth/OAuthInfoProvider.java)
-  - [`OAuthInfoProviderImpl.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/controllers/OAuthInfoProviderImpl.java)
+  - [`OAuthController.java`](main/java/com/intuit/developer/sampleapp/ecommerce/controller/OAuthController.java)
+  - [`OAuthInfoProvider.java`](main/java/com/intuit/developer/sampleapp/ecommerce/oauth/OAuthInfoProvider.java)
+  - [`OAuthInfoProviderImpl.java`](main/java/com/intuit/developer/sampleapp/ecommerce/controllers/OAuthInfoProviderImpl.java)
 
 For QBO V3 Java SDK usage see:
-  - [`QBOGateway.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/QBOGateway.java)
-  - [`PaymentGateway.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/PaymentGateway.java)
-  - [`QBOServiceFactory.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/QBOServiceFactory.java)
+  - [`QBOGateway.java`](main/java/com/intuit/developer/sampleapp/ecommerce/qbo/QBOGateway.java)
+  - [`PaymentGateway.java`](main/java/com/intuit/developer/sampleapp/ecommerce/qbo/PaymentGateway.java)
+  - [`QBOServiceFactory.java`](main/java/com/intuit/developer/sampleapp/ecommerce/qbo/QBOServiceFactory.java)
