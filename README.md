@@ -9,7 +9,7 @@ For setup and run instructions, as well as topical guides, go to:
 ### Project Structure
 * **The Java code for integrating with the QuickBooks Online Accounting and Payments APIs is located in the [`src`](src) directory.**
     *  For OAuth implementation see:
-        - [`OAuthController.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/controller/OAuthController.java)
+        - [`OAuthController.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/controllers/OAuthController.java)
         - [`OAuthInfoProvider.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/oauth/OAuthInfoProvider.java)
         - [`OAuthInfoProviderImpl.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/controllers/OAuthInfoProviderImpl.java)
     *  For QBO V3 Java SDK usage see:
