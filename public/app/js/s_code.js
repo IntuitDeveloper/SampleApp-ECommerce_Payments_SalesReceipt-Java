@@ -14,7 +14,7 @@ var wa = (function (document, wa) {
      */
     wa.reportSuitesQA = "intuitdeveloperqa";
     wa.reportSuitesProd = "intuitdeveloper";
-    wa.internalDomainsQA = "localhost";
+//    wa.internalDomainsQA = "localhost";
     wa.internalDomainsProd = "localhost";
     wa.siteName = "developer";
 
@@ -410,7 +410,7 @@ var wa = (function (document, wa) {
      * Construct Internal Domains
      *****************************
      */
-    wa.internalDomainsQA = (wa.internalDomainsQA) ? wa.internalDomainsQA + ",localhost" : "localhost";
+//    wa.internalDomainsQA = (wa.internalDomainsQA) ? wa.internalDomainsQA + ",localhost" : "localhost";
     wa.internalDomains = "";
     if (wa.internalDomainsQA && wa.internalDomainsProd) {
         wa.internalDomains = wa.internalDomainsQA + "," + wa.internalDomainsProd;

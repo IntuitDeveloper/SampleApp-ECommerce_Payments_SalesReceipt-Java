@@ -1,4 +1,4 @@
-package com.intuit.developer.sampleapp.ecommerce.oauth.controllers;
+package com.intuit.developer.sampleapp.ecommerce.controllers;
 
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOGateway;

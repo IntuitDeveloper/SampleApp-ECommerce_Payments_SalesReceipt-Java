@@ -1,7 +1,7 @@
 package com.intuit.developer.sampleapp.ecommerce.test.unit.controllers;
 
-import com.intuit.developer.sampleapp.ecommerce.oauth.controllers.SyncRequest;
-import com.intuit.developer.sampleapp.ecommerce.oauth.controllers.SyncRequestController;
+import com.intuit.developer.sampleapp.ecommerce.controllers.SyncRequest;
+import com.intuit.developer.sampleapp.ecommerce.controllers.SyncRequestController;
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
 import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;

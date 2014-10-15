@@ -412,40 +412,11 @@ ecommerceServices.factory('SystemPropertySvc', [ '$resource', 'RootUrlSvc', 'Mod
         }
 }]);
 
-ecommerceServices.factory('TrackingSvc', ['$resource', function ($resource) {
-
-
-    var NAME_OF_USER_ID_TRACKING_COOKIE = "tracking_user_id";
-
-    var getUserIdFromCookie = function () {
-
-        var cookie = document.cookie;
-
-        if (cookie) {
-            var cStart = cookie.indexOf(NAME_OF_USER_ID_TRACKING_COOKIE + "=");
-
-            if (cStart > -1) {
-                cStart += (NAME_OF_USER_ID_TRACKING_COOKIE + "=").length;
-                var cEnd = cookie.indexOf(";", cStart);
-
-                if (cEnd == -1) {
-                    cEnd = cookie.length;
-                }
-                cookie = cookie.substring(cStart, cEnd);
-
-                return cookie;
-            }
-        }
-
-        return null;
-
-    };
-
+ecommerceServices.factory('TrackingSvc', [function () {
     return {
 
         trackPage: function (pageName, event, properties) {
             var props = properties || {};
-            props['user_id'] = getUserIdFromCookie();
             props['site_section'] = 'sampleapps';
             pageName = 'sampleapps/ecommerce/' + pageName;
 
@@ -454,7 +425,6 @@ ecommerceServices.factory('TrackingSvc', ['$resource', function ($resource) {
 
         trackEvent: function (event, properties) {
             var props = properties || {};
-            props['user_id'] = getUserIdFromCookie();
             props['site_section'] = 'sampleapps';
 
             wa.trackEvent(event, properties);
