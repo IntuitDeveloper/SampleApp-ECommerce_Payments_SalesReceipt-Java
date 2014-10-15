@@ -11,7 +11,7 @@ For setup and run instructions, as well as topical guides, go to:
     *  For OAuth implementation see:
         - `src/main/java/com/intuit/developer/ecommerce/oauth`
         - `src/main/java/com/intuit/developer/ecommerce/controller`
-    *  For Java Developer Kit usage see:
+    *  For QBO V3 Java SDK usage see:
         - `src/main/java/com/intuit/developer/ecommerce/qbo`
 * The Java code for the rest of the application is located in the `src-general` directory
 * The HTML, CSS and JavaScript code for the web-based client are is located in the `public` directory
