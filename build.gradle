@@ -73,10 +73,17 @@ dependencies {
 sourceSets {
     main {
         java {
-            srcDirs = ['src/main/java', 'src-general/main/java']
+            srcDir 'src/main/java'
+            srcDir 'src-general/main/java'
         }
         resources {
             output.resourcesDir = output.classesDir
+        }
+    }
+
+    test {
+        java {
+            srcDir 'src-general/test/java'
         }
     }
 }
