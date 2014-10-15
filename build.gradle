@@ -67,8 +67,14 @@ dependencies {
     compile("oauth.signpost:signpost-core:1.2.1.2")
 }
 
+
+
+
 sourceSets {
     main {
+        java {
+            srcDirs = ['src/main/java', 'src-general/main/java']
+        }
         resources {
             output.resourcesDir = output.classesDir
         }

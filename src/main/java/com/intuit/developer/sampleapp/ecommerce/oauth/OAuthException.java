@@ -3,10 +3,7 @@ package com.intuit.developer.sampleapp.ecommerce.oauth;
 import java.io.IOException;
 
 /**
- * Created with IntelliJ IDEA.
- * User: russellb337
- * Date: 7/17/14
- * Time: 9:57 AM
+ * TODO: add OAuthException overview
  */
 public class OAuthException extends RuntimeException {
 

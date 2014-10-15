@@ -2,7 +2,7 @@ package com.intuit.developer.sampleapp.ecommerce;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.intuit.developer.sampleapp.ecommerce.controllers.OAuthInfoProviderImpl;
+import com.intuit.developer.sampleapp.ecommerce.oauth.controllers.OAuthInfoProviderImpl;
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
 import com.intuit.developer.sampleapp.ecommerce.domain.ShoppingCart;
@@ -13,7 +13,6 @@ import com.intuit.developer.sampleapp.ecommerce.qbo.QBOServiceFactory;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOGateway;
 import com.intuit.developer.sampleapp.ecommerce.serializers.MoneyDeserializer;
 import com.intuit.developer.sampleapp.ecommerce.serializers.MoneySerializer;
-import org.apache.commons.io.FileUtils;
 import org.joda.money.Money;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
@@ -27,8 +26,6 @@ import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
 
 import javax.sql.DataSource;
-import java.io.File;
-import java.io.IOException;
 
 
 /**

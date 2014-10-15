@@ -1,10 +1,7 @@
 package com.intuit.developer.sampleapp.ecommerce.oauth;
 
 /**
- * Created with IntelliJ IDEA.
- * User: russellb337
- * Date: 7/17/14
- * Time: 2:26 PM
+ * TODO: add OAuthInfoProvider overview
  */
 public interface OAuthInfoProvider {
 

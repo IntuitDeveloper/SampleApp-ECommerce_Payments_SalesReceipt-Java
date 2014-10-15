@@ -1,4 +1,4 @@
-package com.intuit.developer.sampleapp.ecommerce.controllers;
+package com.intuit.developer.sampleapp.ecommerce.oauth.controllers;
 
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
 import com.intuit.developer.sampleapp.ecommerce.oauth.CompanyRequestTokenSecret;

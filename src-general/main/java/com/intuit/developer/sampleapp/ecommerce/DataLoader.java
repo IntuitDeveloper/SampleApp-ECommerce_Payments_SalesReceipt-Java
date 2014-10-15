@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.intuit.developer.sampleapp.ecommerce.domain.*;
 import com.intuit.developer.sampleapp.ecommerce.repository.*;
-import com.intuit.ipp.data.PhysicalAddress;
 import com.intuit.ipp.util.Config;
 import org.apache.commons.io.FileUtils;
 import org.joda.money.Money;

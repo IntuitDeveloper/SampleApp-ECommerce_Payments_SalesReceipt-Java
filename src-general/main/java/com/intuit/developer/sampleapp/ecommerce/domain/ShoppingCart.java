@@ -4,7 +4,6 @@ import org.joda.money.CurrencyUnit;
 import org.joda.money.Money;
 
 import javax.persistence.*;
-import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;

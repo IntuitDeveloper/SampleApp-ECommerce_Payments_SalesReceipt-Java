@@ -14,10 +14,6 @@ import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.BatchOperation;
 import com.intuit.ipp.services.DataService;
 import com.intuit.ipp.services.QueryResult;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.collections.MultiMap;
-import org.apache.commons.collections.Predicate;
-import org.apache.commons.collections.map.MultiValueMap;
 import org.springframework.beans.factory.annotation.Autowired;
 
 

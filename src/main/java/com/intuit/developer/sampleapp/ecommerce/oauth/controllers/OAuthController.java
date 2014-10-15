@@ -1,4 +1,4 @@
-package com.intuit.developer.sampleapp.ecommerce.controllers;
+package com.intuit.developer.sampleapp.ecommerce.oauth.controllers;
 
 import com.intuit.developer.sampleapp.ecommerce.oauth.CompanyRequestTokenSecret;
 import com.intuit.developer.sampleapp.ecommerce.oauth.OAuthInfoProvider;
@@ -16,10 +16,10 @@ import java.io.IOException;
 import java.util.Map;
 
 /**
- * Created with IntelliJ IDEA.
- * User: russellb337
- * Date: 7/22/14
- * Time: 5:34 AM
+ * For a full walk through of this class and what is required for implementing OAuth, please visit our HowTo Guide:
+ * https://github.com/IntuitDeveloper/SampleApp-TimeTracking_Invoicing-Java/wiki/OAuth-How-To-Guide-(Java)
+ *
+ * TODO: add description of OAuth
  */
 @RestController
 public class OAuthController {
@@ -27,7 +27,8 @@ public class OAuthController {
     @Autowired
     private OAuthInfoProvider oAuthInfoProvider;
 
-    /*
+    /**
+     *
      * This is the first REST endpoint invoked in the OAuth 1.0 flow.
 	 *
 	 * It is redirected to by Intuit, when the user clicks on the 'Connect
@@ -116,16 +117,16 @@ public class OAuthController {
 
     }
 
-public static String getProtocolHostnameAndPort(final HttpServletRequest request) {
-    String protocol = request.getProtocol().split("/")[0].toLowerCase();
-    String hostname = request.getServerName();
-    int port = request.getServerPort();
+    public static String getProtocolHostnameAndPort(final HttpServletRequest request) {
+        String protocol = request.getProtocol().split("/")[0].toLowerCase();
+        String hostname = request.getServerName();
+        int port = request.getServerPort();
 
-    StringBuilder result = new StringBuilder(protocol + "://" + hostname);
-    if (port != 80) {
-        result.append(":").append(port);
+        StringBuilder result = new StringBuilder(protocol + "://" + hostname);
+        if (port != 80) {
+            result.append(":").append(port);
+        }
+
+        return result.toString();
     }
-
-    return result.toString();
-}
 }

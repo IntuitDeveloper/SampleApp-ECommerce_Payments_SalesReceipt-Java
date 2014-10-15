@@ -1,8 +1,6 @@
-package com.intuit.developer.sampleapp.ecommerce.controllers;
+package com.intuit.developer.sampleapp.ecommerce.oauth.controllers;
 
 import com.intuit.developer.sampleapp.ecommerce.domain.Company;
-import com.intuit.developer.sampleapp.ecommerce.domain.Customer;
-import com.intuit.developer.sampleapp.ecommerce.domain.SalesItem;
 import com.intuit.developer.sampleapp.ecommerce.qbo.QBOGateway;
 import com.intuit.developer.sampleapp.ecommerce.repository.CompanyRepository;
 import org.slf4j.Logger;

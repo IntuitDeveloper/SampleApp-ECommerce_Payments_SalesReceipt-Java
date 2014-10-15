@@ -1,6 +1,4 @@
-package com.intuit.developer.sampleapp.ecommerce.controllers;
-
-import javax.print.attribute.standard.JobKOctetsProcessed;
+package com.intuit.developer.sampleapp.ecommerce.oauth.controllers;
 
 /**
  * Represents a request to place an order.
