@@ -16,5 +16,5 @@ For setup and run instructions, as well as topical guides, go to:
         - [`QBOGateway.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/QBOGateway.java)
         - [`PaymentGateway.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/PaymentGateway.java)
         - [`QBOServiceFactory.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/QBOServiceFactory.java)
-* The Java code for the rest of the application is located in the `src-general` directory
-* The HTML, CSS and JavaScript code for the web-based client are is located in the `public` directory
+* The Java code for the rest of the application is located in the [`src-general`](src-general) directory
+* The HTML, CSS and JavaScript code for the web-based client are is located in the [`public`](public) directory
