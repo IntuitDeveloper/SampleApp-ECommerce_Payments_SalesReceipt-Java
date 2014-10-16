@@ -189,7 +189,6 @@ ecommerceServices.factory('CustomerSvc', ['$resource', '$rootScope', 'RootUrlSvc
                 ModelSvc.model.company.customers = customers;
                 ModelSvc.model.customer = customers[0];  // auto-set the 'logged in' customer
 
-                //TODO: move to an event handler for customer changed
                 ShoppingCartSvc.initializeModel();
             });
         }

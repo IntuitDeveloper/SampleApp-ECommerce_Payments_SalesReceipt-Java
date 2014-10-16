@@ -118,7 +118,7 @@ public class QBOGateway {
             com.intuit.ipp.data.Customer searchCustomer = new com.intuit.ipp.data.Customer();
             searchCustomer.setGivenName(customer.getFirstName());
             if (qboCustomersWithSameLastName != null) {
-                int pos = Collections.binarySearch(qboCustomersWithSameLastName, searchCustomer, new CustomerComparator());
+                int pos = Collections.binarySearch(qboCustomersWithSameLastName, searchCustomer, new CustomerGivenNameComparator());
                 // If a match is found
                 if (pos >= 0) {
                     // Grab the id of the qbo customer
@@ -586,7 +586,10 @@ public class QBOGateway {
         }
     }
 
-    public class CustomerComparator implements Comparator<com.intuit.ipp.data.Customer> {
+    /**
+     * A Comparator used to match customer given names.
+     */
+    public class CustomerGivenNameComparator implements Comparator<com.intuit.ipp.data.Customer> {
         @Override
         public int compare(com.intuit.ipp.data.Customer o1, com.intuit.ipp.data.Customer o2) {
 

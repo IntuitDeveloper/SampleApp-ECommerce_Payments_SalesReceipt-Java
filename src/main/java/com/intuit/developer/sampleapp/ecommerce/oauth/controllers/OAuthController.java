@@ -17,9 +17,15 @@ import java.util.Map;
 
 /**
  * For a full walk through of this class and what is required for implementing OAuth, please visit our HowTo Guide:
- * https://github.com/IntuitDeveloper/SampleApp-TimeTracking_Invoicing-Java/wiki/OAuth-How-To-Guide-(Java)
+ * https://developer.intuit.com/v2/docs/0050_quickbooks_api/0020_authentication_and_authorization/connect_from_within_your_app
  *
- * TODO: add description of OAuth
+ * In summary, the following occurs during the authorization process:
+ * 1. The user clicks the Connect to QuickBooks button.
+ * 2. An Intuit dialog pops open, asking the user to select a QuickBooks company.
+ * 3. Another Intuit dialog appears, asking the user to authorize the app to access the QuickBooks company.
+ * 4. Your app requests an OAuth request token from the Intuit OAuth service.
+ * 5. Your app requests a valid OAuth access token from Intuit.
+ * 6. Your app saves the valid OAuth access token in a persistent store (such as a database), associating the token with the user ID and the CompanyID.
  */
 @RestController
 public class OAuthController {

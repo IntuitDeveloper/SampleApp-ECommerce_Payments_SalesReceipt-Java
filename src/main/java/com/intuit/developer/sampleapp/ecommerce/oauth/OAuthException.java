@@ -3,7 +3,7 @@ package com.intuit.developer.sampleapp.ecommerce.oauth;
 import java.io.IOException;
 
 /**
- * TODO: add OAuthException overview
+ * An exception class for use in the OAuth flow.
  */
 public class OAuthException extends RuntimeException {
 

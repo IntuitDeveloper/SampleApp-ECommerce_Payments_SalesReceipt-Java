@@ -1,7 +1,7 @@
 package com.intuit.developer.sampleapp.ecommerce.oauth;
 
 /**
- * TODO: add CompanyRequestTokenSecret overview
+ * A container object to connect an appCompanyId to a request token secret.
  */
 public class CompanyRequestTokenSecret {
 
