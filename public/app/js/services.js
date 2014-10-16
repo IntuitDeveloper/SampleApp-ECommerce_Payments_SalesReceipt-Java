@@ -38,7 +38,7 @@ ecommerceServices.factory('InitializerSvc', ['$rootScope', 'RootUrlSvc', 'Compan
                  so that the connect to quickbooks button is rendered properly
                  */
                 if (initialized) { //only reinitialize from the 2nd time onwards
-//                    intuit.ipp.anywhere.init();
+                    intuit.ipp.anywhere.init();
                 }
                 initialized = true;
             });
@@ -132,14 +132,14 @@ ecommerceServices.factory('CompanySvc', ['$resource', '$rootScope', 'RootUrlSvc'
                 ModelSvc.broadcastCompanyChange();
 
                 var grantUrl = RootUrlSvc.oauthGrantUrl() + '?appCompanyId=' + ModelSvc.model.company.id;
-//                intuit.ipp.anywhere.setup({
-//                    grantUrl: grantUrl,
-//                    datasources: {
-//                        quickbooks: true,
-//                        payments: true
-//
-//                    }
-//                });
+                intuit.ipp.anywhere.setup({
+                    grantUrl: grantUrl,
+                    datasources: {
+                        quickbooks: true,
+                        payments: true
+
+                    }
+                });
             });
         };
 
