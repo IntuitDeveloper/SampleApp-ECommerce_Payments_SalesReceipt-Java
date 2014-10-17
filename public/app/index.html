@@ -55,7 +55,7 @@
 <script src="js/s_code.js"></script>
 <!-- Intuit Anywhere Javascript must come before Jquery -->
 <script type="text/javascript" src="https://js.appcenter.intuit.com/Content/IA/intuit.ipp.anywhere-1.3.0.js"></script>
-<script type="text/javascript" src="js/intuit.ipp.payments-0.0.2.js"></script>
+<script type="text/javascript" src="https://js.appcenter.intuit.com/Content/IA/intuit.ipp.payments-0.0.2.js"></script>
 <script src="bower_components/angular/angular.js"></script>
 <script src="bower_components/angular-route/angular-route.js"></script>
 <script src="bower_components/angular-resource/angular-resource.js"></script>
@@ -69,14 +69,5 @@
 <script src="js/controllers.js"></script>
 <script src="js/filters.js"></script>
 <script src="js/directives.js"></script>
-<!--<script type="text/javascript" src="https://qa-appcenter.intuit.com/Content/IA/intuit.ipp.payments-0.0.2.js"></script>-->
-<script type="text/javascript">
-    intuit.ipp.payments.tokenizationUrl = function tokenizationUrl(tokenizationHost, apiKey, isForIE) {
-//        if (isForIE) {
-//            return "https://" + tokenizationHost + "/qa2/v2/tokens/ie?intuit_apikey=" + apiKey;
-//        }
-        return "https://sandbox.api.intuit.com/quickbooks/v4/payments/tokens";
-    };
-</script>
 </body>
 </html>
