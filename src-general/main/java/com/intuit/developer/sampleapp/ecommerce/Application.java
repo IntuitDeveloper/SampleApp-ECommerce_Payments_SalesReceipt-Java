@@ -24,8 +24,11 @@ import org.springframework.context.annotation.Import;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.rest.core.config.RepositoryRestConfiguration;
 import org.springframework.data.rest.webmvc.config.RepositoryRestMvcConfiguration;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 
 import javax.sql.DataSource;
+import java.util.List;
 
 
 /**
@@ -63,7 +66,17 @@ public class Application extends RepositoryRestMvcConfiguration {
         config.setReturnBodyOnCreate(true);
         config.exposeIdsFor(Company.class, Customer.class, ShoppingCart.class, SystemProperty.class);
     }
+    @Override
+    public void configureMessageConverters(List<HttpMessageConverter<?>> converters) {
+        converters.add(converter());
+    }
 
+    @Bean
+    MappingJackson2HttpMessageConverter converter() {
+        MappingJackson2HttpMessageConverter converter = new MappingJackson2HttpMessageConverter();
+        //do your customizations here...
+        return converter;
+    }
     @Override
     protected void configureJacksonObjectMapper(ObjectMapper objectMapper) {
         final SimpleModule myCustomModule = new SimpleModule("MyCustomModule");
