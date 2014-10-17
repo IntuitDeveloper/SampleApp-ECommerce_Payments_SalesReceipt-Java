@@ -15,7 +15,7 @@ var wa = (function (document, wa) {
     wa.reportSuitesQA = "intuitdeveloperqa";
     wa.reportSuitesProd = "intuitdeveloper";
 //    wa.internalDomainsQA = "localhost";
-    wa.internalDomainsProd = "localhost";
+    wa.internalDomainsProd = "localhost,intuit.com";
     wa.siteName = "developer";
 
     /*
@@ -410,7 +410,7 @@ var wa = (function (document, wa) {
      * Construct Internal Domains
      *****************************
      */
-//    wa.internalDomainsQA = (wa.internalDomainsQA) ? wa.internalDomainsQA + ",localhost" : "localhost";
+    wa.internalDomainsQA = (wa.internalDomainsQA) ? wa.internalDomainsQA + ",localhost" : "localhost";
     wa.internalDomains = "";
     if (wa.internalDomainsQA && wa.internalDomainsProd) {
         wa.internalDomains = wa.internalDomainsQA + "," + wa.internalDomainsProd;
@@ -440,7 +440,7 @@ var wa = (function (document, wa) {
      * Configure s Object
      **********************
      */
-    s_account = wa.reportSuitesQA;
+    s_account = wa.reportSuitesProd;
     s = s_gi(s_account);
     s_defaults = {
         charSet: "UTF-8",
@@ -453,7 +453,7 @@ var wa = (function (document, wa) {
         linkLeaveQueryString: false,
         linkTrackVars: "None",
         linkTrackEvents: "None",
-        dynamicAccountSelection: true,
+        dynamicAccountSelection: false,
         dynamicAccountList: wa.reportSuitesQA + "=" + wa.internalDomainsQA + ";" + wa.reportSuitesProd + "=" + wa.internalDomainsProd
     };
 
