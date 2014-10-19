@@ -59,6 +59,16 @@ Once the sample app code is on your computer, you can do the following steps to 
 
 If you happen to be behind an http proxy you will need to create a file called gradle.properties in the root of the project and follow instructions on this [page](http://www.gradle.org/docs/current/userguide/build_environment.html) for configuring gradle to use a proxy.
 
+## Importing into IntelliJ IDEA & Eclipse
+
+To edit the code you will need to open it in an IDE. Currently we support both IntelliJ IDEA and Eclipse.
+
+### IntelliJ IDEA
+  * The project is maintained with IntelliJ IDEA and as such an .ipr file is checked into the GitHub repo.
+
+### Eclipse
+  * [Importing Project into Eclipse IDE](https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/Importing-Project-into-Eclipse-IDE)
+
 
 ### Project Structure
 * **The Java code for integrating with the QuickBooks Online Accounting and Payments APIs is located in the [`src`](src) directory.**
