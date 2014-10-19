@@ -62,6 +62,9 @@ Once the sample app code is on your computer, you can do the following steps to 
 
 If you happen to be behind an http proxy you will need to create a file called gradle.properties in the root of the project and follow instructions on this [page](http://www.gradle.org/docs/current/userguide/build_environment.html) for configuring gradle to use a proxy.
 
+## High Level Workflow
+
+
 ## Importing into IntelliJ IDEA & Eclipse
 
 To edit the code you will need to open it in an IDE. Currently we support both IntelliJ IDEA and Eclipse.
@@ -118,5 +121,5 @@ alt="Watch & Learn" width="240" height="180" border="10" /></a>
 
 ## More Information
 
-More detailed information for this sample app can be found [here](https://developer.intuit.com/v2/docs/0000_about_intuit_developer/0060_sample_app_tutorials/ecommerce).
+More detailed information for this sample app can be found <a href="https://developer.intuit.com/v2/docs/0000_about_intuit_developer/0060_sample_app_tutorials/ecommerce" target="_blank">here</a>.
 
