@@ -64,6 +64,8 @@ If you happen to be behind an http proxy you will need to create a file called g
 
 ## High Level Workflow
 
+### Setup
+
 <ol>
 
 <li>Connect to a QuickBooks Online company.
@@ -77,6 +79,30 @@ If you happen to be behind an http proxy you will need to create a file called g
 </ul>
 <p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/step2sync.png" alt="Sync Entities" height="300" width="427"></p>
 </li>
+</ol>
+
+### Storefront
+
+<ol>
+
+<li>Add Items to Shopping Cart.
+<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/StoreFront.png" alt="StoreFront" height="300" width="576"/></p>
+</li>
+
+<li>Checkout the cart.
+
+<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/Checkout.png" alt="Checkout" height="300" width="578"></p>
+</li>
+
+<li>Submit Order - The following workflow happens when you submit an order
+<ul>
+  <li>Tokenize Credit Card</li>
+  <li>Authorize & Capture a charge</li>
+  <li>Create sales receipt in Quickbooks</li>
+</ul>
+<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/SubmitOrder.png" alt="Sync Entities" height="300" width="578"></p>
+</li>
+
 </ol>
 
 
