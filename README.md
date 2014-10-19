@@ -100,7 +100,8 @@ If you happen to be behind an http proxy you will need to create a file called g
   <li>Authorize & Capture a charge</li>
   <li>Create sales receipt in Quickbooks</li>
 </ul>
-<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/SubmitOrder.png" alt="Sync Entities" height="300" width="578"></p>
+<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/SubmitOrder.png" alt="Submit Order" height="300" width="578"></p>
+<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/SalesReceipt.png" alt="Sales Receipt" height="300" width="578"></p>
 </li>
 
 </ol>
