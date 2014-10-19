@@ -85,3 +85,38 @@ To edit the code you will need to open it in an IDE. Currently we support both I
         - [`QBOServiceFactory.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/QBOServiceFactory.java)
 * The Java code for the rest of the application is located in the [`src-general`](src-general) directory
 * The HTML, CSS and JavaScript code for the web-based client are is located in the [`public`](public) directory
+
+## How To Guides
+
+The following How-To guides related to implementation tasks necessary to produce a production-ready Intuit Partner Platform app (e.g. OAuth, OpenId, etc) are available:
+
+* [OAuth How To Guide (Java)](https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/OAuth-How-To-Guide-(Java))
+
+## Testing the code
+The two types of tests in the project (and how to run them) are listed below.
+
+### Java JUnit tests
+1. _./gradlew test_
+
+### Javascript Karma tests
+To run the Javascript Karma tests you must have NodeJs v0.10.28 or later (http://nodejs.org/) installed and have npm on the path.
+
+1. _cd public_
+2. _npm test_
+
+## Reset the App
+
+This app uses a file-based HSQL database that is stored in the _database_ folder in the root of the project. Deleting
+this folder will delete all data persisted in the database. The next time you start your app a clean database will be created
+with no data.
+
+## Watch & Learn
+
+<a href="http://www.youtube.com/watch?feature=player_embedded&v=WK9G-bwssaY
+" target="_blank"><img src="http://img.youtube.com/vi/WK9G-bwssaY/0.jpg" 
+alt="Watch & Learn" width="240" height="180" border="10" /></a>
+
+## More Information
+
+More detailed information for this sample app can be found [here](https://developer.intuit.com/v2/docs/0000_about_intuit_developer/0060_sample_app_tutorials/ecommerce).
+
