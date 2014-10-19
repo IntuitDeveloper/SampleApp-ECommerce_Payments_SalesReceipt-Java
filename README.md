@@ -21,15 +21,18 @@ Therefore there are certain instances where we might forgo a more complicated im
 * [Requirements](#requirements)
 * [First Use Instructions](#first-use-instructions)
 * [Running the code](#running-the-code)
-* [Project Structure](#project-structure)
+* [High Level Workflow](#high-level-workflow)
 * [Importing into IntelliJ IDEA & Eclipse](#importing-into-intellij-idea--eclipse)
   * [IntelliJ IDEA](#intellij-idea)
   * [Eclipse](#eclipse)
+* [Project Structure](#project-structure)
 * [How To Guides](#how-to-guides)
-* [Cleaning up the database](#cleaning-up-the-database)
 * [Testing the code](#testing-the-code)
   * [Java Junit Tests](#java-junit-tests)
   * [Javascript Karma tests](#javascript-karma-tests)
+* [Reset the App](#reset-the-app)
+* [Watch & Learn](#watch--learn)
+* [More Information](#more-information)
 
 
 ## Requirements
