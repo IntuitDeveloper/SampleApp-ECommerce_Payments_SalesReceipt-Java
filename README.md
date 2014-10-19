@@ -32,6 +32,17 @@ Therefore there are certain instances where we might forgo a more complicated im
   * [Javascript Karma tests](#javascript-karma-tests)
 
 
+## Requirements
+
+In order to successfully run this sample app you need a few things:
+
+1. Java 1.7
+2. A [developer.intuit.com](http://developer.intuit.com) account
+3. An app on [developer.intuit.com](http://developer.intuit.com) and the associated app token, consumer key, and consumer secret.
+4. QuickBooks Java SDK (already included in the [`libs/qbo-sdk`](libs/qbo-sdk) folder) 
+5. Helper Files for the payments API(already included in the [libs/payments-reference-implementation] folder
+
+
 ### Project Structure
 * **The Java code for integrating with the QuickBooks Online Accounting and Payments APIs is located in the [`src`](src) directory.**
     *  For OAuth implementation see:
