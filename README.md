@@ -64,6 +64,21 @@ If you happen to be behind an http proxy you will need to create a file called g
 
 ## High Level Workflow
 
+<ol>
+
+<li>Connect to a QuickBooks Online company.
+<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/c2qbbutton.png" alt="Connect to Quickbooks" height="250" width="544"/></p>
+</li>
+
+<li>Setup—sync the following from the local database to the QuickBooks Online company.
+<ul>
+  <li>customers—so purchases can be billed to them, </li>
+  <li>items—a list of items available for purchase i.e inventory.</li>
+</ul>
+<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/step2sync.png" alt="Sync Entities" height="356" width="250"></p>
+</li>
+
+
 
 ## Importing into IntelliJ IDEA & Eclipse
 
