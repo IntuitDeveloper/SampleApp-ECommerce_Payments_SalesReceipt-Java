@@ -42,6 +42,23 @@ In order to successfully run this sample app you need a few things:
 4. QuickBooks Java SDK (already included in the [`libs/qbo-sdk`](libs/qbo-sdk) folder) 
 5. Helper Files for the payments API(already included in the [`libs/payments-reference-implementation`](libs/payments-reference-implementation) folder
 
+## First Use Instructions
+
+1. Clone the GitHub repo to your computer
+2. Fill in your [`oauth.json`](oauth.json) file values (app token, consumer key, consumer secret) by copying over from the keys section for your app.
+
+## Running the code
+
+Once the sample app code is on your computer, you can do the following steps to run the app:
+
+1. cd to the project directory</li>
+2. Run the command:`./gradlew bootRun` (Mac OS) or `gradlew.bat bootRun` (Windows)</li>
+3. Wait until the terminal output displays the **READY** message.
+<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/App-Ready.png" alt="App Ready" height="141" width="1000"/>
+4. Open your browser and go to `http://localhost:9001/app/index.html`</li>
+
+If you happen to be behind an http proxy you will need to create a file called gradle.properties in the root of the project and follow instructions on this [page](http://www.gradle.org/docs/current/userguide/build_environment.html) for configuring gradle to use a proxy.
+
 
 ### Project Structure
 * **The Java code for integrating with the QuickBooks Online Accounting and Payments APIs is located in the [`src`](src) directory.**
@@ -49,7 +66,7 @@ In order to successfully run this sample app you need a few things:
         - [`OAuthController.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/oauth/controllers/OAuthController.java)
         - [`OAuthInfoProvider.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/oauth/OAuthInfoProvider.java)
         - [`OAuthInfoProviderImpl.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/controllers/OAuthInfoProviderImpl.java)
-    *  For QBO V3 Java SDK usage see:
+    *  For QBO V3 Java SDK & Payments reference implementation usage see:
         - [`QBOGateway.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/QBOGateway.java)
         - [`PaymentGateway.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/PaymentGateway.java)
         - [`QBOServiceFactory.java`](src/main/java/com/intuit/developer/sampleapp/ecommerce/qbo/QBOServiceFactory.java)
