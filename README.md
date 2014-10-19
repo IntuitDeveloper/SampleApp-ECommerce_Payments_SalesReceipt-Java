@@ -90,7 +90,7 @@ To edit the code you will need to open it in an IDE. Currently we support both I
 
 The following How-To guides related to implementation tasks necessary to produce a production-ready Intuit Partner Platform app (e.g. OAuth, OpenId, etc) are available:
 
-* [OAuth How To Guide (Java)](https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/OAuth-How-To-Guide-(Java))
+* <a href="https://github.com/IntuitDeveloper/SampleApp-TimeTracking_Invoicing-Java/wiki/OAuth-How-To-Guide-(Java)" target="_blank">OAuth How To Guide (Java)</a>
 
 ## Testing the code
 The two types of tests in the project (and how to run them) are listed below.
