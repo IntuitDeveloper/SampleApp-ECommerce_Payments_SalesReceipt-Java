@@ -75,9 +75,9 @@ If you happen to be behind an http proxy you will need to create a file called g
   <li>customers—so purchases can be billed to them, </li>
   <li>items—a list of items available for purchase i.e inventory.</li>
 </ul>
-<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/step2sync.png" alt="Sync Entities" height="356" width="250"></p>
+<p align="center"><img src="https://github.com/IntuitDeveloper/SampleApp-ECommerce_Payments_SalesReceipt-Java/wiki/images/step2sync.png" alt="Sync Entities" height="300" width="427"></p>
 </li>
-
+</ol>
 
 
 ## Importing into IntelliJ IDEA & Eclipse
