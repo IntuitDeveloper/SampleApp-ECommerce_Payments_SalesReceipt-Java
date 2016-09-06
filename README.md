@@ -163,5 +163,5 @@ alt="Watch & Learn" width="240" height="180" border="10" /></a>
 
 ## More Information
 
-More detailed information for this sample app can be found <a href="https://developer.intuit.com/v2/docs/0000_about_intuit_developer/0060_sample_app_tutorials/ecommerce" target="_blank">here</a>.
+More detailed information for this sample app can be found <a href="https://developer.intuit.com/sampleapps/ecommerce" target="_blank">here</a>.
 
