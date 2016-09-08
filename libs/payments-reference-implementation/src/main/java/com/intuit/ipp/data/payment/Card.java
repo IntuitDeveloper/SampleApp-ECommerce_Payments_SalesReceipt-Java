@@ -13,6 +13,7 @@ public class Card {
     private Address address = null;
     private String commercialCardCode = null;
     private CardPresent cardPresent = null;
+    private String cardType = null;
     /**
      * System generated alpha-numeric id
      *
@@ -179,5 +180,15 @@ public class Card {
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
+
+    public String getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
+    }
+    
+    
 }
 

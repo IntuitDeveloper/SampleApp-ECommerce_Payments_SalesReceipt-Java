@@ -9,6 +9,7 @@ public class PaymentContext {
     private BigDecimal tax = null;
     private DeviceInfo deviceInfo = null;
     private Boolean recurring = null;
+    private String mobile = null;
     /**
      * Sales Tax - required for commercial card processing
      *
@@ -51,6 +52,14 @@ public class PaymentContext {
      */
     public void setRecurring(Boolean recurring) {
         this.recurring = recurring;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 
     @Override

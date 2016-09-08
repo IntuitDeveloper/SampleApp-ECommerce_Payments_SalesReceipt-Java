@@ -21,6 +21,10 @@ public class Charge {
     private Capture captureDetail = null;
     private Refund[] refundDetail = null;
     private String description = null;
+    private String avsStreet = null;
+    private String avsZip = null;
+    private String cardSecurityCodeMatch = null;
+
     /**
      * System generated alpha-numeric id
      *
@@ -259,5 +263,32 @@ public class Charge {
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }
+
+    public String getAvsStreet() {
+        return avsStreet;
+    }
+
+    public void setAvsStreet(String avsStreet) {
+        this.avsStreet = avsStreet;
+    }
+
+    public String getAvsZip() {
+        return avsZip;
+    }
+
+    public void setAvsZip(String avsZip) {
+        this.avsZip = avsZip;
+    }
+
+    public String getCardSecurityCodeMatch() {
+        return cardSecurityCodeMatch;
+    }
+
+    public void setCardSecurityCodeMatch(String cardSecurityCodeMatch) {
+        this.cardSecurityCodeMatch = cardSecurityCodeMatch;
+    }
+    
+    
+    
 }
 
