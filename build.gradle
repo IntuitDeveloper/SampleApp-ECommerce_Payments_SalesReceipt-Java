@@ -50,8 +50,7 @@ apply plugin: 'spring-boot'
 apply plugin: 'jacoco'
 
 dependencies {
-    compile fileTree(dir: "libs/qbo-sdk", include: "ipp-v3*.jar") 
-    compile fileTree(dir: "libs/qbo-sdk", include: "ipp-java*.jar") 
+    compile fileTree(dir: "libs/qbo-sdk", include: "*.jar") 
     compile project('libs:payments-reference-implementation')
     compile("org.springframework.boot:spring-boot-starter-web")
     compile("org.springframework.boot:spring-boot-starter-data-jpa")
