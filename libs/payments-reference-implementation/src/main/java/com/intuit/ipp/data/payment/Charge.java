@@ -24,6 +24,7 @@ public class Charge {
     private String avsStreet = null;
     private String avsZip = null;
     private String cardSecurityCodeMatch = null;
+    private String appType = null;
 
     /**
      * System generated alpha-numeric id
@@ -287,6 +288,15 @@ public class Charge {
     public void setCardSecurityCodeMatch(String cardSecurityCodeMatch) {
         this.cardSecurityCodeMatch = cardSecurityCodeMatch;
     }
+
+	public String getAppType() {
+		return appType;
+	}
+
+	public void setAppType(String appType) {
+		this.appType = appType;
+	}
+    
     
     
     
