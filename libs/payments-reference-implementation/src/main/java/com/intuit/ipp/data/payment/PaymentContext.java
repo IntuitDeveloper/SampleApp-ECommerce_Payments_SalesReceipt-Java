@@ -10,6 +10,8 @@ public class PaymentContext {
     private DeviceInfo deviceInfo = null;
     private Boolean recurring = null;
     private String mobile = null;
+    private String isEcommerce = null;
+    private String ecommerce = null;
     /**
      * Sales Tax - required for commercial card processing
      *
@@ -61,8 +63,24 @@ public class PaymentContext {
     public void setMobile(String mobile) {
         this.mobile = mobile;
     }
+    
+    public String getIsEcommerce() {
+		return isEcommerce;
+	}
 
-    @Override
+	public void setIsEcommerce(String isEcommerce) {
+		this.isEcommerce = isEcommerce;
+	}
+	
+	public String getEcommerce() {
+		return ecommerce;
+	}
+
+	public void setEcommerce(String ecommerce) {
+		this.ecommerce = ecommerce;
+	}
+
+	@Override
     public String toString() {
         return ReflectionToStringBuilder.toString(this);
     }

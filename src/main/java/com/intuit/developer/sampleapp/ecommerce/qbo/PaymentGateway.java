@@ -4,6 +4,7 @@ import com.intuit.developer.sampleapp.ecommerce.domain.ShoppingCart;
 import com.intuit.ipp.data.payment.Capture;
 import com.intuit.ipp.data.payment.Charge;
 import com.intuit.ipp.data.payment.Charge.ChargeStatus;
+import com.intuit.ipp.data.payment.PaymentContext;
 import com.intuit.ipp.exception.FMSException;
 import com.intuit.ipp.services.payment.ChargeService;
 import com.intuit.ipp.services.payment.RequestContext;
@@ -113,6 +114,13 @@ public class PaymentGateway {
 
         // Supply the credit card information in the form of a payment token
         charge.setToken(paymentToken);
+        
+        //set mobile and ecommerce indicators
+        PaymentContext context = new PaymentContext();
+        context.setMobile("false");
+        context.setIsEcommerce("true");
+        
+        charge.setContext(context);
 
         // Create request id
         RequestContext requestContext = new RequestContext();
@@ -144,7 +152,13 @@ public class PaymentGateway {
         // Keep the description from the authorization. They do not have to be the same,
         //  but it makes sense in this situation
         capture.setDescription(charge.getDescription());
+        
+        //set mobile and ecommerce indicators
+        PaymentContext context = new PaymentContext();
+        context.setMobile("false");
+        context.setIsEcommerce("true");
 
+        capture.setContext(context);
         // Create request id
         RequestContext requestContext = new RequestContext();
 
