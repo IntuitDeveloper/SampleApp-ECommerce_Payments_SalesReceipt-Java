@@ -1,3 +1,5 @@
+[![Sample Banner](views/Sample.png)][ss1]
+
 eCommerce Java Sample App
 ===
 
@@ -165,3 +167,4 @@ alt="Watch & Learn" width="240" height="180" border="10" /></a>
 
 More detailed information for this sample app can be found <a href="https://developer.intuit.com/sampleapps/ecommerce" target="_blank">here</a>.
 
+[ss1]: https://help.developer.intuit.com/s/samplefeedback?cid=9010&repoName=SampleApp-ECommerce_Payments_SalesReceipt-Java
